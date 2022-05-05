@@ -38,7 +38,7 @@ import asyncio
 async def search():
     client = askitsu.Client()
     anime = client.search_anime("attack on titan")
-    print(anime.episode_cout)
+    print(anime.episode_count)
     print(anime.status)
     client.close()
 
@@ -47,3 +47,7 @@ loop.run_until_complete(search())
 ```
 
 More examples can be found inside the example directory -> [Here](https://github.com/ShomyKohai/askitsu/tree/master/examples)
+
+# Links
+
+- [PyPi](https://pypi.org/manage/project/askitsu/)
