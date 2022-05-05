@@ -1,0 +1,8 @@
+
+setup.cfg
+askitsu.egg-info/dependency_links.txt
+askitsu.egg-info/PKG-INFO
+askitsu.egg-info/requires.txt
+askitsu.egg-info/SOURCES.txt
+askitsu.egg-info/top_level.txt
+dist/askitsu-0.1.1.tar.gz
