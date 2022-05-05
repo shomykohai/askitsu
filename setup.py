@@ -20,7 +20,7 @@ setup(
     version=version,
     license='MIT',
     description='An async python wrapper Kitsu.io API',
-    keywords='kitsu'
+    keywords='kitsu',
     install_requires=requirements,
     classifiers=[
         'Development Status :: 3 - Alpha',
