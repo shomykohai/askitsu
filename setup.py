@@ -20,6 +20,7 @@ setup(
     version=version,
     license='MIT',
     description='An async python wrapper Kitsu.io API',
+    packages=packages,
     keywords='kitsu',
     install_requires=requirements,
     classifiers=[
@@ -34,6 +35,6 @@ setup(
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Utilities',
-        'Typing :: Typed',
+        'Typing :: Typed'
     ]
 )
