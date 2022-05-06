@@ -22,20 +22,23 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+__all__ = ('Anime', 'StreamLink')
+
 from .core import Entry
 from typing import Optional
+
 
 class Anime(Entry):
     """Represents an :class:`Anime` instance 
 
-    Parameters
+    Attributes
     -----------
     id: :class:`int`
         ID of the anime
     status: :class:`str`
         Actual status of the given anime (Ex. "finished")
     created_at: Optional[:class:`datetime`]
-    updated_at: Optioal[:class:`datetime`]
+    updated_at: Optional[:class:`datetime`]
     started_at: Optional[:class:`datetime`]
     ended_at: Optional[:class:`datetime`]
     slug: :class:`str`
@@ -75,6 +78,7 @@ class Anime(Entry):
 
     def __init__(self, type: str, attributes: dict, *args):
         data = attributes['attributes']
+        self.type = "anime"
         self.episode_count: int = data['episodeCount']
         self.episode_length: int = data['episodeLength']
         self.total_length: int = data['totalLength']
@@ -85,6 +89,7 @@ class Anime(Entry):
     @property
     def youtube_url(self) -> Optional[str]:
         return f"https://www.youtube.com/watch?v={self.yt_id}" if self.yt_id else None
+
 
 class StreamLink():
 

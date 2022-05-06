@@ -22,19 +22,21 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+__all__ = ('Manga')
+
 from .core import Entry
 
 class Manga(Entry):
     """Represents a :class:`Manga` instance 
 
-    Parameters
+    Attributes
     -----------
     id: :class:`int`
         ID of the manga
     status: :class:`str`
         Actual status of the given manga (Ex. "finished")
     created_at: Optional[:class:`datetime`]
-    updated_at: Optioal[:class:`datetime`]
+    updated_at: Optional[:class:`datetime`]
     started_at: Optional[:class:`datetime`]
     ended_at: Optional[:class:`datetime`]
     slug: :class:`str`
@@ -65,6 +67,7 @@ class Manga(Entry):
 
     def __init__(self, type: str, attributes: dict):
         data = attributes['attributes']
+        self.type: str = "manga"
         self.chapter_count: int = data['chapterCount']
         self.volume_count: int = data['volumeCount']
         self.serialization: str = data['serialization']

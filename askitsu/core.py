@@ -66,6 +66,3 @@ class Entry:
             return self.poster_image.get(_size, None)
         except AttributeError:
             return None
-
-class Character():
-    pass

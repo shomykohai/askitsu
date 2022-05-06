@@ -22,5 +22,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-class InvalidArgument(Exception):
-    pass
+class InvalidArgument(AttributeError):
+    def __init__(self, msg) -> None:
+        super().__init__(msg)
