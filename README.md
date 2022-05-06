@@ -51,3 +51,5 @@ More examples can be found inside the example directory -> [Here](https://github
 # Links
 
 - [PyPi](https://pypi.org/manage/project/askitsu/)
+- [Kitsu.io Docs](https://kitsu.docs.apiary.io/)
+- [discord.py](https://github.com/Rapptz/discord.py) (for docstrings inspiration and bot example)
