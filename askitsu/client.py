@@ -52,7 +52,7 @@ class Client:
     def __init__(self, session: Optional[aiohttp.ClientSession] = None):
         self._entries = {
             "anime": Anime,
-            "manga": Manga,
+            "manga": Manga
         }
         self._session: aiohttp.ClientSession = session or aiohttp.ClientSession()
         self._headers = {
@@ -211,6 +211,27 @@ class Client:
             for links, role in zip(characters_link, characters_roles)
         ]
         return characters if len(characters)>1 else characters[0]
+
+    async def get_trending_entry(
+        self, type: Literal["anime", "manga"]
+    ) -> Union[List[Anime], List[Manga]]:
+        """|coro|
+
+        Return a list of anime or manga
+
+        Parameters
+        -----------
+        entry: Union[:class:`Anime`, :class:`Manga`]
+            Entry to fetch its trending
+        """
+        entry = self._entries.get(type)
+        fetched_data = await self._get_data(
+            f"{BASE}/trending/{type}"
+        )
+        return [entry(type=type, attributes=attributes) 
+            for attributes in fetched_data["data"]
+        ]
+        
 
     async def close(self) -> None:
         """

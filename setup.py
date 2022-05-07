@@ -10,10 +10,6 @@ readme = ''
 with open('README.md') as f:
     readme = f.read()
 
-requirements = []
-with open('requirements.txt') as f:
-  requirements = f.read().splitlines()
-
 packages = [
     'askitsu'
 ]
@@ -28,7 +24,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=packages,
     keywords='kitsu',
-    install_requires=requirements,
+    install_requires=['aiohttp'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
