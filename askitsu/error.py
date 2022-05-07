@@ -23,5 +23,13 @@ DEALINGS IN THE SOFTWARE.
 """
 
 class InvalidArgument(AttributeError):
+    """
+    Raises when an invalid entry gets passed
+
+    Parameters
+    -----------
+    msg: :class:`str`
+        Error message to pass
+    """
     def __init__(self, msg) -> None:
         super().__init__(msg)

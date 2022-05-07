@@ -50,7 +50,7 @@ class Manga(Entry):
     volume_count: :class:`int`
         Number of volumes
     serialization: :class:`str`
-        #Total lenght of all episodes (minutes)
+        Return manga serialization
     cover_image: :class:`str`
         Return cover image
     poster_image: :class:`str`

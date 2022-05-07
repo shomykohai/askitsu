@@ -53,16 +53,30 @@ class Entry:
         self, 
         _size: Optional[Literal["tiny", "small", "large", "original"]] = "original"
     ) -> Optional[str]:
+        """Get the cover image
+
+        Parameters
+        -----------
+            size: Optional[Literal["tiny", "small", "large", "original"]]
+                Size of the cover image
+        """
         try: 
             return self.cover_image.get(_size, None)
         except AttributeError:
             return None
 
     def get_poster_image(
-        self, _size: 
+        self, size: 
         Optional[Literal["tiny", "small", "medium", "large", "original"]] = "original"
     ) -> Optional[str]:
+        """Get the cover image
+
+        Parameters
+        -----------
+            size: Optional[Literal["tiny", "small", "medium", "large", "original"]]
+                Size of the poster image
+        """
         try: 
-            return self.poster_image.get(_size, None)
+            return self.poster_image.get(size, None)
         except AttributeError:
             return None

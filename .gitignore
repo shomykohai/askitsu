@@ -1,4 +1,3 @@
-
 setup.cfg
 askitsu.egg-info/dependency_links.txt
 askitsu.egg-info/PKG-INFO
@@ -8,3 +7,4 @@ askitsu.egg-info/top_level.txt
 dist/askitsu-0.1.1.tar.gz
 *.pyc
 test.py
+.vscode/settings.json

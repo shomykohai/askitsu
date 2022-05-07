@@ -84,11 +84,18 @@ class Character:
         _character.role = role
         return _character
 
-    def get_image(self, _size: 
+    def get_image(self, size: 
         Optional[Literal["tiny", "small", "medium", "large", "original"]] = "original"
     ) -> Optional[str]:
+        """Get character image
+
+        Parameters
+        -----------
+            size: Optional[Literal["tiny", "small", "medium", "large", "original"]]
+                Size of the cover image
+        """
         try: 
-            return self.image.get(_size, None)
+            return self.image.get(size, None)
         except AttributeError:
             return None
         

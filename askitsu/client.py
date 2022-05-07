@@ -103,7 +103,7 @@ class Client:
     ) -> Optional[Union[Anime, List[Anime]]]:
         """|coro|
 
-        Shortcut function to :coro:`search` with the `type` parameter populated by the "anime" keyword
+        Shortcut function to :meth:`search` with the `type` parameter populated by the "anime" keyword
 
         Parameters
         -----------
@@ -119,7 +119,7 @@ class Client:
     ) -> Optional[Union[Manga, List[Manga]]]:
         """|coro|
 
-        Shortcut function to :coro:`search` with the `type` parameter populated by the "manga" keyword
+        Shortcut function to :meth:`search` with the `type` parameter populated by the "manga" keyword
 
         Parameters
         -----------
@@ -149,7 +149,7 @@ class Client:
     async def get_anime_entry(self, id: int) -> Anime:
         """|coro|
 
-        Shortcut for :coro:`get_entry`; returns only `Anime` object
+        Shortcut for :meth:`get_entry`; returns only `Anime` object
 
         Parameters
         -----------

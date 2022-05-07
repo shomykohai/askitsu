@@ -58,10 +58,10 @@ class Anime(Entry):
         Return True | False
     yt_id: :class:`str`
         Return id of the YouTube trailer
-    cover_image: :class:`str`
-        Return cover image
-    poster_image: :class:`str`
-        Return poster image
+    cover_image: :class:`dict`
+        Return cover image dict with all sizes
+    poster_image: :class:`dict`
+        Return poster image dict with all sizes
     rating_rank: :class:`int`
         Return rating rank
     popularity_rank: :class:`int`
@@ -69,6 +69,7 @@ class Anime(Entry):
     youtube_url: Optional[:class:`str`]
         Return full url of YouTube trailer
     """
+
 
     __slots__ = (
         'id', 'type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
@@ -91,8 +92,22 @@ class Anime(Entry):
         return f"https://www.youtube.com/watch?v={self.yt_id}" if self.yt_id else None
 
 
-class StreamLink():
+class StreamLink:
+    """
+    Represent an :class:`Anime` stream link
 
+
+    Attributes
+    -----------
+    id: :class:`int`
+        ID of Anime Stream links
+    url: :class:`str`
+        URL of streaming service
+    subs: :class:`list`
+        Avaiable subs
+    dub: :class:`list`
+        Avaiable dub in streaming service
+    """
     __slots__ = ('id', 'url', 'subs', 'dub')
 
     def __init__(self, attributes: dict):
