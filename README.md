@@ -19,6 +19,16 @@ To install the package, you can simply run
 
 ```py
 #Linux/MacOS
+python3 -m pip install askitsu
+
+#Windows
+py -3 -m pip install askitsu
+```
+
+Or to get the latest commit
+
+```py
+#Linux/MacOS
 python3 -m pip install git+https://github.com/ShomyKohai/askitsu.git
 
 #Windows
@@ -50,6 +60,7 @@ More examples can be found inside the example directory -> [Here](https://github
 
 # Links
 
+- [Docs](https://askitsu.readthedocs.io/)
 - [PyPi](https://pypi.org/project/askitsu/)
 - [Kitsu.io Docs](https://kitsu.docs.apiary.io/)
 - [discord.py](https://github.com/Rapptz/discord.py) (for docstrings inspiration and bot example)
