@@ -3,6 +3,8 @@
 </h1>
 
 [![TwitterShomy](https://img.shields.io/badge/-shomykohai-1DA1F2?style=flat&logo=twitter&logoColor=white&labelColor=1DA1F2)](https://twitter.com/shomykohai)
+[![askitsu](https://img.shields.io/pypi/v/askitsu?label=askitsu&logo=pypi&logoColor=white&labelColor=blue&color=9cf)](https://pypi.org/project/askitsu/)
+[![Documentation Status](https://readthedocs.org/projects/askitsu/badge/?version=latest)](https://askitsu.readthedocs.io/en/latest/?badge=latest)
 
 An async python wrapper for Kitsu.io API
 
