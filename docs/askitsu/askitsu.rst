@@ -14,6 +14,12 @@ Client
 .. autoclass:: askitsu.Client
    :members:
 
+Reviews
+---------------------
+
+.. autoclass:: askitsu.Review
+   :members:
+
 Entries
 ===============
 
