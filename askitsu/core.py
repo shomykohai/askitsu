@@ -80,3 +80,42 @@ class Entry:
             return self.poster_image.get(size, None)
         except AttributeError:
             return None
+
+class Review:
+    """Represents a :class:`Review` instance
+    Reviews belong to a media (:class:askitsu.Anime, :class:askitsu.Manga) 
+
+    Attributes
+    -----------
+    id: :class:`int`
+        ID of the review
+    content: :class:`str`
+        Content of the review
+    content_formatted: :class:`str`
+        Formatted content of the review
+    likes_count: :class:`int`
+        How many likes a reviews has
+    progress: :class:`str`
+    rating: :class:`int`
+        Rating of the review
+    source: :class:`int`
+        Source of the review
+    spoiler: :class:`bool`
+        If the review is/has a spoiler or not
+    """
+
+    __slots__ = ('id', 'content', 'content_formatted', 'likes_count', 'progress',
+                'rating', 'source', 'spoiler', 'media_id', 'media_type')
+
+    def __init__(self, entry_id: str, entry_type: str, attributes: dict):
+        data = attributes['attributes']
+        self.media_id = entry_id 
+        self.media_type = entry_type
+        self.id: str = attributes['id']
+        self.content: str = data['content']
+        self.content_formatted: str = data['contentFormatted']
+        self.likes_count: int = data['likesCount']
+        self.progress: str = data['progress']
+        self.rating: int = data['rating']
+        self.source: str = data['source']
+        self.spoiler: bool = data['spoiler']

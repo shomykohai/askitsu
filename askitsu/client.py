@@ -32,6 +32,7 @@ from typing import (
 )
 from .anime import Anime, StreamLink
 from .character import Character
+from .core import Review
 from .manga import Manga
 from .error import *
 
@@ -158,6 +159,18 @@ class Client:
         """
         return await self.get_entry("anime", id=id)
 
+    async def get_manga_entry(self, id: int) -> Manga:
+        """|coro|
+
+        Shortcut for :meth:`get_entry`; returns only `Manga` object
+
+        Parameters
+        -----------
+        id: :class:`int`
+            ID of the manga
+        """
+        return await self.get_entry("anime", id=id)
+
     async def get_stream_links(self, anime: Anime) -> List[StreamLink]:
         """|coro|
 
@@ -232,6 +245,29 @@ class Client:
             for attributes in fetched_data["data"]
         ]
         
+    async def get_reviews(
+        self, entry: Union[Manga, Anime],
+        limit: int = 1
+    ) -> Optional[Union[Review, List[Review]]]:
+        """|coro|
+
+        Get reviews of a given entry
+
+        Parameters
+        -----------
+        entry: Union[Manga, Anime]
+            A valid entry to get reviews
+        limit: :class:`int`
+            Limit to reviews to fetch
+        """
+        fetched_data = await self._get_data(
+            url=f"{BASE}/{entry.type}/{entry.id}/reviews?page%5Blimit%5D={limit}"
+        )
+        reviews = [
+            Review(entry.id, entry.type, reviews) 
+            for reviews in fetched_data["data"]
+        ]
+        return (reviews if limit>1 else reviews[0]) if reviews else None
 
     async def close(self) -> None:
         """
