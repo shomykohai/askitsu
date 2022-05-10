@@ -65,7 +65,7 @@ class Manga(Entry):
                 'slug', 'synopsis', 'title', 'cover_image', 'poster_image', 'rating_rank',
                 'popularity_rank', 'chapter_count', 'volume_count', 'serialization',)
 
-    def __init__(self, type: str, attributes: dict):
+    def __init__(self, attributes: dict):
         data = attributes['attributes']
         self.type: str = "manga"
         self.chapter_count: int = data['chapterCount']

@@ -83,7 +83,7 @@ class Entry:
 
 class Review:
     """Represents a :class:`Review` instance
-    Reviews belong to a media (:class:askitsu.Anime, :class:askitsu.Manga) 
+    Reviews belong to a media (:class:`Anime`, :class:`Manga`) 
 
     Attributes
     -----------

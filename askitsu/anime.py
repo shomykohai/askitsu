@@ -77,7 +77,7 @@ class Anime(Entry):
         'nsfw', 'yt_id', 'cover_image', 'poster_image', 'rating_rank', 'popularity_rank'
     )
 
-    def __init__(self, type: str, attributes: dict, *args):
+    def __init__(self, attributes: dict, *args):
         data = attributes['attributes']
         self.type = "anime"
         self.episode_count: int = data['episodeCount']

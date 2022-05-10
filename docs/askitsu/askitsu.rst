@@ -14,12 +14,6 @@ Client
 .. autoclass:: askitsu.Client
    :members:
 
-Reviews
----------------------
-
-.. autoclass:: askitsu.Review
-   :members:
-
 Entries
 ===============
 
@@ -42,12 +36,17 @@ Manga
    :members: get_cover_image, get_poster_image
    :show-inheritance:
 
-
 Character
 ------------------------
 
 .. autoclass:: askitsu.Character
    :members: get_image
+
+Reviews
+---------------------
+
+.. autoclass:: askitsu.Review
+   :members:
 
 Errors
 ==============

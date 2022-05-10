@@ -53,7 +53,8 @@ class Client:
     def __init__(self, session: Optional[aiohttp.ClientSession] = None):
         self._entries = {
             "anime": Anime,
-            "manga": Manga
+            "manga": Manga,
+            "characters": Character
         }
         self._session: aiohttp.ClientSession = session or aiohttp.ClientSession()
         self._headers = {
@@ -70,16 +71,23 @@ class Client:
                 return
 
     async def search(
-        self, type: Literal["anime", "manga"], query: str, limit: int = 1
-    ) -> Optional[Union[Anime, List[Anime], Manga, List[Manga]]]:
+        self, 
+        type: Literal["anime", "manga", "characters"], 
+        query: str, 
+        limit: int = 1
+    ) -> Optional[Union[
+            Anime, List[Anime], 
+            Manga, List[Manga],
+            Character, List[Character]
+        ]]:
         """|coro|
 
         Search trough Kitsu API with the providen query and fetch the found data
 
         Parameters
         -----------
-        type: :class:`str`
-            The type of media to search
+        type: Literal["anime", "manga", "characters"]
+            The type of entry to search
         query: :class:`str`
             Represents the search query
         limit: :class:`int`
@@ -87,15 +95,16 @@ class Client:
 
         """
         entry = self._entries.get(type)
+        filter = "name" if type == "characters" else "text"
         fetched_data = await self._get_data(
-            f"{BASE}/{type}?filter%5Btext%5D={query}&page%5Blimit%5D={limit}"
+            f"{BASE}/{type}?filter%5B{filter}%5D={query}&page%5Blimit%5D={limit}"
         )
         if not fetched_data["data"]:
             return None
         if len(fetched_data["data"]) == 1:
-            return entry(type, fetched_data["data"][0])
+            return entry(fetched_data["data"][0])
         return [
-            entry(type=type, attributes=attributes)
+            entry(attributes=attributes)
             for attributes in fetched_data["data"]
         ]
 
@@ -131,6 +140,24 @@ class Client:
         """
         return await self.search("manga", query=query, limit=limit)
 
+    async def search_character(
+        self, query: str, limit: int = 1
+    ) -> Optional[Union[Character, List[Character]]]:
+        """|coro|
+
+        Shortcut function to :meth:`search` with the `type` parameter populated by the "character" keyword
+
+        Parameters
+        -----------
+        query: :class:`str`
+            Represents the search query
+        limit: :class:`int`
+            Limit the search to a specific number of results
+        
+        NOTE: By searching characters, you will not get :attr:`askitsu.Character.media_id` and :attr:`askitsu.Character.role` attributes
+        """
+        return await self.search("characters", query=query, limit=limit)
+
     async def get_entry(self, type: str, id: int) -> Union[Anime, Manga]:
         """|coro|
 
@@ -145,7 +172,7 @@ class Client:
         """
         entry = self._entries.get(type)
         fetched_data = await self._get_data(f"{BASE}/{type}/{id}")
-        return entry(type, fetched_data["data"])
+        return entry(fetched_data["data"])
 
     async def get_anime_entry(self, id: int) -> Anime:
         """|coro|
@@ -186,9 +213,7 @@ class Client:
         fetched_data = await self._get_data(
             url=f"{BASE}/anime/{anime.id}/streaming-links"
         )
-        stream_links = []
-        for links in fetched_data["data"]:
-            stream_links.append(StreamLink(links))
+        stream_links = [StreamLink(links) for links in fetched_data["data"]]
         return stream_links
 
     async def get_characters(
@@ -241,7 +266,7 @@ class Client:
         fetched_data = await self._get_data(
             f"{BASE}/trending/{type}"
         )
-        return [entry(type=type, attributes=attributes) 
+        return [entry(attributes=attributes) 
             for attributes in fetched_data["data"]
         ]
         

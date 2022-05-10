@@ -52,23 +52,24 @@ class Character:
     updated_at: Optional[:class:`datetime`]
     """       
 
-    __slots__ = ('id', 'media_id', 'name', 'slug', 'description', 'role',
+    __slots__ = ('id', 'type', 'media_id', 'name', 'slug', 'description', 'role',
                 'slug', 'mal_id', 'image', 'created_at', 'updated_at')
 
-    def __init__(self, entry_id: str, data: dict):
+    def __init__(self, attributes: dict, *, entry_id: str = None):
         self.media_id = entry_id
-        attributes = data['attributes']
-        self.id: str = data['id']
-        self.name: str = attributes['canonicalName']
-        self.description: str = attributes['description']
+        data = attributes['attributes']
+        self.id: str = attributes['id']
+        self.type: str = "characters"
+        self.name: str = data['canonicalName']
+        self.description: str = data['description']
         self.role: Literal["main", "supporting"] = None
-        self.slug: str = attributes['slug']
-        self.mal_id: str = attributes['malId']
-        self.created_at: datetime = datetime.strptime(attributes['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            attributes['createdAt']) else None
-        self.updated_at: datetime = datetime.strptime(attributes['updatedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            attributes['updatedAt']) else None
-        self.image: str = attributes['image']
+        self.slug: str = data['slug']
+        self.mal_id: str = data['malId']
+        self.created_at: datetime = datetime.strptime(data['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
+            data['createdAt']) else None
+        self.updated_at: datetime = datetime.strptime(data['updatedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
+            data['updatedAt']) else None
+        self.image: str = data['image']
 
 
     @classmethod
@@ -80,7 +81,7 @@ class Character:
             role: Literal["main", "supporting"] = None
     ) -> Character:
         _data = await _cls._get_data(url=link)
-        _character = Character(entry_id, _data["data"])
+        _character = Character(_data["data"], entry_id)
         _character.role = role
         return _character
 
