@@ -154,7 +154,9 @@ class Client:
         limit: :class:`int`
             Limit the search to a specific number of results
         
-        NOTE: By searching characters, you will not get :attr:`askitsu.Character.media_id` and :attr:`askitsu.Character.role` attributes
+        Note
+        ------------
+        By searching characters, you will not get :attr:`askitsu.Character.media_id` and :attr:`askitsu.Character.role` attributes
         """
         return await self.search("characters", query=query, limit=limit)
 
