@@ -57,3 +57,8 @@ InvalidArgument
    :members:
    :undoc-members:
 
+NotAuthenticated
+------------------------
+.. autoclass:: askitsu.NotAuthenticated
+   :members:
+   :undoc-members:

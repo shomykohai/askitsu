@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+from colorama import Fore, Style
+
 
 class InvalidArgument(AttributeError):
     """
@@ -33,3 +35,15 @@ class InvalidArgument(AttributeError):
     """
     def __init__(self, msg) -> None:
         super().__init__(msg)
+
+class NotAuthenticated(Exception):
+    """
+    Raises when an Authenticated API request 
+    get place without being authenticated  
+    """
+    def __init__(self) -> None:
+        super().__init__(
+            f"{Fore.RED}You are not authenticated.\n"
+            f"Check if the called API request need authentication "
+            f"or if you passed valid credentials{Style.RESET_ALL}"
+        )

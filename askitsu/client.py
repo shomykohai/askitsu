@@ -23,6 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import aiohttp
+from colorama import Fore, Style
 from typing import (
     Any, 
     Optional, 
@@ -68,7 +69,9 @@ class Client:
             if response.status == 200:
                 return response_data
             if response.status == 404:
-                return
+                return None
+            if response.status == 401:
+                raise NotAuthenticated
 
     async def search(
         self, 
@@ -94,10 +97,11 @@ class Client:
             Limit the search to a specific number of results
 
         """
-        entry = self._entries.get(type)
-        filter = "name" if type == "characters" else "text"
+        type_lower = type.lower()
+        entry = self._entries.get(type_lower)
+        filter = "name" if type_lower == "characters" else "text"
         fetched_data = await self._get_data(
-            f"{BASE}/{type}?filter%5B{filter}%5D={query}&page%5Blimit%5D={limit}"
+            f"{BASE}/{type_lower}?filter%5B{filter}%5D={query}&page%5Blimit%5D={limit}"
         )
         if not fetched_data["data"]:
             return None
@@ -160,10 +164,10 @@ class Client:
         """
         return await self.search("characters", query=query, limit=limit)
 
-    async def get_entry(self, type: str, id: int) -> Union[Anime, Manga]:
+    async def get_entry(self, type: str, id: int) -> Union[Anime, Manga, Character]:
         """|coro|
 
-        Get an entry object (`Anime` | `Manga`) by an id
+        Get an entry object (`Anime` | `Manga` | `Character`) by an id
 
         Parameters
         -----------
@@ -172,9 +176,10 @@ class Client:
         id: :class:`int`
             ID of the media
         """
-        entry = self._entries.get(type)
-        fetched_data = await self._get_data(f"{BASE}/{type}/{id}")
-        return entry(fetched_data["data"])
+        type_lower = type.lower()
+        entry = self._entries.get(type_lower)
+        fetched_data = await self._get_data(f"{BASE}/{type_lower}/{id}")
+        return entry(fetched_data["data"]) if fetched_data else None
 
     async def get_anime_entry(self, id: int) -> Anime:
         """|coro|
@@ -211,7 +216,10 @@ class Client:
             The anime to get stream links
         """
         if not isinstance(anime, Anime):
-            return InvalidArgument
+            raise InvalidArgument(
+                f"{Fore.RED}'{anime}' is not an istance of Anime\n"
+                f"Make sure you pass a valid argument to {Fore.LIGHTCYAN_EX}get_stream_links{Style.RESET_ALL}"
+            )
         fetched_data = await self._get_data(
             url=f"{BASE}/anime/{anime.id}/streaming-links"
         )
@@ -264,9 +272,15 @@ class Client:
         entry: Union[:class:`Anime`, :class:`Manga`]
             Entry to fetch its trending
         """
-        entry = self._entries.get(type)
+        type_lower = type.lower()
+        if type_lower == "characters":
+            raise InvalidArgument(
+                f"{Fore.RED}Characters can't be fetched in trending list\n"
+                f"Please pass 'anime' or 'manga' as parameter to {Fore.LIGHTCYAN_EX}get_trending_entry{Style.RESET_ALL}"
+            )
+        entry = self._entries.get(type_lower)
         fetched_data = await self._get_data(
-            f"{BASE}/trending/{type}"
+            f"{BASE}/trending/{type_lower}"
         )
         return [entry(attributes=attributes) 
             for attributes in fetched_data["data"]

@@ -40,6 +40,7 @@ py -3 -m pip install git+https://github.com/ShomyKohai/askitsu.git
 ## Requirements
 
 - [aiohttp](https://pypi.org/project/aiohttp/)
+- [colorama](https://pypi.org/project/colorama/)
 
 # Examples
 

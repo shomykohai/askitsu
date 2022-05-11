@@ -6,6 +6,7 @@ Prerequisites
 ---------------
 Before starting to use the library, you have to satisfy the dependencies:
     * `aiohttp <https://pypi.org/project/aiohttp/>`_
+    * `colorama <https://pypi.org/project/colorama/>`_
 
 Install
 ---------------

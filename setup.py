@@ -24,7 +24,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=packages,
     keywords='kitsu',
-    install_requires=['aiohttp'],
+    install_requires=['aiohttp', 'colorama'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
