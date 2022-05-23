@@ -27,12 +27,12 @@ from typing import Optional, Literal
 
 class Entry:
 
-    __slots__ = ('id', 'type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
+    __slots__ = ('id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
                 'slug', 'synopsis', 'title', 'rating_rank', 'popularity_rank')
 
-    def __init__(self, id: str, type: str, attributes: dict):
-        self.id= id
-        self.type = type
+    def __init__(self, _id: str, _type: str, attributes: dict):
+        self.id= _id
+        self.entry_type = _type
         self.status: str = attributes['status']
         self.created_at: datetime = datetime.strptime(attributes['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
             attributes['createdAt']) else None
@@ -80,6 +80,11 @@ class Entry:
             return self.poster_image.get(size, None)
         except AttributeError:
             return None
+
+    @property
+    def url(self) -> str:
+        return  f"https://kitsu.io/{self.entry_type}/{self.slug}"
+
 
 class Review:
     """Represents a :class:`Review` instance

@@ -179,7 +179,7 @@ class Client:
         type_lower = type.lower()
         entry = self._entries.get(type_lower)
         fetched_data = await self._get_data(f"{BASE}/{type_lower}/{id}")
-        return entry(fetched_data["data"]) if fetched_data else None
+        return entry(attributes=fetched_data["data"]) if fetched_data else None
 
     async def get_anime_entry(self, id: int) -> Anime:
         """|coro|
@@ -302,10 +302,10 @@ class Client:
             Limit to reviews to fetch
         """
         fetched_data = await self._get_data(
-            url=f"{BASE}/{entry.type}/{entry.id}/reviews?page%5Blimit%5D={limit}"
+            url=f"{BASE}/{entry.entry_type}/{entry.id}/reviews?page%5Blimit%5D={limit}"
         )
         reviews = [
-            Review(entry.id, entry.type, reviews) 
+            Review(entry.id, entry.entry_type, reviews) 
             for reviews in fetched_data["data"]
         ]
         return (reviews if limit>1 else reviews[0]) if reviews else None

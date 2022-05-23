@@ -68,24 +68,26 @@ class Anime(Entry):
         Return popularity rank position
     youtube_url: Optional[:class:`str`]
         Return full url of YouTube trailer
+    url: :class:`str`
+        Returns url to Kitsu.io website
     """
 
 
     __slots__ = (
-        'id', 'type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
+        'id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
         'slug', 'synopsis', 'title', 'episode_count', 'episode_length', 'total_length',
         'nsfw', 'yt_id', 'cover_image', 'poster_image', 'rating_rank', 'popularity_rank'
     )
 
     def __init__(self, attributes: dict, *args):
         data = attributes['attributes']
-        self.type = "anime"
+        self.entry_type = "anime"
         self.episode_count: int = data['episodeCount']
         self.episode_length: int = data['episodeLength']
         self.total_length: int = data['totalLength']
         self.nsfw: bool = data['nsfw']
         self.yt_id: str = data['youtubeVideoId']
-        super().__init__(attributes['id'], type, data, *args)
+        super().__init__(attributes['id'], self.entry_type, data, *args)
 
     @property
     def youtube_url(self) -> Optional[str]:

@@ -59,16 +59,18 @@ class Manga(Entry):
         Return rating rank
     popularity_rank: :class:`int`
         Return popularity rank position
+    url: :class:`str`
+        Returns url to Kitsu.io website
     """
 
-    __slots__ = ('id', 'type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
+    __slots__ = ('id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
                 'slug', 'synopsis', 'title', 'cover_image', 'poster_image', 'rating_rank',
-                'popularity_rank', 'chapter_count', 'volume_count', 'serialization',)
+                'popularity_rank', 'chapter_count', 'volume_count', 'serialization')
 
     def __init__(self, attributes: dict):
         data = attributes['attributes']
-        self.type: str = "manga"
+        self.entry_type: str = "manga"
         self.chapter_count: int = data['chapterCount']
         self.volume_count: int = data['volumeCount']
         self.serialization: str = data['serialization']
-        super().__init__(attributes['id'], type, data)
+        super().__init__(attributes['id'], self.entry_type, data)
