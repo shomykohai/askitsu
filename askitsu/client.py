@@ -33,12 +33,9 @@ from typing import (
 )
 from .anime import Anime, StreamLink
 from .character import Character
-from .core import Review
+from .core import Review, BASE
 from .manga import Manga
 from .error import *
-
-
-BASE: str = "https://kitsu.io/api/edge/"
 
 
 class Client:
@@ -106,9 +103,9 @@ class Client:
         if not fetched_data["data"]:
             return None
         if len(fetched_data["data"]) == 1:
-            return entry(fetched_data["data"][0])
+            return entry(fetched_data["data"][0], self._session)
         return [
-            entry(attributes=attributes)
+            entry(attributes=attributes, session=self._session)
             for attributes in fetched_data["data"]
         ]
 
@@ -179,7 +176,7 @@ class Client:
         type_lower = type.lower()
         entry = self._entries.get(type_lower)
         fetched_data = await self._get_data(f"{BASE}/{type_lower}/{id}")
-        return entry(attributes=fetched_data["data"]) if fetched_data else None
+        return entry(attributes=fetched_data["data"], session=self._session) if fetched_data else None
 
     async def get_anime_entry(self, id: int) -> Anime:
         """|coro|
@@ -223,8 +220,7 @@ class Client:
         fetched_data = await self._get_data(
             url=f"{BASE}/anime/{anime.id}/streaming-links"
         )
-        stream_links = [StreamLink(links) for links in fetched_data["data"]]
-        return stream_links
+        return [StreamLink(links) for links in fetched_data["data"]]
 
     async def get_characters(
         self, entry: Union[Anime, Manga], limit: int = 1
@@ -282,7 +278,7 @@ class Client:
         fetched_data = await self._get_data(
             f"{BASE}/trending/{type_lower}"
         )
-        return [entry(attributes=attributes) 
+        return [entry(attributes=attributes, session=self._session) 
             for attributes in fetched_data["data"]
         ]
         

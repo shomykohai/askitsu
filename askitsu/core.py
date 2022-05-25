@@ -22,15 +22,20 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import aiohttp
 from datetime import datetime
 from typing import Optional, Literal
+
+BASE: str = "https://kitsu.io/api/edge/"
+
 
 class Entry:
 
     __slots__ = ('id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
                 'slug', 'synopsis', 'title', 'rating_rank', 'popularity_rank')
 
-    def __init__(self, _id: str, _type: str, attributes: dict):
+    def __init__(self, _id: str, _type: str, attributes: dict, session: aiohttp.ClientSession = None):
+        self._session = session
         self.id= _id
         self.entry_type = _type
         self.status: str = attributes['status']

@@ -24,9 +24,34 @@ DEALINGS IN THE SOFTWARE.
 
 __all__ = ('Anime', 'StreamLink')
 
-from .core import Entry
-from typing import Optional
+import aiohttp
+from typing import Optional, List
+from .core import Entry, BASE
 
+class StreamLink:
+    """
+    Represent an :class:`Anime` stream link
+
+
+    Attributes
+    -----------
+    id: :class:`int`
+        ID of Anime Stream links
+    url: :class:`str`
+        URL of streaming service
+    subs: :class:`list`
+        Avaiable subs
+    dub: :class:`list`
+        Avaiable dub in streaming service
+    """
+    __slots__ = ('id', 'url', 'subs', 'dub')
+
+    def __init__(self, attributes: dict):
+        data = attributes['attributes']
+        self.id: int = attributes['id']
+        self.url: str = data['url']
+        self.subs: list = data['subs']
+        self.dub: list = data['dubs']
 
 class Anime(Entry):
     """Represents an :class:`Anime` instance 
@@ -70,54 +95,46 @@ class Anime(Entry):
         Return full url of YouTube trailer
     url: :class:`str`
         Returns url to Kitsu.io website
+    stream_links: List[:class:`StreamLink`]
+        Return a list of :class:StreamLink
     """
 
 
     __slots__ = (
         'id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
         'slug', 'synopsis', 'title', 'episode_count', 'episode_length', 'total_length',
-        'nsfw', 'yt_id', 'cover_image', 'poster_image', 'rating_rank', 'popularity_rank'
+        'nsfw', 'yt_id', 'cover_image', 'poster_image', 'rating_rank', 'popularity_rank',
+        '_session'
     )
 
-    def __init__(self, attributes: dict, *args):
+    def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args):
         data = attributes['attributes']
+        self._session = session
         self.entry_type = "anime"
         self.episode_count: int = data['episodeCount']
         self.episode_length: int = data['episodeLength']
         self.total_length: int = data['totalLength']
         self.nsfw: bool = data['nsfw']
         self.yt_id: str = data['youtubeVideoId']
-        super().__init__(attributes['id'], self.entry_type, data, *args)
+        super().__init__(attributes['id'], self.entry_type, data, session,*args)
 
     @property
     def youtube_url(self) -> Optional[str]:
         return f"https://www.youtube.com/watch?v={self.yt_id}" if self.yt_id else None
 
+    async def _fetch_stream_links(self) -> List[StreamLink]:
+        async with self._session.get(
+            url=f"{BASE}/anime/{self.id}/streaming-links"
+        ) as data:
+            fetched_data = await data.json()
+            return [
+                StreamLink(links) for links in fetched_data["data"]
+            ] if fetched_data else None
+    
+    @property
+    async def stream_links(self) -> List[StreamLink]:
+        return await self._fetch_stream_links()
 
-class StreamLink:
-    """
-    Represent an :class:`Anime` stream link
-
-
-    Attributes
-    -----------
-    id: :class:`int`
-        ID of Anime Stream links
-    url: :class:`str`
-        URL of streaming service
-    subs: :class:`list`
-        Avaiable subs
-    dub: :class:`list`
-        Avaiable dub in streaming service
-    """
-    __slots__ = ('id', 'url', 'subs', 'dub')
-
-    def __init__(self, attributes: dict):
-        data = attributes['attributes']
-        self.id: int = attributes['id']
-        self.url: str = data['url']
-        self.subs: list = data['subs']
-        self.dub: list = data['dubs']
 
 class Episodes:
     pass

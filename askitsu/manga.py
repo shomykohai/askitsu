@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 
 __all__ = ('Manga',)
 
+import aiohttp
 from .core import Entry
 
 class Manga(Entry):
@@ -65,12 +66,13 @@ class Manga(Entry):
 
     __slots__ = ('id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
                 'slug', 'synopsis', 'title', 'cover_image', 'poster_image', 'rating_rank',
-                'popularity_rank', 'chapter_count', 'volume_count', 'serialization')
+                'popularity_rank', 'chapter_count', 'volume_count', 'serialization', '_session')
 
-    def __init__(self, attributes: dict):
+    def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args):
         data = attributes['attributes']
+        self._session = session
         self.entry_type: str = "manga"
         self.chapter_count: int = data['chapterCount']
         self.volume_count: int = data['volumeCount']
         self.serialization: str = data['serialization']
-        super().__init__(attributes['id'], self.entry_type, data)
+        super().__init__(attributes['id'], self.entry_type, data, session, *args)
