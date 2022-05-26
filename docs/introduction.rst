@@ -12,15 +12,20 @@ Install
 ---------------
 To install the library you simply run this command
 
-.. code:: 
+.. tab-set:: 
 
-    python3 -m pip install askitsu
+    .. tab-item:: Linux/MacOS
 
-Or if you're using Microsoft Windows
+        .. code::
+            
+            python3 -m pip install askitsu
+    
+    .. tab-item:: Windows
+        
+        .. code::
 
-.. code:: 
+            py3 -m pip install askitsu
 
-    py3 -m pip install askitsu
 
 
 .. admonition:: Master

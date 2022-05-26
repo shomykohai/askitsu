@@ -35,7 +35,8 @@ release = version
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
-    "sphinx_autodoc_typehints"
+    "sphinx_autodoc_typehints",
+    "sphinx_design"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -66,6 +67,8 @@ html_domain_indices = False
 
 html_favicon = './images/favicon.ico'
 
+pygments_style = "sphinx"
+pygments_dark_style = "monokai"
 
 def remove_module_docstring(app, what, name, obj, options, lines):
     if what == "module" and name in ('client', 'character', 'core', 'anime', 'error', 'manga'):

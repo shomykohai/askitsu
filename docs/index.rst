@@ -26,8 +26,16 @@ Tree
 * :ref:`search`
 
 
-.. toctree::
-   :maxdepth: 2
+.. toctree:: 
+   :hidden:
    :caption: Contents:
+
+   introduction
+   examples
+
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+   :caption: API Reference:
 
    modules
