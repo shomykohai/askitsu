@@ -25,7 +25,8 @@ DEALINGS IN THE SOFTWARE.
 __all__ = ('Anime', 'StreamLink')
 
 import aiohttp
-from typing import Optional, List
+from datetime import datetime
+from typing import Optional, Union, List
 from .core import Entry, BASE
 
 class StreamLink:
@@ -52,6 +53,26 @@ class StreamLink:
         self.url: str = data['url']
         self.subs: list = data['subs']
         self.dub: list = data['dubs']
+
+class Episode:
+    
+    __slots__ = ('id', 'created_at', 'updated_at', 'synopsis', 'description',
+                    'title', 'season', 'number', 'length', 'thumbnail')
+
+    def __init__(self, attributes: dict) -> None:
+        data = attributes['attributes']
+        self.id: int = attributes['id']
+        self.created_at: datetime = datetime.strptime(data['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
+            data['createdAt']) else None
+        self.updated_at: datetime = datetime.strptime(data['updatedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
+            data['updatedAt']) else None
+        self.synopsis: str = data['synopsis']
+        self.description: str = data['description']
+        self.title: str = data['canonicalTitle']
+        self.season: int = data['seasonNumber']
+        self.number: int = data['number']
+        self.length: int = data['length']
+        self.thumbnail: str = data['thumbnail']['original'] if data['thumbnail'] else None
 
 class Anime(Entry):
     """Represents an :class:`Anime` instance 
@@ -135,6 +156,10 @@ class Anime(Entry):
     async def stream_links(self) -> List[StreamLink]:
         return await self._fetch_stream_links()
 
-
-class Episodes:
-    pass
+    async def episodes(self, limit: int = 12) -> Union[Episode, List[Episode]]:
+        async with self._session.get(
+            url=f"{BASE}/anime/{self.id}/episodes?page[limit]={limit}"
+        ) as data:
+            fetched_data = await data.json()
+            episodes = [Episode(attributes) for attributes in fetched_data["data"]]
+            return episodes if len(episodes)>1 else episodes[0]
