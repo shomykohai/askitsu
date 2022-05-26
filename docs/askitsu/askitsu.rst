@@ -51,6 +51,18 @@ Reviews
 Errors
 ==============
 
+AskitsuException
+------------------------
+.. autoclass:: askitsu.AskitsuException
+   :members:
+   :undoc-members:
+
+HTTPError
+------------------------
+.. autoclass:: askitsu.HTTPError
+   :members:
+   :undoc-members:
+
 InvalidArgument
 ------------------------
 .. autoclass:: askitsu.InvalidArgument
@@ -60,5 +72,11 @@ InvalidArgument
 NotAuthenticated
 ------------------------
 .. autoclass:: askitsu.NotAuthenticated
+   :members:
+   :undoc-members:
+
+BadApiRequest
+------------------------
+.. autoclass:: askitsu.BadApiRequest
    :members:
    :undoc-members:

@@ -69,6 +69,8 @@ class Client:
                 return None
             if response.status == 401:
                 raise NotAuthenticated
+            if response.status == 400:
+                raise BadApiRequest(response_data["errors"][0])
 
     async def search(
         self, 

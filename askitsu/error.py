@@ -23,6 +23,26 @@ DEALINGS IN THE SOFTWARE.
 """
 from colorama import Fore, Style
 
+class AskitsuException(Exception):
+    """
+    Base class for most of the library errors
+    """
+    pass
+
+class HTTPError(AskitsuException):
+    """
+    Represents a generic HTTP error.
+
+    Parameters
+    -----------
+    msg: :class:`str`
+        Error message
+    status: :class:`int`
+        Code of the HTTP response
+    """
+    def __init__(self, msg: str, status: int) -> None:
+        self.status = status
+        super().__init__(msg)
 
 class InvalidArgument(AttributeError):
     """
@@ -36,14 +56,26 @@ class InvalidArgument(AttributeError):
     def __init__(self, msg) -> None:
         super().__init__(msg)
 
-class NotAuthenticated(Exception):
+class NotAuthenticated(HTTPError):
     """
     Raises when an Authenticated API request 
     get place without being authenticated  
     """
     def __init__(self) -> None:
         super().__init__(
-            f"{Fore.RED}You are not authenticated.\n"
+            f"{Fore.RED}You are not authenticated.\n" 
             f"Check if the called API request need authentication "
-            f"or if you passed valid credentials{Style.RESET_ALL}"
+            f"or if you passed valid credentials{Style.RESET_ALL}", 
+            401
+        )
+
+class BadApiRequest(HTTPError):
+    """
+    Raises when a 400 error code takes place
+    """
+    def __init__(self, response: str) -> None:
+        super().__init__(
+            f"{Fore.RED}An error occured.\n"
+            f"{response['detail']} - Response code: {400}{Style.RESET_ALL}",
+            400
         )
