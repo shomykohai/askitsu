@@ -109,15 +109,18 @@ class Anime(Entry):
     poster_image: :class:`dict`
         Return poster image dict with all sizes
     rating_rank: :class:`int`
-        Return rating rank
+        Return rating rank (Position on the leaderboard based on rating)
     popularity_rank: :class:`int`
-        Return popularity rank position
+        Return popularity rank (Position on the leaderboard based on user preferences)
     youtube_url: Optional[:class:`str`]
         Return full url of YouTube trailer
     url: :class:`str`
         Returns url to Kitsu.io website
     stream_links: List[:class:`StreamLink`]
         Return a list of :class:StreamLink
+    rating: :class:`float`
+        The rating received from the community in a scale from 1 to 100
+    age_rating: Literal['G', 'PG', 'R', 'R18']
     """
 
 
@@ -125,7 +128,7 @@ class Anime(Entry):
         'id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
         'slug', 'synopsis', 'title', 'episode_count', 'episode_length', 'total_length',
         'nsfw', 'yt_id', 'cover_image', 'poster_image', 'rating_rank', 'popularity_rank',
-        '_session'
+        'rating', 'age_rating','_session'
     )
 
     def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args):

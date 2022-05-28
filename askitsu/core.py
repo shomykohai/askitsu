@@ -32,7 +32,7 @@ BASE: str = "https://kitsu.io/api/edge/"
 class Entry:
 
     __slots__ = ('id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
-                'slug', 'synopsis', 'title', 'rating_rank', 'popularity_rank')
+                'slug', 'synopsis', 'title', 'rating_rank', 'popularity_rank', 'rating', 'age_rating')
 
     def __init__(self, _id: str, _type: str, attributes: dict, session: aiohttp.ClientSession = None):
         self._session = session
@@ -52,6 +52,8 @@ class Entry:
         self.poster_image = attributes['posterImage']
         self.rating_rank = attributes['ratingRank']
         self.popularity_rank = attributes['popularityRank']
+        self.rating: float = attributes['averageRating']
+        self.age_rating: Literal['G', 'PG', 'R', 'R18'] = attributes['ageRating']
 
 
     def get_cover_image(
@@ -88,7 +90,7 @@ class Entry:
 
     @property
     def url(self) -> str:
-        return  f"https://kitsu.io/{self.entry_type}/{self.slug}"
+        return f"https://kitsu.io/{self.entry_type}/{self.slug}"
 
 
 class Review:
