@@ -48,7 +48,7 @@ class Client:
 
     """
 
-    def __init__(self, session: Optional[aiohttp.ClientSession] = None):
+    def __init__(self, session: Optional[aiohttp.ClientSession] = None) -> None:
         self._entries = {
             "anime": Anime,
             "manga": Manga,
@@ -202,7 +202,7 @@ class Client:
         id: :class:`int`
             ID of the manga
         """
-        return await self.get_entry("anime", id=id)
+        return await self.get_entry("manga", id=id)
 
     async def get_stream_links(self, anime: Anime) -> List[StreamLink]:
         """|coro|
