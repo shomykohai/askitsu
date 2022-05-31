@@ -22,7 +22,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-__all__ = ('Anime', 'StreamLink')
+__all__ = ('Anime', 'StreamLink', 'Episode')
 
 import aiohttp
 from datetime import datetime
@@ -55,7 +55,31 @@ class StreamLink:
         self.dub: list = data['dubs']
 
 class Episode:
-    
+    """
+    Represent an :class:`Anime` episode
+
+
+    Attributes
+    -----------
+    id: :class:`int`
+        ID of the episode
+    created_at: :class:`datetime`
+    updated_at: :class:`datetime`
+    synopsis: :class:`str`
+        Synopsis of the episode
+    description: :class:`str`
+        Full description of the episode
+    title: :class:`str`
+        Title of the episode
+    season: :class:`int`
+        Season which the episode belong to
+    number: :class:`int`
+        Episode's number
+    lenght: :class:`int`
+        Lenght of the episode (in minutes)
+    thumbnail: :class:`str`
+        Url of the thumbnail
+    """
     __slots__ = ('id', 'created_at', 'updated_at', 'synopsis', 'description',
                     'title', 'season', 'number', 'length', 'thumbnail')
 

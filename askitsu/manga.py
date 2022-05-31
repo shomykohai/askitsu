@@ -22,10 +22,61 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-__all__ = ('Manga',)
+__all__ = ('Manga', 'Chapter')
 
 import aiohttp
-from .core import Entry
+from datetime import datetime
+from typing import Union, List
+from .core import Entry, BASE
+
+class Chapter:
+    """
+    Represent a :class:`Manga` chapter
+
+
+    Attributes
+    -----------
+    id: :class:`int`
+        ID of the chapter
+    created_at: :class:`datetime`
+    updated_at: :class:`datetime`
+    published: :class:`datetime`
+        When the chapter got published (YYYY-mm-dd)
+    synopsis: :class:`str`
+        Synopsis of the chapter
+    description: :class:`str`
+        Full description of the chapter
+    title: :class:`str`
+        Title of the chapter
+    volume_number: :class:`int`
+        Which volume the chapter belong to
+    chapter: :class:`int`
+        Chapter number
+    lenght: :class:`int`
+        Pages of the chapter
+    thumbnail: :class:`str`
+        Url of the thumbnail
+    """
+    __slots__ = ('id', 'created_at', 'updated_at', 'synopsis', 'description',
+                'published', 'title', 'volume_number', 'chapter', 'length', 
+                'thumbnail')
+
+    def __init__(self, attributes: dict) -> None:
+        data = attributes['attributes']
+        self.id: int = attributes['id']
+        self.created_at: datetime = datetime.strptime(data['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
+            data['createdAt']) else None
+        self.updated_at: datetime = datetime.strptime(data['updatedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
+            data['updatedAt']) else None
+        self.published: datetime = datetime.strptime(data['published'], "%Y-%m-%d") if (
+            data['published']) else None
+        self.synopsis: str = data['synopsis']
+        self.description: str = data['description']
+        self.title: str = data['canonicalTitle']
+        self.volume_number: int = data['volumeNumber']
+        self.chapter: int = data['number']
+        self.length: int = data['length']
+        self.thumbnail: str = data['thumbnail']['original'] if data['thumbnail'] else None
 
 class Manga(Entry):
     """Represents a :class:`Manga` instance 
@@ -80,3 +131,12 @@ class Manga(Entry):
         self.volume_count: int = data['volumeCount']
         self.serialization: str = data['serialization']
         super().__init__(attributes['id'], self.entry_type, data, session, *args)
+
+
+    async def chapters(self, limit: int = 12) -> Union[Chapter, List[Chapter]]:
+        async with self._session.get(
+            url=f"{BASE}/manga/{self.id}/chapters?page[limit]={limit}"
+        ) as data:
+            fetched_data = await data.json()
+            chapters = [Chapter(attributes) for attributes in fetched_data["data"]]
+            return chapters if len(chapters)>1 else chapters[0]

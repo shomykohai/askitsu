@@ -24,6 +24,11 @@ Anime
    :members: get_cover_image, get_poster_image
    :show-inheritance:
 
+Episode
+--------------------
+.. autoclass:: askitsu.Episode
+   :members:
+
 StreamingLinks
 --------------------
 .. autoclass:: askitsu.StreamLink
@@ -35,6 +40,11 @@ Manga
 .. autoclass:: askitsu.Manga
    :members: get_cover_image, get_poster_image
    :show-inheritance:
+
+Chapter
+--------------------
+.. autoclass:: askitsu.Chapter
+   :members:
 
 Character
 ------------------------
