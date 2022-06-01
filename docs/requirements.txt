@@ -1,3 +1,4 @@
 sphinx-autodoc-typehints==1.18.1
 furo==2022.4.7
 sphinx-design
+sphinx-copybutton
