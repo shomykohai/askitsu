@@ -22,9 +22,11 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+from __future__ import annotations
+
 import aiohttp
 from datetime import datetime
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 
 BASE: str = "https://kitsu.io/api/edge/"
 
@@ -92,6 +94,48 @@ class Entry:
     def url(self) -> str:
         return f"https://kitsu.io/{self.entry_type}/{self.slug}"
 
+    @property
+    async def categories(self) -> List[Category]:
+        """
+        Fetch all the categories of a media
+        """
+        async with self._session.get(
+            url=f"{BASE}/{self.entry_type}/{self.id}/categories"
+        ) as data:
+            fetched_data = await data.json()
+            categories = [Category(attributes) for attributes in fetched_data["data"]]
+            return categories
+
+class Category:
+    """
+    Represent a category of a media.
+
+    Attributes
+    ------------
+    created_at: :class:`datetime`
+    updated_at: :class:`datetime`
+    title: :class:`str`
+        Title of the category
+    description: :class:`str`   
+        Description of the category
+    slug: :class:`str`
+        Identifier string of the category
+    nsfw: :class:`bool`
+        If the category is NSFW or not
+    """
+    
+    __slots__ = ('created_at', 'updated_at', 'title', 'description', 'slug', 'nsfw')
+
+    def __init__(self, attributes: dict) -> None:
+        data = attributes['attributes']
+        self.created_at: datetime = datetime.strptime(data['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
+            data['createdAt']) else None
+        self.updated_at: datetime = datetime.strptime(data['updatedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
+            data['updatedAt']) else None
+        self.title: str = data['title']
+        self.description: str = data['description']
+        self.slug: str = data['slug']
+        self.nsfw: bool = data['nsfw']
 
 class Review:
     """Represents a :class:`Review` instance.
@@ -119,7 +163,7 @@ class Review:
     __slots__ = ('id', 'content', 'content_formatted', 'likes_count', 'progress',
                 'rating', 'source', 'spoiler', 'media_id', 'media_type')
 
-    def __init__(self, entry_id: str, entry_type: str, attributes: dict):
+    def __init__(self, entry_id: str, entry_type: str, attributes: dict) -> None:
         data = attributes['attributes']
         self.media_id = entry_id 
         self.media_type = entry_type

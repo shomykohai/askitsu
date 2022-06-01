@@ -155,7 +155,7 @@ class Anime(Entry):
         'rating', 'age_rating','_session'
     )
 
-    def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args):
+    def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args) -> None:
         data = attributes['attributes']
         self._session = session
         self.entry_type = "anime"

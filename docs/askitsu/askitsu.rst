@@ -14,14 +14,14 @@ Client
 .. autoclass:: askitsu.Client
    :members:
 
-Entries
+Anime
 ===============
 
 Anime
 --------------------
 
 .. autoclass:: askitsu.Anime
-   :members: get_cover_image, get_poster_image
+   :members: get_cover_image, get_poster_image, categories
    :show-inheritance:
 
 Episode
@@ -35,16 +35,30 @@ StreamingLinks
    :members:
 
 Manga
+==============
+
+Manga
 --------------------
 
 .. autoclass:: askitsu.Manga
-   :members: get_cover_image, get_poster_image
+   :members: get_cover_image, get_poster_image, categories
    :show-inheritance:
 
 Chapter
 --------------------
 .. autoclass:: askitsu.Chapter
    :members:
+
+
+Misc
+================
+
+Categories
+---------------------
+
+.. autoclass:: askitsu.Category
+   :members:
+
 
 Character
 ------------------------
