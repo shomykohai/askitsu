@@ -116,6 +116,9 @@ class Manga(Entry):
     rating: :class:`float`
         The rating received from the community in a scale from 1 to 100
     age_rating: Literal['G', 'PG', 'R', 'R18']
+        Age rating of the manga
+    categories: List[:class:`Category`]
+        Categories of the manga
     """
 
     __slots__ = ('id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',

@@ -145,6 +145,9 @@ class Anime(Entry):
     rating: :class:`float`
         The rating received from the community in a scale from 1 to 100
     age_rating: Literal['G', 'PG', 'R', 'R18']
+        Age rating of the anime
+    categories: List[:class:`Category`]
+        Categories of the anime
     """
 
 
