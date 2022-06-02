@@ -96,9 +96,6 @@ class Entry:
 
     @property
     async def categories(self) -> List[Category]:
-        """
-        Fetch all the categories of a media
-        """
         async with self._session.get(
             url=f"{BASE}/{self.entry_type}/{self.id}/categories"
         ) as data:
