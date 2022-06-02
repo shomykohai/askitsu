@@ -22,12 +22,13 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-__all__ = ('Manga', 'Chapter')
+__all__ = ("Manga", "Chapter")
 
 import aiohttp
 from datetime import datetime
 from typing import Union, List
 from .core import Entry, BASE
+
 
 class Chapter:
     """
@@ -57,29 +58,52 @@ class Chapter:
     thumbnail: :class:`str`
         Url of the thumbnail
     """
-    __slots__ = ('id', 'created_at', 'updated_at', 'synopsis', 'description',
-                'published', 'title', 'volume_number', 'chapter', 'length', 
-                'thumbnail')
+
+    __slots__ = (
+        "id",
+        "created_at",
+        "updated_at",
+        "synopsis",
+        "description",
+        "published",
+        "title",
+        "volume_number",
+        "chapter",
+        "length",
+        "thumbnail",
+    )
 
     def __init__(self, attributes: dict) -> None:
-        data = attributes['attributes']
-        self.id: int = attributes['id']
-        self.created_at: datetime = datetime.strptime(data['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            data['createdAt']) else None
-        self.updated_at: datetime = datetime.strptime(data['updatedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            data['updatedAt']) else None
-        self.published: datetime = datetime.strptime(data['published'], "%Y-%m-%d") if (
-            data['published']) else None
-        self.synopsis: str = data['synopsis']
-        self.description: str = data['description']
-        self.title: str = data['canonicalTitle']
-        self.volume_number: int = data['volumeNumber']
-        self.chapter: int = data['number']
-        self.length: int = data['length']
-        self.thumbnail: str = data['thumbnail']['original'] if data['thumbnail'] else None
+        data = attributes["attributes"]
+        self.id: int = attributes["id"]
+        self.created_at: datetime = (
+            datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (data["createdAt"])
+            else None
+        )
+        self.updated_at: datetime = (
+            datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (data["updatedAt"])
+            else None
+        )
+        self.published: datetime = (
+            datetime.strptime(data["published"], "%Y-%m-%d")
+            if (data["published"])
+            else None
+        )
+        self.synopsis: str = data["synopsis"]
+        self.description: str = data["description"]
+        self.title: str = data["canonicalTitle"]
+        self.volume_number: int = data["volumeNumber"]
+        self.chapter: int = data["number"]
+        self.length: int = data["length"]
+        self.thumbnail: str = (
+            data["thumbnail"]["original"] if data["thumbnail"] else None
+        )
+
 
 class Manga(Entry):
-    """Represents a :class:`Manga` instance 
+    """Represents a :class:`Manga` instance
 
     Attributes
     -----------
@@ -121,20 +145,37 @@ class Manga(Entry):
         Categories of the manga
     """
 
-    __slots__ = ('id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
-                'slug', 'synopsis', 'title', 'cover_image', 'poster_image', 'rating_rank',
-                'popularity_rank', 'chapter_count', 'volume_count', 'serialization', 'rating', 
-                'age_rating','_session')
+    __slots__ = (
+        "id",
+        "entry_type",
+        "status",
+        "created_at",
+        "updated_at",
+        "started_at",
+        "ended_at",
+        "slug",
+        "synopsis",
+        "title",
+        "cover_image",
+        "poster_image",
+        "rating_rank",
+        "popularity_rank",
+        "chapter_count",
+        "volume_count",
+        "serialization",
+        "rating",
+        "age_rating",
+        "_session",
+    )
 
     def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args) -> None:
-        data = attributes['attributes']
+        data = attributes["attributes"]
         self._session = session
         self.entry_type: str = "manga"
-        self.chapter_count: int = data['chapterCount']
-        self.volume_count: int = data['volumeCount']
-        self.serialization: str = data['serialization']
-        super().__init__(attributes['id'], self.entry_type, data, session, *args)
-
+        self.chapter_count: int = data["chapterCount"]
+        self.volume_count: int = data["volumeCount"]
+        self.serialization: str = data["serialization"]
+        super().__init__(attributes["id"], self.entry_type, data, session, *args)
 
     async def chapters(self, limit: int = 12) -> Union[Chapter, List[Chapter]]:
         async with self._session.get(
@@ -142,4 +183,4 @@ class Manga(Entry):
         ) as data:
             fetched_data = await data.json()
             chapters = [Chapter(attributes) for attributes in fetched_data["data"]]
-            return chapters if len(chapters)>1 else chapters[0]
+            return chapters if len(chapters) > 1 else chapters[0]

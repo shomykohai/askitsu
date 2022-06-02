@@ -73,15 +73,10 @@ class Client:
                 raise BadApiRequest(response_data["errors"][0])
 
     async def search(
-        self, 
-        type: Literal["anime", "manga", "characters"], 
-        query: str, 
-        limit: int = 1
-    ) -> Optional[Union[
-            Anime, List[Anime], 
-            Manga, List[Manga],
-            Character, List[Character]
-        ]]:
+        self, type: Literal["anime", "manga", "characters"], query: str, limit: int = 1
+    ) -> Optional[
+        Union[Anime, List[Anime], Manga, List[Manga], Character, List[Character]]
+    ]:
         """|coro|
 
         Search trough Kitsu API with the providen query and fetch the found data
@@ -156,7 +151,7 @@ class Client:
             Represents the search query
         limit: :class:`int`
             Limit the search to a specific number of results
-        
+
         Note
         ------------
         By searching characters, you will not get :attr:`askitsu.Character.media_id` and :attr:`askitsu.Character.role` attributes
@@ -178,7 +173,11 @@ class Client:
         type_lower = type.lower()
         entry = self._entries.get(type_lower)
         fetched_data = await self._get_data(f"{BASE}/{type_lower}/{id}")
-        return entry(attributes=fetched_data["data"], session=self._session) if fetched_data else None
+        return (
+            entry(attributes=fetched_data["data"], session=self._session)
+            if fetched_data
+            else None
+        )
 
     async def get_anime_entry(self, id: int) -> Anime:
         """|coro|
@@ -229,7 +228,7 @@ class Client:
     ) -> Union[Character, List[Character]]:
         """|coro|
 
-        Return a :class:`Character` | List[:class:`Character`] 
+        Return a :class:`Character` | List[:class:`Character`]
 
         Parameters
         -----------
@@ -241,22 +240,16 @@ class Client:
         fetched_data = await self._get_data(
             url=f"{BASE}/{entry.type}/{entry.id}/characters?page%5Blimit%5D={limit}"
         )
-        characters_roles = [
-            link["attributes"]["role"]
-            for link in fetched_data["data"]
-        ]
+        characters_roles = [link["attributes"]["role"] for link in fetched_data["data"]]
         characters_link = [
             link["relationships"]["character"]["links"]["related"]
             for link in fetched_data["data"]
         ]
-        characters = [await Character._character_instance(
-            links, 
-            self, 
-            entry.id, 
-            role) 
+        characters = [
+            await Character._character_instance(links, self, entry.id, role)
             for links, role in zip(characters_link, characters_roles)
         ]
-        return characters if len(characters)>1 else characters[0]
+        return characters if len(characters) > 1 else characters[0]
 
     async def get_trending_entry(
         self, type: Literal["anime", "manga"]
@@ -277,16 +270,14 @@ class Client:
                 f"Please pass 'anime' or 'manga' as parameter to {Fore.LIGHTCYAN_EX}get_trending_entry{Style.RESET_ALL}"
             )
         entry = self._entries.get(type_lower)
-        fetched_data = await self._get_data(
-            f"{BASE}/trending/{type_lower}"
-        )
-        return [entry(attributes=attributes, session=self._session) 
+        fetched_data = await self._get_data(f"{BASE}/trending/{type_lower}")
+        return [
+            entry(attributes=attributes, session=self._session)
             for attributes in fetched_data["data"]
         ]
-        
+
     async def get_reviews(
-        self, entry: Union[Manga, Anime],
-        limit: int = 1
+        self, entry: Union[Manga, Anime], limit: int = 1
     ) -> Optional[Union[Review, List[Review]]]:
         """|coro|
 
@@ -303,10 +294,10 @@ class Client:
             url=f"{BASE}/{entry.entry_type}/{entry.id}/reviews?page%5Blimit%5D={limit}"
         )
         reviews = [
-            Review(entry.id, entry.entry_type, reviews) 
+            Review(entry.id, entry.entry_type, reviews)
             for reviews in fetched_data["data"]
         ]
-        return (reviews if limit>1 else reviews[0]) if reviews else None
+        return (reviews if limit > 1 else reviews[0]) if reviews else None
 
     async def close(self) -> None:
         """

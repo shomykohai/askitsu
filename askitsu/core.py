@@ -33,34 +33,56 @@ BASE: str = "https://kitsu.io/api/edge/"
 
 class Entry:
 
-    __slots__ = ('id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
-                'slug', 'synopsis', 'title', 'rating_rank', 'popularity_rank', 'rating', 'age_rating')
+    __slots__ = (
+        "id",
+        "entry_type",
+        "status",
+        "created_at",
+        "updated_at",
+        "started_at",
+        "ended_at",
+        "slug",
+        "synopsis",
+        "title",
+        "rating_rank",
+        "popularity_rank",
+        "rating",
+        "age_rating",
+    )
 
     def __init__(self, _id: str, _type: str, attributes: dict, session: aiohttp.ClientSession = None):
         self._session = session
-        self.id= _id
+        self.id = _id
         self.entry_type = _type
-        self.status: str = attributes['status']
-        self.created_at: datetime = datetime.strptime(attributes['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            attributes['createdAt']) else None
-        self.updated_at: datetime = datetime.strptime(attributes['updatedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            attributes['updatedAt']) else None
-        self.ended_at: datetime = datetime.strptime(attributes['endDate'], "%Y-%m-%d") if (
-            attributes['endDate']) else None
-        self.slug: str = attributes['slug']
-        self.synopsis: str = attributes['synopsis']
-        self.title: str = attributes['canonicalTitle']
-        self.cover_image = attributes['coverImage']
-        self.poster_image = attributes['posterImage']
-        self.rating_rank = attributes['ratingRank']
-        self.popularity_rank = attributes['popularityRank']
-        self.rating: float = attributes['averageRating']
-        self.age_rating: Literal['G', 'PG', 'R', 'R18'] = attributes['ageRating']
-
+        self.status: str = attributes["status"]
+        self.created_at: datetime = (
+            datetime.strptime(attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (attributes["createdAt"])
+            else None
+        )
+        self.updated_at: datetime = (
+            datetime.strptime(attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (attributes["updatedAt"])
+            else None
+        )
+        self.ended_at: datetime = (
+            datetime.strptime(attributes["endDate"], "%Y-%m-%d")
+            if (attributes["endDate"])
+            else None
+        )
+        self.slug: str = attributes["slug"]
+        self.synopsis: str = attributes["synopsis"]
+        self.title: str = attributes["canonicalTitle"]
+        self.cover_image = attributes["coverImage"]
+        self.poster_image = attributes["posterImage"]
+        self.rating_rank = attributes["ratingRank"]
+        self.popularity_rank = attributes["popularityRank"]
+        self.rating: float = attributes["averageRating"]
+        self.age_rating: Literal["G", "PG", "R", "R18"] = attributes["ageRating"]
 
     def get_cover_image(
-        self, 
-        _size: Optional[Literal["tiny", "small", "large", "original"]] = "original"
+        self,
+        _size: Optional[Literal["tiny", "small", "large", "original"]] = "original",
     ) -> Optional[str]:
         """Get the cover image
 
@@ -69,14 +91,16 @@ class Entry:
             size: Optional[Literal["tiny", "small", "large", "original"]]
                 Size of the cover image
         """
-        try: 
+        try:
             return self.cover_image.get(_size, None)
         except AttributeError:
             return None
 
     def get_poster_image(
-        self, size: 
-        Optional[Literal["tiny", "small", "medium", "large", "original"]] = "original"
+        self,
+        size: Optional[
+            Literal["tiny", "small", "medium", "large", "original"]
+        ] = "original",
     ) -> Optional[str]:
         """Get the cover image
 
@@ -85,7 +109,7 @@ class Entry:
             size: Optional[Literal["tiny", "small", "medium", "large", "original"]]
                 Size of the poster image
         """
-        try: 
+        try:
             return self.poster_image.get(size, None)
         except AttributeError:
             return None
@@ -103,6 +127,7 @@ class Entry:
             categories = [Category(attributes) for attributes in fetched_data["data"]]
             return categories
 
+
 class Category:
     """
     Represent a category of a media.
@@ -113,30 +138,37 @@ class Category:
     updated_at: :class:`datetime`
     title: :class:`str`
         Title of the category
-    description: :class:`str`   
+    description: :class:`str`
         Description of the category
     slug: :class:`str`
         Identifier string of the category
     nsfw: :class:`bool`
         If the category is NSFW or not
     """
-    
-    __slots__ = ('created_at', 'updated_at', 'title', 'description', 'slug', 'nsfw')
+
+    __slots__ = ("created_at", "updated_at", "title", "description", "slug", "nsfw")
 
     def __init__(self, attributes: dict) -> None:
-        data = attributes['attributes']
-        self.created_at: datetime = datetime.strptime(data['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            data['createdAt']) else None
-        self.updated_at: datetime = datetime.strptime(data['updatedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            data['updatedAt']) else None
-        self.title: str = data['title']
-        self.description: str = data['description']
-        self.slug: str = data['slug']
-        self.nsfw: bool = data['nsfw']
+        data = attributes["attributes"]
+        self.created_at: datetime = (
+            datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (data["createdAt"])
+            else None
+        )
+        self.updated_at: datetime = (
+            datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (data["updatedAt"])
+            else None
+        )
+        self.title: str = data["title"]
+        self.description: str = data["description"]
+        self.slug: str = data["slug"]
+        self.nsfw: bool = data["nsfw"]
+
 
 class Review:
     """Represents a :class:`Review` instance.
-    Reviews belong to a media (:class:`Anime`, :class:`Manga`) 
+    Reviews belong to a media (:class:`Anime`, :class:`Manga`)
 
     Attributes
     -----------
@@ -157,18 +189,28 @@ class Review:
         If the review is/has a spoiler or not
     """
 
-    __slots__ = ('id', 'content', 'content_formatted', 'likes_count', 'progress',
-                'rating', 'source', 'spoiler', 'media_id', 'media_type')
+    __slots__ = (
+        "id",
+        "content",
+        "content_formatted",
+        "likes_count",
+        "progress",
+        "rating",
+        "source",
+        "spoiler",
+        "media_id",
+        "media_type",
+    )
 
     def __init__(self, entry_id: str, entry_type: str, attributes: dict) -> None:
-        data = attributes['attributes']
-        self.media_id = entry_id 
+        data = attributes["attributes"]
+        self.media_id = entry_id
         self.media_type = entry_type
-        self.id: str = attributes['id']
-        self.content: str = data['content']
-        self.content_formatted: str = data['contentFormatted']
-        self.likes_count: int = data['likesCount']
-        self.progress: str = data['progress']
-        self.rating: int = data['rating']
-        self.source: str = data['source']
-        self.spoiler: bool = data['spoiler']
+        self.id: str = attributes["id"]
+        self.content: str = data["content"]
+        self.content_formatted: str = data["contentFormatted"]
+        self.likes_count: int = data["likesCount"]
+        self.progress: str = data["progress"]
+        self.rating: int = data["rating"]
+        self.source: str = data["source"]
+        self.spoiler: bool = data["spoiler"]

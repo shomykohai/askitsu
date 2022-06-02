@@ -22,12 +22,13 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-__all__ = ('Anime', 'StreamLink', 'Episode')
+__all__ = ("Anime", "StreamLink", "Episode")
 
 import aiohttp
 from datetime import datetime
 from typing import Optional, Union, List
 from .core import Entry, BASE
+
 
 class StreamLink:
     """
@@ -45,14 +46,16 @@ class StreamLink:
     dub: :class:`list`
         Avaiable dub in streaming service
     """
-    __slots__ = ('id', 'url', 'subs', 'dub')
+
+    __slots__ = ("id", "url", "subs", "dub")
 
     def __init__(self, attributes: dict):
-        data = attributes['attributes']
-        self.id: int = attributes['id']
-        self.url: str = data['url']
-        self.subs: list = data['subs']
-        self.dub: list = data['dubs']
+        data = attributes["attributes"]
+        self.id: int = attributes["id"]
+        self.url: str = data["url"]
+        self.subs: list = data["subs"]
+        self.dub: list = data["dubs"]
+
 
 class Episode:
     """
@@ -80,26 +83,46 @@ class Episode:
     thumbnail: :class:`str`
         Url of the thumbnail
     """
-    __slots__ = ('id', 'created_at', 'updated_at', 'synopsis', 'description',
-                    'title', 'season', 'number', 'length', 'thumbnail')
+
+    __slots__ = (
+        "id",
+        "created_at",
+        "updated_at",
+        "synopsis",
+        "description",
+        "title",
+        "season",
+        "number",
+        "length",
+        "thumbnail",
+    )
 
     def __init__(self, attributes: dict) -> None:
-        data = attributes['attributes']
-        self.id: int = attributes['id']
-        self.created_at: datetime = datetime.strptime(data['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            data['createdAt']) else None
-        self.updated_at: datetime = datetime.strptime(data['updatedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            data['updatedAt']) else None
-        self.synopsis: str = data['synopsis']
-        self.description: str = data['description']
-        self.title: str = data['canonicalTitle']
-        self.season: int = data['seasonNumber']
-        self.number: int = data['number']
-        self.length: int = data['length']
-        self.thumbnail: str = data['thumbnail']['original'] if data['thumbnail'] else None
+        data = attributes["attributes"]
+        self.id: int = attributes["id"]
+        self.created_at: datetime = (
+            datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (data["createdAt"])
+            else None
+        )
+        self.updated_at: datetime = (
+            datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (data["updatedAt"])
+            else None
+        )
+        self.synopsis: str = data["synopsis"]
+        self.description: str = data["description"]
+        self.title: str = data["canonicalTitle"]
+        self.season: int = data["seasonNumber"]
+        self.number: int = data["number"]
+        self.length: int = data["length"]
+        self.thumbnail: str = (
+            data["thumbnail"]["original"] if data["thumbnail"] else None
+        )
+
 
 class Anime(Entry):
-    """Represents an :class:`Anime` instance 
+    """Represents an :class:`Anime` instance
 
     Attributes
     -----------
@@ -150,24 +173,41 @@ class Anime(Entry):
         Categories of the anime
     """
 
-
     __slots__ = (
-        'id', 'entry_type', 'status', 'created_at', 'updated_at', 'started_at', 'ended_at',
-        'slug', 'synopsis', 'title', 'episode_count', 'episode_length', 'total_length',
-        'nsfw', 'yt_id', 'cover_image', 'poster_image', 'rating_rank', 'popularity_rank',
-        'rating', 'age_rating','_session'
+        "id",
+        "entry_type",
+        "status",
+        "created_at",
+        "updated_at",
+        "started_at",
+        "ended_at",
+        "slug",
+        "synopsis",
+        "title",
+        "episode_count",
+        "episode_length",
+        "total_length",
+        "nsfw",
+        "yt_id",
+        "cover_image",
+        "poster_image",
+        "rating_rank",
+        "popularity_rank",
+        "rating",
+        "age_rating",
+        "_session",
     )
 
     def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args) -> None:
-        data = attributes['attributes']
+        data = attributes["attributes"]
         self._session = session
         self.entry_type = "anime"
-        self.episode_count: int = data['episodeCount']
-        self.episode_length: int = data['episodeLength']
-        self.total_length: int = data['totalLength']
-        self.nsfw: bool = data['nsfw']
-        self.yt_id: str = data['youtubeVideoId']
-        super().__init__(attributes['id'], self.entry_type, data, session,*args)
+        self.episode_count: int = data["episodeCount"]
+        self.episode_length: int = data["episodeLength"]
+        self.total_length: int = data["totalLength"]
+        self.nsfw: bool = data["nsfw"]
+        self.yt_id: str = data["youtubeVideoId"]
+        super().__init__(attributes["id"], self.entry_type, data, session, *args)
 
     @property
     def youtube_url(self) -> Optional[str]:
@@ -178,10 +218,12 @@ class Anime(Entry):
             url=f"{BASE}/anime/{self.id}/streaming-links"
         ) as data:
             fetched_data = await data.json()
-            return [
-                StreamLink(links) for links in fetched_data["data"]
-            ] if fetched_data else None
-    
+            return (
+                [StreamLink(links) for links in fetched_data["data"]]
+                if fetched_data
+                else None
+            )
+
     @property
     async def stream_links(self) -> List[StreamLink]:
         return await self._fetch_stream_links()
@@ -192,4 +234,4 @@ class Anime(Entry):
         ) as data:
             fetched_data = await data.json()
             episodes = [Episode(attributes) for attributes in fetched_data["data"]]
-            return episodes if len(episodes)>1 else episodes[0]
+            return episodes if len(episodes) > 1 else episodes[0]

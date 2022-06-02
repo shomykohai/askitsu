@@ -27,6 +27,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional, Literal
 
+
 class Character:
     """Represents a :class:`Character` istance
 
@@ -50,43 +51,63 @@ class Character:
         Return character's image
     created_at: Optional[:class:`datetime`]
     updated_at: Optional[:class:`datetime`]
-    """       
+    """
 
-    __slots__ = ('id', 'type', 'media_id', 'name', 'slug', 'description', 'role',
-                'slug', 'mal_id', 'image', 'created_at', 'updated_at')
+    __slots__ = (
+        "id",
+        "type",
+        "media_id",
+        "name",
+        "slug",
+        "description",
+        "role",
+        "slug",
+        "mal_id",
+        "image",
+        "created_at",
+        "updated_at",
+    )
 
     def __init__(self, attributes: dict, *, entry_id: str = None):
         self.media_id = entry_id
-        data = attributes['attributes']
-        self.id: str = attributes['id']
+        data = attributes["attributes"]
+        self.id: str = attributes["id"]
         self.type: str = "characters"
-        self.name: str = data['canonicalName']
-        self.description: str = data['description']
+        self.name: str = data["canonicalName"]
+        self.description: str = data["description"]
         self.role: Literal["main", "supporting"] = None
-        self.slug: str = data['slug']
-        self.mal_id: str = data['malId']
-        self.created_at: datetime = datetime.strptime(data['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            data['createdAt']) else None
-        self.updated_at: datetime = datetime.strptime(data['updatedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") if (
-            data['updatedAt']) else None
-        self.image: str = data['image']
-
+        self.slug: str = data["slug"]
+        self.mal_id: str = data["malId"]
+        self.created_at: datetime = (
+            datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (data["createdAt"])
+            else None
+        )
+        self.updated_at: datetime = (
+            datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (data["updatedAt"])
+            else None
+        )
+        self.image: str = data["image"]
 
     @classmethod
     async def _character_instance(
-            cls, 
-            link: str = None,
-            _cls = None, 
-            entry_id: str = None, 
-            role: Literal["main", "supporting"] = None
+        cls,
+        link: str = None,
+        _cls=None,
+        entry_id: str = None,
+        role: Literal["main", "supporting"] = None,
     ) -> Character:
         _data = await _cls._get_data(url=link)
         _character = Character(_data["data"], entry_id)
         _character.role = role
         return _character
 
-    def get_image(self, size: 
-        Optional[Literal["tiny", "small", "medium", "large", "original"]] = "original"
+    def get_image(
+        self,
+        size: Optional[
+            Literal["tiny", "small", "medium", "large", "original"]
+        ] = "original",
     ) -> Optional[str]:
         """Get character image
 
@@ -95,8 +116,7 @@ class Character:
             size: Optional[Literal["tiny", "small", "medium", "large", "original"]]
                 Size of the cover image
         """
-        try: 
+        try:
             return self.image.get(size, None)
         except AttributeError:
             return None
-        
