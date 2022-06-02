@@ -10,7 +10,7 @@ askitsu
   An async wrapper for Kitsu.io API written in Python
 </p>
 
-![askitsu](./docs/images/dark.png?raw=true "askitsu")
+![askitsu](https://github.com/ShomyKohai/askitsu/blob/master/docs/images/dark.png?raw=true "askitsu")
   
 # Key features
 
