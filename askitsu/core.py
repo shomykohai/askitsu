@@ -82,11 +82,15 @@ class Entry:
         self.age_rating: Literal["G", "PG", "R", "R18"] = attributes["ageRating"]
         self.subtype: str = attributes["subtype"]
 
-    def get_cover_image(
+    async def get_cover_image(
         self,
         _size: Optional[Literal["tiny", "small", "large", "original"]] = "original",
     ) -> Optional[str]:
         """Get the cover image
+
+        .. versionchanged:: 0.4.1
+
+            Made the method async
 
         Parameters
         -----------
@@ -98,13 +102,17 @@ class Entry:
         except AttributeError:
             return None
 
-    def get_poster_image(
+    async def get_poster_image(
         self,
         size: Optional[
             Literal["tiny", "small", "medium", "large", "original"]
         ] = "original",
     ) -> Optional[str]:
         """Get the cover image
+
+        .. versionchanged:: 0.4.1
+
+            Made the method async
 
         Parameters
         -----------
