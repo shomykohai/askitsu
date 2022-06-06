@@ -27,6 +27,8 @@ from colorama import Fore, Style
 class AskitsuException(Exception):
     """
     Base class for most of the library errors
+
+    .. versionadded:: 0.4.0
     """
 
     pass
@@ -67,6 +69,8 @@ class NotAuthenticated(HTTPError):
     """
     Raises when an Authenticated API request
     get place without being authenticated
+
+    .. versionadded:: 0.3.0
     """
 
     def __init__(self) -> None:
@@ -81,6 +85,8 @@ class NotAuthenticated(HTTPError):
 class BadApiRequest(HTTPError):
     """
     Raises when a 400 error code takes place
+
+    .. versionadded:: 0.4.0
     """
 
     def __init__(self, response: str) -> None:

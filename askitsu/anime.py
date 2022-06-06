@@ -61,6 +61,7 @@ class Episode:
     """
     Represent an :class:`Anime` episode
 
+    .. versionadded:: 0.4.0
 
     Attributes
     -----------
@@ -163,14 +164,33 @@ class Anime(Entry):
         Return full url of YouTube trailer
     url: :class:`str`
         Returns url to Kitsu.io website
+
+        .. versionadded:: 0.4.0
+
     stream_links: List[:class:`StreamLink`]
         Return a list of :class:StreamLink
+
+        .. versionadded:: 0.4.0
+
     rating: :class:`float`
         The rating received from the community in a scale from 1 to 100
+
+        .. versionadded:: 0.4.0
+
     age_rating: Literal['G', 'PG', 'R', 'R18']
         Age rating of the anime
+
+        .. versionadded:: 0.4.0
+
     categories: List[:class:`Category`]
         Categories of the anime
+
+        .. versionadded:: 0.4.0
+
+    subtype: Literal['ONA', 'OVA', 'TV', 'movie', 'music', 'special']
+        The subtype of the show
+
+        .. versionadded:: 0.4.1
     """
 
     __slots__ = (
@@ -195,6 +215,7 @@ class Anime(Entry):
         "popularity_rank",
         "rating",
         "age_rating",
+        "subtype",
         "_session",
     )
 
@@ -229,6 +250,14 @@ class Anime(Entry):
         return await self._fetch_stream_links()
 
     async def episodes(self, limit: int = 12) -> Union[Episode, List[Episode]]:
+        """
+        Returns a a episode or a list of episodes
+
+        .. versionadded:: 0.4.0
+
+        limit: :class:`int`
+            Limit of episodes to fetch. Defaults to 12 (Max 25).
+        """
         async with self._session.get(
             url=f"{BASE}/anime/{self.id}/episodes?page[limit]={limit}"
         ) as data:

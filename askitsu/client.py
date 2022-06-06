@@ -145,6 +145,8 @@ class Client:
 
         Shortcut function to :meth:`search` with the `type` parameter populated by the "character" keyword
 
+        .. versionadded:: 0.3.0
+
         Parameters
         -----------
         query: :class:`str`
@@ -195,6 +197,8 @@ class Client:
         """|coro|
 
         Shortcut for :meth:`get_entry`; returns only `Manga` object
+
+        .. versionadded:: 0.3.0
 
         Parameters
         -----------
@@ -258,6 +262,8 @@ class Client:
 
         Return a list of anime or manga
 
+        .. versionadded:: 0.2.1
+
         Parameters
         -----------
         entry: Union[:class:`Anime`, :class:`Manga`]
@@ -282,6 +288,8 @@ class Client:
         """|coro|
 
         Get reviews of a given entry
+
+        .. versionadded:: 0.3.0
 
         Parameters
         -----------

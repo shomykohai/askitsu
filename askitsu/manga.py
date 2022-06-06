@@ -137,12 +137,28 @@ class Manga(Entry):
         Return popularity rank position
     url: :class:`str`
         Returns url to Kitsu.io website
+
+        .. versionadded:: 0.4.0
+
     rating: :class:`float`
         The rating received from the community in a scale from 1 to 100
+
+        .. versionadded:: 0.4.0
+
     age_rating: Literal['G', 'PG', 'R', 'R18']
         Age rating of the manga
+
+        .. versionadded:: 0.4.0
+
     categories: List[:class:`Category`]
         Categories of the manga
+
+        .. versionadded:: 0.4.0
+
+    subtype: Literal['doujin', 'manga', 'manhua', 'manhwa', 'novel', 'oel', 'oneshot']
+        The subtype of the manga
+
+        .. versionadded:: 0.4.1
     """
 
     __slots__ = (
@@ -165,6 +181,7 @@ class Manga(Entry):
         "serialization",
         "rating",
         "age_rating",
+        "subtype",
         "_session",
     )
 
@@ -178,6 +195,14 @@ class Manga(Entry):
         super().__init__(attributes["id"], self.entry_type, data, session, *args)
 
     async def chapters(self, limit: int = 12) -> Union[Chapter, List[Chapter]]:
+        """
+        Returns a chapter list of chapters
+
+        .. versionadded:: 0.4.0
+
+        limit: :class:`int`
+            Limit of chapters to fetch. Defaults to 12 (Max 25).
+        """
         async with self._session.get(
             url=f"{BASE}/manga/{self.id}/chapters?page[limit]={limit}"
         ) as data:

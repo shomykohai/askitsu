@@ -31,6 +31,8 @@ from typing import Optional, Literal
 class Character:
     """Represents a :class:`Character` istance
 
+    .. versionadded:: 0.2.0
+
     Attributes
     -----------
     media_id: :class:`int`

@@ -48,6 +48,7 @@ class Entry:
         "popularity_rank",
         "rating",
         "age_rating",
+        "subtype"
     )
 
     def __init__(self, _id: str, _type: str, attributes: dict, session: aiohttp.ClientSession = None):
@@ -79,6 +80,7 @@ class Entry:
         self.popularity_rank = attributes["popularityRank"]
         self.rating: float = attributes["averageRating"]
         self.age_rating: Literal["G", "PG", "R", "R18"] = attributes["ageRating"]
+        self.subtype: str = attributes["subtype"]
 
     def get_cover_image(
         self,
@@ -132,6 +134,8 @@ class Category:
     """
     Represent a category of a media.
 
+    .. versionadded:: 0.4.0
+
     Attributes
     ------------
     created_at: :class:`datetime`
@@ -169,6 +173,8 @@ class Category:
 class Review:
     """Represents a :class:`Review` instance.
     Reviews belong to a media (:class:`Anime`, :class:`Manga`)
+
+    .. versionadded:: 0.3.0
 
     Attributes
     -----------
