@@ -43,25 +43,32 @@ class Client:
 
     Parameters
     -----------
+    token: :class:`str`
+        Access token to make authenticated requests.\n
+        Useful when you need to fetch NSFW content, interact with users or post something. 
+
+        .. versionadded:: 0.4.1
+
     session: Optional[:class:`aiohttp.ClientSession`]
         An object that represents the effective connection
-
     """
 
-    def __init__(self, session: Optional[aiohttp.ClientSession] = None) -> None:
+    def __init__(self, token: str = None, *, session: Optional[aiohttp.ClientSession] = None) -> None:
         self._entries = {
             "anime": Anime,
             "manga": Manga,
             "characters": Character
         }
+        self.__authorization = f"Bearer {token}" if token else None
         self._session: aiohttp.ClientSession = session or aiohttp.ClientSession()
-        self._headers = {
+        self.__headers = {
             "Accept": "application/vnd.api+json",
             "Content-Type": "application/vnd.api+json",
+            "Authorization": self.__authorization
         }
 
     async def _get_data(self, url: str) -> Any:
-        async with self._session.get(url=url, headers=self._headers) as response:
+        async with self._session.get(url=url, headers=self.__headers) as response:
             response_data = await response.json()
             if response.status == 200:
                 return response_data
