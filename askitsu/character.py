@@ -70,14 +70,14 @@ class Character:
         "updated_at",
     )
 
-    def __init__(self, attributes: dict, *, entry_id: str = None):
+    def __init__(self, attributes: dict, *, role: str = None, entry_id: str = None):
         self.media_id = entry_id
         data = attributes["attributes"]
         self.id: str = attributes["id"]
         self.type: str = "characters"
         self.name: str = data["canonicalName"]
         self.description: str = data["description"]
-        self.role: Literal["main", "supporting"] = None
+        self.role: Literal["main", "supporting"] = role
         self.slug: str = data["slug"]
         self.mal_id: str = data["malId"]
         self.created_at: datetime = (

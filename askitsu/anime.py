@@ -191,6 +191,16 @@ class Anime(Entry):
         The subtype of the show
 
         .. versionadded:: 0.4.1
+
+    characters: Union[:class:`Character`, List[:class:`Character`]
+        Get all characters (Max 20)
+
+        .. versionadded:: 0.4.1
+
+        Note
+        --------------
+        Use :meth:`askitsu.Client.get_characters` if you want to set a limit\n
+        The limit with this property is automatically set to 20 (The highest)
     """
 
     __slots__ = (

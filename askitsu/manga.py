@@ -159,6 +159,16 @@ class Manga(Entry):
         The subtype of the manga
 
         .. versionadded:: 0.4.1
+
+    characters: Union[:class:`Character`, List[:class:`Character`]
+        Get all characters (Max 20)
+
+        .. versionadded:: 0.4.1
+
+        Note
+        --------------
+        Use :meth:`askitsu.Client.get_characters` if you want to set a limit\n
+        The limit with this property is automatically set to 20 (The highest)
     """
 
     __slots__ = (
@@ -201,7 +211,7 @@ class Manga(Entry):
         .. versionadded:: 0.4.0
 
         limit: :class:`int`
-            Limit of chapters to fetch. Defaults to 12 (Max 25).
+            Limit of chapters to fetch. Defaults to 12 (Max 20).
         """
         async with self._session.get(
             url=f"{BASE}/manga/{self.id}/chapters?page[limit]={limit}"

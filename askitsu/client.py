@@ -249,16 +249,12 @@ class Client:
             Number of characters' fetch
         """
         fetched_data = await self._get_data(
-            url=f"{BASE}/{entry.type}/{entry.id}/characters?page%5Blimit%5D={limit}"
+            url=f"{BASE}/{entry.entry_type}/{entry.id}/characters?include=character&page%5Blimit%5D={limit}"
         )
         characters_roles = [link["attributes"]["role"] for link in fetched_data["data"]]
-        characters_link = [
-            link["relationships"]["character"]["links"]["related"]
-            for link in fetched_data["data"]
-        ]
         characters = [
-            await Character._character_instance(links, self, entry.id, role)
-            for links, role in zip(characters_link, characters_roles)
+            Character(attributes, role=role, entry_id=entry.id) 
+            for attributes, role in zip(fetched_data["included"], characters_roles)
         ]
         return characters if len(characters) > 1 else characters[0]
 

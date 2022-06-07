@@ -26,7 +26,8 @@ from __future__ import annotations
 
 import aiohttp
 from datetime import datetime
-from typing import Optional, Literal, List
+from typing import Optional, Literal, Union, List
+from .character import Character
 
 BASE: str = "https://kitsu.io/api/edge/"
 
@@ -137,6 +138,18 @@ class Entry:
             categories = [Category(attributes) for attributes in fetched_data["data"]]
             return categories
 
+    @property
+    async def characters(self) -> Union[Character, List[Character]]:
+        async with self._session.get(
+            url=f"{BASE}/{self.entry_type}/{self.id}/characters?include=character&page%5Blimit%5D=20"
+        ) as data:
+            fetched_data = await data.json()
+            characters_roles = [link["attributes"]["role"] for link in fetched_data["data"]]
+            characters = [
+                Character(attributes, role=role, entry_id=self.id)
+                for attributes, role in zip(fetched_data["included"], characters_roles)
+            ]
+            return characters if len(characters) > 1 else characters[0]
 
 class Category:
     """
