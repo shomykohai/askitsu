@@ -59,7 +59,7 @@ class Client:
             "manga": Manga,
             "characters": Character
         }
-        self.__authorization = f"Bearer {token}" if token else None
+        self.__authorization = f"Bearer {token}" if token else ""
         self._session: aiohttp.ClientSession = session or aiohttp.ClientSession()
         self.__headers = {
             "Accept": "application/vnd.api+json",
