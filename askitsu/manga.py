@@ -121,6 +121,15 @@ class Manga(Entry):
         Description of the given manga
     title: :class:`str`
         Return canon title of the given manga
+
+        .. versionchanged:: 0.4.1
+
+        Now it returns an instance of :class:`askitsu.Title`
+    canonical_title: :class:`str`
+        Returns canonical title of the given manga
+
+        .. versionadded:: 0.4.1
+        
     chapter_count: :class:`int`
         Number of chapters
     volume_count: :class:`int`
@@ -181,7 +190,7 @@ class Manga(Entry):
         "ended_at",
         "slug",
         "synopsis",
-        "title",
+        "canonical_title",
         "cover_image",
         "poster_image",
         "rating_rank",
@@ -193,6 +202,7 @@ class Manga(Entry):
         "age_rating",
         "subtype",
         "_session",
+        "_titles"
     )
 
     def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args) -> None:

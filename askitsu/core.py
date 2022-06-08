@@ -44,7 +44,7 @@ class Entry:
         "ended_at",
         "slug",
         "synopsis",
-        "title",
+        "canonical_title",
         "rating_rank",
         "popularity_rank",
         "rating",
@@ -54,6 +54,7 @@ class Entry:
 
     def __init__(self, _id: int, _type: str, attributes: dict, session: aiohttp.ClientSession = None):
         self._session = session
+        self._titles: dict = attributes["titles"]
         self.id = int(_id)
         self.entry_type = _type
         self.status: str = attributes["status"]
@@ -74,7 +75,7 @@ class Entry:
         )
         self.slug: str = attributes["slug"]
         self.synopsis: str = attributes["synopsis"]
-        self.title: str = attributes["canonicalTitle"]
+        self.canonical_title: str = attributes["canonicalTitle"]
         self.cover_image = attributes["coverImage"]
         self.poster_image = attributes["posterImage"]
         self.rating_rank = attributes["ratingRank"]
@@ -128,6 +129,10 @@ class Entry:
     @property
     def url(self) -> str:
         return f"https://kitsu.io/{self.entry_type}/{self.slug}"
+
+    @property
+    def title(self) -> Title:
+        return Title(self._titles, self.id, self.entry_type)
 
     @property
     async def categories(self) -> List[Category]:

@@ -141,6 +141,15 @@ class Anime(Entry):
         Description of the given anime
     title: :class:`str`
         Return canon title of the given anime
+
+        .. versionchanged:: 0.4.1
+
+        Now it returns an instance of :class:`askitsu.Title`
+    canonical_title: :class:`str`
+        Returns canonical title of the given anime
+
+        .. versionadded:: 0.4.1
+
     episode_count: :class:`int`
         Episode number
     episode_lenght: :class:`int`
@@ -213,7 +222,7 @@ class Anime(Entry):
         "ended_at",
         "slug",
         "synopsis",
-        "title",
+        "canonical_title",
         "episode_count",
         "episode_length",
         "total_length",
@@ -227,6 +236,7 @@ class Anime(Entry):
         "age_rating",
         "subtype",
         "_session",
+        "_titles"
     )
 
     def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args) -> None:
