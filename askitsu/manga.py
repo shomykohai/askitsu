@@ -136,10 +136,20 @@ class Manga(Entry):
         Number of volumes
     serialization: :class:`str`
         Return manga serialization
-    cover_image: :class:`str`
-        Return cover image
-    poster_image: :class:`str`
-        Return poster image
+    cover_image: :class:`CoverImage`
+        Return cover image dict with all sizes
+
+        .. versionchanged:: 0.4.1
+
+        Now it returns a cover image object
+
+    poster_image: :class:`PosterImage`
+        Return poster image dict with all sizes
+
+        .. versionchanged:: 0.4.1
+
+        Now it returns a poster image object
+
     rating_rank: :class:`int`
         Return rating rank
     popularity_rank: :class:`int`
@@ -191,8 +201,6 @@ class Manga(Entry):
         "slug",
         "synopsis",
         "canonical_title",
-        "cover_image",
-        "poster_image",
         "rating_rank",
         "popularity_rank",
         "chapter_count",
@@ -202,7 +210,8 @@ class Manga(Entry):
         "age_rating",
         "subtype",
         "_session",
-        "_titles"
+        "_titles",
+        "_attributes"
     )
 
     def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args) -> None:

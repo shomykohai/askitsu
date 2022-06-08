@@ -161,10 +161,20 @@ class Anime(Entry):
         Return True | False
     yt_id: :class:`str`
         Return id of the YouTube trailer
-    cover_image: :class:`dict`
+    cover_image: :class:`CoverImage`
         Return cover image dict with all sizes
-    poster_image: :class:`dict`
+
+        .. versionchanged:: 0.4.1
+
+        Now it returns a cover image object
+
+    poster_image: :class:`PosterImage`
         Return poster image dict with all sizes
+
+        .. versionchanged:: 0.4.1
+
+        Now it returns a poster image object
+
     rating_rank: :class:`int`
         Return rating rank (Position on the leaderboard based on rating)
     popularity_rank: :class:`int`
@@ -228,15 +238,14 @@ class Anime(Entry):
         "total_length",
         "nsfw",
         "yt_id",
-        "cover_image",
-        "poster_image",
         "rating_rank",
         "popularity_rank",
         "rating",
         "age_rating",
         "subtype",
         "_session",
-        "_titles"
+        "_titles",
+        "_attributes"
     )
 
     def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args) -> None:

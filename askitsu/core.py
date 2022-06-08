@@ -27,7 +27,9 @@ from __future__ import annotations
 import aiohttp
 from datetime import datetime
 from typing import Optional, Literal, Union, List
+
 from .character import Character
+from .images import CoverImage, PosterImage
 
 BASE: str = "https://kitsu.io/api/edge/"
 
@@ -54,6 +56,7 @@ class Entry:
 
     def __init__(self, _id: int, _type: str, attributes: dict, session: aiohttp.ClientSession = None):
         self._session = session
+        self._attributes = attributes
         self._titles: dict = attributes["titles"]
         self.id = int(_id)
         self.entry_type = _type
@@ -76,55 +79,12 @@ class Entry:
         self.slug: str = attributes["slug"]
         self.synopsis: str = attributes["synopsis"]
         self.canonical_title: str = attributes["canonicalTitle"]
-        self.cover_image = attributes["coverImage"]
-        self.poster_image = attributes["posterImage"]
         self.rating_rank = attributes["ratingRank"]
         self.popularity_rank = attributes["popularityRank"]
         self.rating: float = attributes["averageRating"]
         self.age_rating: Literal["G", "PG", "R", "R18"] = attributes["ageRating"]
         self.subtype: str = attributes["subtype"]
 
-    async def get_cover_image(
-        self,
-        _size: Optional[Literal["tiny", "small", "large", "original"]] = "original",
-    ) -> Optional[str]:
-        """Get the cover image
-
-        .. versionchanged:: 0.4.1
-
-            Made the method async
-
-        Parameters
-        -----------
-            size: Optional[Literal["tiny", "small", "large", "original"]]
-                Size of the cover image
-        """
-        try:
-            return self.cover_image.get(_size, None)
-        except AttributeError:
-            return None
-
-    async def get_poster_image(
-        self,
-        size: Optional[
-            Literal["tiny", "small", "medium", "large", "original"]
-        ] = "original",
-    ) -> Optional[str]:
-        """Get the cover image
-
-        .. versionchanged:: 0.4.1
-
-            Made the method async
-
-        Parameters
-        -----------
-            size: Optional[Literal["tiny", "small", "medium", "large", "original"]]
-                Size of the poster image
-        """
-        try:
-            return self.poster_image.get(size, None)
-        except AttributeError:
-            return None
 
     @property
     def url(self) -> str:
@@ -133,6 +93,22 @@ class Entry:
     @property
     def title(self) -> Title:
         return Title(self._titles, self.id, self.entry_type)
+    
+    @property
+    def poster_image(self) -> PosterImage:
+        return PosterImage(
+            self._attributes["posterImage"],
+            self.id,
+            self.entry_type
+        )
+
+    @property
+    def cover_image(self) -> CoverImage:
+        return CoverImage(
+            self._attributes["coverImage"],
+            self.id,
+            self.entry_type
+        )
 
     @property
     async def categories(self) -> List[Category]:

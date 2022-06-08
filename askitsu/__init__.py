@@ -20,4 +20,5 @@ from .anime import *
 from .client import *
 from .core import *
 from .error import *
+from .images import *
 from .manga import *
