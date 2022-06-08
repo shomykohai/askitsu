@@ -151,6 +151,17 @@ class Entry:
             ]
             return characters if len(characters) > 1 else characters[0]
 
+    async def reviews(self, limit: int = 1) -> Optional[Union[Review, List[Review]]]:
+        async with self._session.get(
+            url=f"{BASE}/{self.entry_type}/{self.id}/reviews?page%5Blimit%5D={limit}"
+        ) as data:
+            fetched_data = await data.json()
+            reviews = [
+                Review(self.id, self.entry_type, reviews)
+                for reviews in fetched_data["data"]
+            ]
+            return (reviews if limit > 1 else reviews[0]) if reviews else None
+
 class Category:
     """
     Represent a category of a media.

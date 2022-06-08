@@ -199,8 +199,8 @@ class Manga(Entry):
         data = attributes["attributes"]
         self._session = session
         self.entry_type: str = "manga"
-        self.chapter_count: int = int(data["chapterCount"])
-        self.volume_count: int = int(data["volumeCount"])
+        self.chapter_count: int = data["chapterCount"]
+        self.volume_count: int = data["volumeCount"]
         self.serialization: str = data["serialization"]
         super().__init__(attributes["id"], self.entry_type, data, session, *args)
 
