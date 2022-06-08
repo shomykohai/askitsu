@@ -72,6 +72,11 @@ Reviews
 .. autoclass:: askitsu.Review
    :members:
 
+Titles
+---------------------
+.. autoclass:: askitsu.Title
+   :members:
+
 Errors
 ==============
 

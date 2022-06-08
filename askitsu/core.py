@@ -252,3 +252,44 @@ class Review:
         self.rating: int = data["rating"]
         self.source: str = data["source"]
         self.spoiler: bool = data["spoiler"]
+
+
+class Title:
+    """
+    Represent the various titles that a entry can have
+
+    Attributes
+    -----------
+    entry_id: :class:`int`
+        The id of the media which the title belong to
+    entry_type: :class:`str`
+        The type of the media (anime, manga)
+    en: :class:`str`
+        The title of the media in English
+    en_jp: :class:`str`
+        The title of the media in romanized Japanese
+    romaji: :class:`str`
+        Same as :attr:`en_jp`
+    ja_jp: :class:`str`
+        The title of the media in Japanese
+    """
+    def __init__(self, data: dict, entry_id: int = None, entry_type: str = None) -> None:
+        self.__data = data
+        self.entry_id = entry_id
+        self.entry_type = entry_type
+
+    @property
+    def en(self) -> Optional[str]:
+        return self.__data.get("en")
+
+    @property
+    def en_jp(self) -> Optional[str]:
+        return self.__data.get("en_jp")
+
+    @property
+    def romaji(self) -> Optional[str]:
+        return self.en_jp
+
+    @property
+    def ja_jp(self) -> Optional[str]:
+        return self.__data.get("ja_jp")
