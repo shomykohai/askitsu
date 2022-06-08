@@ -21,7 +21,7 @@ Anime
 --------------------
 
 .. autoclass:: askitsu.Anime
-   :members: get_cover_image, get_poster_image, episodes, categories
+   :members: episodes, categories
    :show-inheritance:
 
 Episode
@@ -41,7 +41,7 @@ Manga
 --------------------
 
 .. autoclass:: askitsu.Manga
-   :members: get_cover_image, get_poster_image, chapters, categories
+   :members: chapters, categories
    :show-inheritance:
 
 Chapter
@@ -75,6 +75,16 @@ Reviews
 Titles
 ---------------------
 .. autoclass:: askitsu.Title
+   :members:
+
+CoverImage
+---------------------
+.. autoclass:: askitsu.CoverImage
+   :members:
+
+PosterImage
+---------------------
+.. autoclass:: askitsu.PosterImage
    :members:
 
 Errors

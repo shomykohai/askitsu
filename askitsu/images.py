@@ -42,6 +42,26 @@ from typing import Optional, Literal
 #         return PosterImage(self._data["coverImage"])
 
 class PosterImage:
+    """
+    Poster image of a media
+
+    Attributes
+    ---------------
+    entry_id: :class:`int`
+        The id which the poster image belongs to
+    entry_id: :class:`str`
+        The type of the media
+    tiny: :class:`str`
+        Poster image -- size: tiny
+    small: :class:`str`
+        Poster image -- size: small
+    medium: :class:`str`
+        Poster image -- size: medium
+    large: :class:`str`
+        Poster image -- size: large
+    original: :class:`str`
+        Poster image with original size
+    """
 
     def __init__(self, data: dict, entry_id: int = None, entry_type: str = None) -> None:
         self._data = data
@@ -76,6 +96,26 @@ class PosterImage:
 
 
 class CoverImage:
+    """
+    Cover image of a media
+
+    Attributes
+    ---------------
+    entry_id: :class:`int`
+        The id which the cover image belongs to
+    entry_id: :class:`str`
+        The type of the media
+    tiny: :class:`str`
+        Cover image -- size: tiny
+    small: :class:`str`
+        Cover image -- size: small
+    medium: :class:`str`
+        Cover image -- size: medium
+    large: :class:`str`
+        Cover image -- size: large
+    original: :class:`str`
+        Cover image with original size
+    """
 
     def __init__(self, data: dict, entry_id: int = None, entry_type: str = None) -> None:
         self._data = data
