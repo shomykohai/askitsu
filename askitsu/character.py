@@ -70,16 +70,16 @@ class Character:
         "updated_at",
     )
 
-    def __init__(self, attributes: dict, *, role: str = None, entry_id: str = None):
-        self.media_id = entry_id
+    def __init__(self, attributes: dict, *, role: str = None, entry_id: int = None):
+        self.media_id = int(entry_id)
         data = attributes["attributes"]
-        self.id: str = attributes["id"]
+        self.id: int = int(attributes["id"])
         self.type: str = "characters"
         self.name: str = data["canonicalName"]
         self.description: str = data["description"]
         self.role: Literal["main", "supporting"] = role
         self.slug: str = data["slug"]
-        self.mal_id: str = data["malId"]
+        self.mal_id: int = int(data["malId"])
         self.created_at: datetime = (
             datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["createdAt"])

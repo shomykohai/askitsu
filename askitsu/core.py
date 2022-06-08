@@ -52,9 +52,9 @@ class Entry:
         "subtype"
     )
 
-    def __init__(self, _id: str, _type: str, attributes: dict, session: aiohttp.ClientSession = None):
+    def __init__(self, _id: int, _type: str, attributes: dict, session: aiohttp.ClientSession = None):
         self._session = session
-        self.id = _id
+        self.id = int(_id)
         self.entry_type = _type
         self.status: str = attributes["status"]
         self.created_at: datetime = (

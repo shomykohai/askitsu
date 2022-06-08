@@ -75,7 +75,7 @@ class Chapter:
 
     def __init__(self, attributes: dict) -> None:
         data = attributes["attributes"]
-        self.id: int = attributes["id"]
+        self.id: int = int(attributes["id"])
         self.created_at: datetime = (
             datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["createdAt"])
@@ -199,8 +199,8 @@ class Manga(Entry):
         data = attributes["attributes"]
         self._session = session
         self.entry_type: str = "manga"
-        self.chapter_count: int = data["chapterCount"]
-        self.volume_count: int = data["volumeCount"]
+        self.chapter_count: int = int(data["chapterCount"])
+        self.volume_count: int = int(data["volumeCount"])
         self.serialization: str = data["serialization"]
         super().__init__(attributes["id"], self.entry_type, data, session, *args)
 

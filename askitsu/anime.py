@@ -51,7 +51,7 @@ class StreamLink:
 
     def __init__(self, attributes: dict):
         data = attributes["attributes"]
-        self.id: int = attributes["id"]
+        self.id: int = int(attributes["id"])
         self.url: str = data["url"]
         self.subs: list = data["subs"]
         self.dub: list = data["dubs"]
@@ -100,7 +100,7 @@ class Episode:
 
     def __init__(self, attributes: dict) -> None:
         data = attributes["attributes"]
-        self.id: int = attributes["id"]
+        self.id: int = int(attributes["id"])
         self.created_at: datetime = (
             datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["createdAt"])
