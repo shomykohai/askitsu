@@ -70,9 +70,9 @@ class PosterImage:
 
     def dimension(
         self, 
-        size: Literal["tiny", "small", "medium", "large", "original"]
+        size: Literal["tiny", "small", "medium", "large"]
     ) -> dict:
-        return self._data["meta"][size]
+        return self._data["meta"]["dimensions"][size]
 
 
 class CoverImage:
@@ -100,6 +100,6 @@ class CoverImage:
 
     def dimension(
         self, 
-        size: Literal["tiny", "small", "large", "original"]
+        size: Literal["tiny", "small", "large"]
     ) -> dict:
-        return self._data["meta"][size]
+        return self._data["meta"]["dimensions"][size]
