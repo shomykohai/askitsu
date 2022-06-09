@@ -49,7 +49,7 @@ class PosterImage:
     ---------------
     entry_id: :class:`int`
         The id which the poster image belongs to
-    entry_id: :class:`str`
+    entry_type: :class:`str`
         The type of the media
     tiny: :class:`str`
         Poster image -- size: tiny
@@ -103,7 +103,7 @@ class CoverImage:
     ---------------
     entry_id: :class:`int`
         The id which the cover image belongs to
-    entry_id: :class:`str`
+    entry_type: :class:`str`
         The type of the media
     tiny: :class:`str`
         Cover image -- size: tiny

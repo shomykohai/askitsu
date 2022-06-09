@@ -38,4 +38,4 @@ To install the library you simply run this command
 
         python3 -m pip install git+https://github.com/ShomyKohai/askitsu.git
 
-Next: :doc:`Simple examples <../examples>`
+Next: :doc:`Token <../token>`

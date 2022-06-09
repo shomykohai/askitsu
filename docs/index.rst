@@ -15,9 +15,9 @@ askitsu
 
 Introduction
 ==================
-To begin with askitsu you can read the guide below
-   * :doc:`Introduction <../introduction>`
-   * :doc:`Examples <../examples>`
+To begin with askitsu you can read the guides below
+   * **First steps** to work with the library: :doc:`Introduction <../introduction>` | :doc:`Token <../token>`
+   * **Simple examples** to get started with the library: :doc:`Examples <../examples>`
 
 
 Tree
@@ -31,6 +31,7 @@ Tree
    :caption: Contents:
 
    introduction
+   token
    examples
 
 .. toctree::
