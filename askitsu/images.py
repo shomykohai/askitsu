@@ -70,29 +70,47 @@ class PosterImage:
 
     @property
     def tiny(self) -> Optional[str]:
-        return self._data["tiny"]
-
+        try:
+            return self._data.get("tiny", None)
+        except:
+            return None
+    
     @property
     def small(self) -> Optional[str]:
-        return self._data["small"]
+        try:
+            return self._data.get("small", None)
+        except:
+            return None
 
     @property
     def medium(self) -> Optional[str]:
-        return self._data["medium"]
+        try:
+            return self._data.get("medium", None)
+        except:
+            return None
 
     @property
     def large(self) -> Optional[str]:
-        return self._data["large"]
+        try:
+            return self._data.get("large", None)
+        except:
+            return None
 
     @property
     def original(self) -> Optional[str]:
-        return self._data["original"]
+        try:
+            return self._data.get("original", None)
+        except:
+            return None
 
     def dimension(
         self, 
         size: Literal["tiny", "small", "medium", "large"]
-    ) -> dict:
-        return self._data["meta"]["dimensions"][size]
+    ) -> Optional[dict]:
+        try:
+            return self._data["meta"]["dimensions"][size]
+        except:
+            return None
 
 
 class CoverImage:
@@ -124,22 +142,37 @@ class CoverImage:
 
     @property
     def tiny(self) -> Optional[str]:
-        return self._data["tiny"]
-
+        try:
+            return self._data.get("tiny", None)
+        except:
+            return None
+    
     @property
     def small(self) -> Optional[str]:
-        return self._data["small"]
+        try:
+            return self._data.get("small", None)
+        except:
+            return None
 
     @property
     def large(self) -> Optional[str]:
-        return self._data["large"]
+        try:
+            return self._data.get("large", None)
+        except:
+            return None
 
     @property
     def original(self) -> Optional[str]:
-        return self._data["original"]
+        try:
+            return self._data.get("original", None)
+        except:
+            return None
 
     def dimension(
         self, 
         size: Literal["tiny", "small", "large"]
-    ) -> dict:
-        return self._data["meta"]["dimensions"][size]
+    ) -> Optional[dict]:
+        try:
+            return self._data["meta"]["dimensions"][size]
+        except:
+            return None
