@@ -26,7 +26,7 @@ __all__ = ("Manga", "Chapter")
 
 import aiohttp
 from datetime import datetime
-from typing import Union, List
+from typing import Union, List, Optional
 from .core import Entry, BASE
 
 
@@ -39,9 +39,9 @@ class Chapter:
     -----------
     id: :class:`int`
         ID of the chapter
-    created_at: :class:`datetime`
-    updated_at: :class:`datetime`
-    published: :class:`datetime`
+    created_at: Optional[:class:`datetime`]
+    updated_at: Optional[:class:`datetime`]
+    published: Optional[:class:`datetime`]
         When the chapter got published (YYYY-mm-dd)
     synopsis: :class:`str`
         Synopsis of the chapter
@@ -76,17 +76,17 @@ class Chapter:
     def __init__(self, attributes: dict) -> None:
         data = attributes["attributes"]
         self.id: int = int(attributes["id"])
-        self.created_at: datetime = (
+        self.created_at: Optional[datetime] = (
             datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["createdAt"])
             else None
         )
-        self.updated_at: datetime = (
+        self.updated_at: Optional[datetime] = (
             datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["updatedAt"])
             else None
         )
-        self.published: datetime = (
+        self.published: Optional[datetime] = (
             datetime.strptime(data["published"], "%Y-%m-%d")
             if (data["published"])
             else None

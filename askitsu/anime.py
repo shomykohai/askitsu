@@ -26,7 +26,7 @@ __all__ = ("Anime", "StreamLink", "Episode")
 
 import aiohttp
 from datetime import datetime
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 from .core import Entry, BASE
 
 
@@ -67,8 +67,8 @@ class Episode:
     -----------
     id: :class:`int`
         ID of the episode
-    created_at: :class:`datetime`
-    updated_at: :class:`datetime`
+    created_at: Optional[:class:`datetime`]
+    updated_at: Optional[:class:`datetime`]
     synopsis: :class:`str`
         Synopsis of the episode
     description: :class:`str`
@@ -101,12 +101,12 @@ class Episode:
     def __init__(self, attributes: dict) -> None:
         data = attributes["attributes"]
         self.id: int = int(attributes["id"])
-        self.created_at: datetime = (
+        self.created_at: Optional[datetime] = (
             datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["createdAt"])
             else None
         )
-        self.updated_at: datetime = (
+        self.updated_at: Optional[datetime] = (
             datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["updatedAt"])
             else None
@@ -263,7 +263,7 @@ class Anime(Entry):
     def youtube_url(self) -> Optional[str]:
         return f"https://www.youtube.com/watch?v={self.yt_id}" if self.yt_id else None
 
-    async def _fetch_stream_links(self) -> List[StreamLink]:
+    async def _fetch_stream_links(self) -> Optional[List[StreamLink]]:
         async with self._session.get(
             url=f"{BASE}/anime/{self.id}/streaming-links"
         ) as data:
@@ -275,7 +275,7 @@ class Anime(Entry):
             )
 
     @property
-    async def stream_links(self) -> List[StreamLink]:
+    async def stream_links(self) -> Optional[List[StreamLink]]:
         return await self._fetch_stream_links()
 
     async def episodes(self, limit: int = 12) -> Union[Episode, List[Episode]]:

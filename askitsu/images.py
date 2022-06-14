@@ -24,22 +24,67 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
-from typing import Optional, Literal
+from typing import Literal, Optional
 
-# class Image:
+class Image:
+    """
+    Represent a general image
 
-#     def __init__(self, data: dict, entry_id: int = None, entry_type: str = None) -> None:
-#         self._data = data
-#         self.entry_id = entry_id
-#         self.entry_type = entry_type
+    Attributes
+    ---------------
+    entry_id: :class:`int`
+        The id which the poster image belongs to
+    entry_type: :class:`str`
+        The type of the media
+    tiny: :class:`str`
+        Poster image -- size: tiny
+    small: :class:`str`
+        Poster image -- size: small
+    medium: :class:`str`
+        Poster image -- size: medium
+    large: :class:`str`
+        Poster image -- size: large
+    original: :class:`str`
+        Poster image with original size
+    """
 
-#     @property
-#     def poster_image(self) -> PosterImage:
-#         return PosterImage(self._data["posterImage"])
+    def __init__(self, data: dict) -> None:
+        self._data = data
 
-#     @property
-#     def cover_image(self) -> CoverImage:
-#         return PosterImage(self._data["coverImage"])
+    @property
+    def tiny(self) -> Optional[str]:
+        try:
+            return self._data.get("tiny", None)
+        except:
+            return None
+    
+    @property
+    def small(self) -> Optional[str]:
+        try:
+            return self._data.get("small", None)
+        except:
+            return None
+
+    @property
+    def medium(self) -> Optional[str]:
+        try:
+            return self._data.get("medium", None)
+        except:
+            return None
+
+    @property
+    def large(self) -> Optional[str]:
+        try:
+            return self._data.get("large", None)
+        except:
+            return None
+
+    @property
+    def original(self) -> Optional[str]:
+        try:
+            return self._data.get("original", None)
+        except:
+            return None
 
 class PosterImage:
     """

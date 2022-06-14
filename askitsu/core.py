@@ -26,8 +26,7 @@ from __future__ import annotations
 
 import aiohttp
 from datetime import datetime
-from typing import Optional, Literal, Union, List
-
+from typing import List, Literal, Optional, Union
 from .character import Character
 from .images import CoverImage, PosterImage
 
@@ -54,24 +53,24 @@ class Entry:
         "subtype"
     )
 
-    def __init__(self, _id: int, _type: str, attributes: dict, session: aiohttp.ClientSession = None):
+    def __init__(self, _id: int, _type: str, attributes: dict, session: aiohttp.ClientSession):
         self._session = session
         self._attributes = attributes
         self._titles: dict = attributes["titles"]
         self.id = int(_id)
         self.entry_type = _type
         self.status: str = attributes["status"]
-        self.created_at: datetime = (
+        self.created_at: Optional[datetime] = (
             datetime.strptime(attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (attributes["createdAt"])
             else None
         )
-        self.updated_at: datetime = (
+        self.updated_at: Optional[datetime] = (
             datetime.strptime(attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (attributes["updatedAt"])
             else None
         )
-        self.ended_at: datetime = (
+        self.ended_at: Optional[datetime] = (
             datetime.strptime(attributes["endDate"], "%Y-%m-%d")
             if (attributes["endDate"])
             else None
@@ -167,12 +166,12 @@ class Category:
 
     def __init__(self, attributes: dict) -> None:
         data = attributes["attributes"]
-        self.created_at: datetime = (
+        self.created_at: Optional[datetime] = (
             datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["createdAt"])
             else None
         )
-        self.updated_at: datetime = (
+        self.updated_at: Optional[datetime] = (
             datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["updatedAt"])
             else None
@@ -221,7 +220,7 @@ class Review:
         "media_type",
     )
 
-    def __init__(self, entry_id: str, entry_type: str, attributes: dict) -> None:
+    def __init__(self, entry_id: int, entry_type: str, attributes: dict) -> None:
         data = attributes["attributes"]
         self.media_id = entry_id
         self.media_type = entry_type

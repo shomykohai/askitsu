@@ -25,7 +25,8 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional, Literal
+from typing import Literal, Optional
+from .images import Image
 
 
 class Character:
@@ -65,14 +66,15 @@ class Character:
         "role",
         "slug",
         "mal_id",
-        "image",
         "created_at",
         "updated_at",
+        "_data"
     )
 
-    def __init__(self, attributes: dict, *, role: str = None, entry_id: int = None):
-        self.media_id = int(entry_id)
+    def __init__(self, attributes: dict, *, role: str, entry_id: int = None):
         data = attributes["attributes"]
+        self._data = data
+        self.media_id = int(entry_id)
         self.id: int = int(attributes["id"])
         self.type: str = "characters"
         self.name: str = data["canonicalName"]
@@ -80,45 +82,17 @@ class Character:
         self.role: Literal["main", "supporting"] = role
         self.slug: str = data["slug"]
         self.mal_id: int = int(data["malId"])
-        self.created_at: datetime = (
+        self.created_at: Optional[datetime] = (
             datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["createdAt"])
             else None
         )
-        self.updated_at: datetime = (
+        self.updated_at: Optional[datetime] = (
             datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
             if (data["updatedAt"])
             else None
         )
-        self.image: str = data["image"]
 
-    @classmethod
-    async def _character_instance(
-        cls,
-        link: str = None,
-        _cls=None,
-        entry_id: str = None,
-        role: Literal["main", "supporting"] = None,
-    ) -> Character:
-        _data = await _cls._get_data(url=link)
-        _character = Character(_data["data"], entry_id)
-        _character.role = role
-        return _character
-
-    def get_image(
-        self,
-        size: Optional[
-            Literal["tiny", "small", "medium", "large", "original"]
-        ] = "original",
-    ) -> Optional[str]:
-        """Get character image
-
-        Parameters
-        -----------
-            size: Optional[Literal["tiny", "small", "medium", "large", "original"]]
-                Size of the cover image
-        """
-        try:
-            return self.image.get(size, None)
-        except AttributeError:
-            return None
+    @property
+    def image(self) -> Image:
+        return Image(self._data["image"])

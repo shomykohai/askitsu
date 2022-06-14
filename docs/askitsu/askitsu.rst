@@ -64,7 +64,7 @@ Character
 ------------------------
 
 .. autoclass:: askitsu.Character
-   :members: get_image
+   :members:
 
 Reviews
 ---------------------

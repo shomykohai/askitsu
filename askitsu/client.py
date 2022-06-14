@@ -26,16 +26,23 @@ import aiohttp
 from colorama import Fore, Style
 from typing import (
     Any, 
-    Optional, 
-    Union, 
     List,
-    Literal
+    Literal,
+    Optional,
+    overload,
+    Union
 )
 from .anime import Anime, StreamLink
 from .character import Character
 from .core import Review, BASE
+from .error import (
+    BadApiRequest, 
+    InvalidArgument,
+    NotAuthenticated
+)
+from . import __version__
 from .manga import Manga
-from .error import *
+
 
 
 class Client:
@@ -64,6 +71,7 @@ class Client:
         self.__headers = {
             "Accept": "application/vnd.api+json",
             "Content-Type": "application/vnd.api+json",
+            "User-Agent": f"askitsu (https://github.com/ShomyKohai/askitsu {__version__})",
             "Authorization": self.__authorization
         }
 
@@ -78,6 +86,43 @@ class Client:
                 raise NotAuthenticated
             if response.status == 400:
                 raise BadApiRequest(response_data["errors"][0])
+
+    @overload
+    async def search(
+       self, type: Literal["anime"], query: str
+    ) -> Optional[Anime]:
+        ...
+    
+    @overload
+    async def search(
+       self, type: Literal["anime"], query: str, limit: int = ...
+    ) -> Optional[List[Anime]]:
+        ...
+
+    @overload
+    async def search(
+       self, type: Literal["manga"], query: str
+    ) -> Optional[Manga]:
+        ...
+    
+    @overload
+    async def search(
+       self, type: Literal["manga"], query: str, limit: int = ...
+    ) -> Optional[List[Manga]]:
+        ...
+    
+    @overload
+    async def search(
+       self, type: Literal["characters"], query: str
+    ) -> Optional[Character]:
+        ...
+    
+    @overload
+    async def search(
+       self, type: Literal["characters"], query: str, limit: int = ...
+    ) -> Optional[List[Character]]:
+        ...    
+       
 
     async def search(
         self, type: Literal["anime", "manga", "characters"], query: str, limit: int = 1
@@ -167,7 +212,28 @@ class Client:
         """
         return await self.search("characters", query=query, limit=limit)
 
-    async def get_entry(self, type: str, id: int) -> Union[Anime, Manga, Character]:
+
+    @overload
+    async def get_entry(
+        self, type: Literal["anime"], id: int
+    ) -> Anime:
+        ...
+
+    @overload
+    async def get_entry(
+        self, type: Literal["manga"], id: int
+    ) -> Manga:
+        ... 
+
+    @overload
+    async def get_entry(
+        self, type: Literal["characters"], id: int
+    ) -> Character:
+        ...
+
+    async def get_entry(
+        self, type: Literal["anime", "manga", "characters"], id: int
+    ) -> Union[Anime, Manga, Character]:
         """|coro|
 
         Get an entry object (`Anime` | `Manga` | `Character`) by an id
@@ -234,6 +300,19 @@ class Client:
         )
         return [StreamLink(links) for links in fetched_data["data"]]
 
+
+    @overload
+    async def get_characters(
+        self, entry: Union[Anime, Manga]
+    ) -> Character:
+        ...
+
+    @overload
+    async def get_characters(
+        self, entry: Union[Anime, Manga], limit: int = ...
+    ) -> List[Character]:
+        ...
+
     async def get_characters(
         self, entry: Union[Anime, Manga], limit: int = 1
     ) -> Union[Character, List[Character]]:
@@ -258,6 +337,19 @@ class Client:
         ]
         return characters if len(characters) > 1 else characters[0]
 
+
+    @overload
+    async def get_trending_entry(
+        self, type: Literal["anime"]
+    ) -> List[Anime]:
+        ...
+
+    @overload
+    async def get_trending_entry(
+        self, type: Literal["manga"]
+    ) -> List[Manga]:
+        ...
+    
     async def get_trending_entry(
         self, type: Literal["anime", "manga"]
     ) -> Union[List[Anime], List[Manga]]:
@@ -284,6 +376,18 @@ class Client:
             entry(attributes=attributes, session=self._session)
             for attributes in fetched_data["data"]
         ]
+
+    @overload
+    async def get_reviews(
+        self, entry: Union[Manga, Anime]
+    ) -> Optional[Review]:
+        ...
+
+    @overload
+    async def get_reviews(
+        self, entry: Union[Manga, Anime], limit: int = 1
+    ) -> Optional[List[Review]]:
+        ...
 
     async def get_reviews(
         self, entry: Union[Manga, Anime], limit: int = 1
