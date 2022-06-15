@@ -74,12 +74,12 @@ class Character:
     def __init__(self, attributes: dict, *, role: str, entry_id: int = None):
         data = attributes["attributes"]
         self._data = data
-        self.media_id = int(entry_id)
+        self.media_id = entry_id
         self.id: int = int(attributes["id"])
         self.type: str = "characters"
         self.name: str = data["canonicalName"]
         self.description: str = data["description"]
-        self.role: Literal["main", "supporting"] = role
+        self.role: str = role
         self.slug: str = data["slug"]
         self.mal_id: int = int(data["malId"])
         self.created_at: Optional[datetime] = (

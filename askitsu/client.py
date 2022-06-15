@@ -158,6 +158,18 @@ class Client:
             for attributes in fetched_data["data"]
         ]
 
+    @overload
+    async def search_anime(
+        self, query: str
+    ) -> Optional[Anime]:
+        ...
+
+    @overload
+    async def search_anime(
+        self, query: str, limit: int = ...
+    ) -> Optional[List[Anime]]:
+        ...
+   
     async def search_anime(
         self, query: str, limit: int = 1
     ) -> Optional[Union[Anime, List[Anime]]]:
@@ -174,6 +186,17 @@ class Client:
         """
         return await self.search("anime", query=query, limit=limit)
 
+    @overload
+    async def search_manga(
+        self, query: str
+    ) -> Optional[Manga]:
+        ...
+    @overload
+    async def search_manga(
+        self, query: str, limit: int = ...
+    ) -> Optional[List[Manga]]:
+        ...    
+
     async def search_manga(
         self, query: str, limit: int = 1
     ) -> Optional[Union[Manga, List[Manga]]]:
@@ -189,6 +212,18 @@ class Client:
             Limit the search to a specific number of results
         """
         return await self.search("manga", query=query, limit=limit)
+
+    @overload
+    async def search_character(
+        self, query: str
+    ) -> Optional[Character]:
+        ...
+
+    @overload
+    async def search_character(
+        self, query: str, limit: int = ...
+    ) -> Optional[List[Character]]:
+        ...
 
     async def search_character(
         self, query: str, limit: int = 1
@@ -337,22 +372,21 @@ class Client:
         ]
         return characters if len(characters) > 1 else characters[0]
 
-
     @overload
     async def get_trending_entry(
         self, type: Literal["anime"]
-    ) -> List[Anime]:
+    ) -> Optional[List[Anime]]:
         ...
 
     @overload
     async def get_trending_entry(
         self, type: Literal["manga"]
-    ) -> List[Manga]:
+    ) -> Optional[List[Manga]]:
         ...
     
     async def get_trending_entry(
         self, type: Literal["anime", "manga"]
-    ) -> Union[List[Anime], List[Manga]]:
+    ) -> Union[List[Anime], List[Manga], None]:
         """|coro|
 
         Return a list of anime or manga
@@ -377,15 +411,17 @@ class Client:
             for attributes in fetched_data["data"]
         ]
 
+
     @overload
     async def get_reviews(
-        self, entry: Union[Manga, Anime]
+        self, 
+        entry: Union[Manga, Anime]
     ) -> Optional[Review]:
         ...
 
     @overload
     async def get_reviews(
-        self, entry: Union[Manga, Anime], limit: int = 1
+        self, entry: Union[Manga, Anime], limit: int = ...
     ) -> Optional[List[Review]]:
         ...
 
