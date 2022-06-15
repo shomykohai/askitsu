@@ -58,6 +58,11 @@ class Client:
 
     session: Optional[:class:`aiohttp.ClientSession`]
         An object that represents the effective connection
+    
+    Attributes
+    -----------
+    token: :class:`str`
+        Token passed to the session.
     """
 
     def __init__(self, token: str = None, *, session: Optional[aiohttp.ClientSession] = None) -> None:
@@ -74,6 +79,7 @@ class Client:
             "User-Agent": f"askitsu (https://github.com/ShomyKohai/askitsu {__version__})",
             "Authorization": self.__authorization
         }
+        self.token = token
 
     async def _get_data(self, url: str) -> Any:
         async with self._session.get(url=url, headers=self.__headers) as response:
