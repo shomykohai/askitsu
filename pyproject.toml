@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "askitsu"
-version = "0.4.0"
+version = "0.4.1"
 description = "An async wrapper for Kitsu.io  API written in python"
 authors = ["Shomy <61943525+ShomyKohai@users.noreply.github.com>"]
 license = "MIT"
