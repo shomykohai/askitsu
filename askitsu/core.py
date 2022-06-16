@@ -24,13 +24,12 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
-import aiohttp
 from datetime import datetime
 from typing import List, Literal, Optional, Union
-from .character import Character
-from .images import CoverImage, PosterImage
 
-BASE: str = "https://kitsu.io/api/edge/"
+from .character import Character
+from .http import HTTPClient
+from .images import CoverImage, PosterImage
 
 
 class Entry:
@@ -53,8 +52,8 @@ class Entry:
         "subtype"
     )
 
-    def __init__(self, _id: int, _type: str, attributes: dict, session: aiohttp.ClientSession):
-        self._session = session
+    def __init__(self, _id: int, _type: str, attributes: dict, http: HTTPClient):
+        self._http = http
         self._attributes = attributes
         self._titles: dict = attributes["titles"]
         self.id = int(_id)
@@ -111,36 +110,32 @@ class Entry:
 
     @property
     async def categories(self) -> List[Category]:
-        async with self._session.get(
-            url=f"{BASE}/{self.entry_type}/{self.id}/categories"
-        ) as data:
-            fetched_data = await data.json()
-            categories = [Category(attributes) for attributes in fetched_data["data"]]
-            return categories
+        data = await self._http.get_data(
+            url=f"{self._http.BASE}/{self.entry_type}/{self.id}/categories"
+        )
+        return [Category(attributes) for attributes in data["data"]]
 
     @property
     async def characters(self) -> Union[Character, List[Character]]:
-        async with self._session.get(
-            url=f"{BASE}/{self.entry_type}/{self.id}/characters?include=character&page%5Blimit%5D=20"
-        ) as data:
-            fetched_data = await data.json()
-            characters_roles = [link["attributes"]["role"] for link in fetched_data["data"]]
-            characters = [
-                Character(attributes, role=role, entry_id=self.id)
-                for attributes, role in zip(fetched_data["included"], characters_roles)
-            ]
-            return characters if len(characters) > 1 else characters[0]
+        data = await self._http.get_data(
+            url=f"{self._http.BASE}/{self.entry_type}/{self.id}/characters?include=character&page%5Blimit%5D=20"
+        )
+        characters_roles = [link["attributes"]["role"] for link in data["data"]]
+        characters = [
+            Character(attributes, role=role, entry_id=self.id)
+            for attributes, role in zip(data["included"], characters_roles)
+        ]
+        return characters if len(characters) > 1 else characters[0]
 
     async def reviews(self, limit: int = 1) -> Optional[Union[Review, List[Review]]]:
-        async with self._session.get(
-            url=f"{BASE}/{self.entry_type}/{self.id}/reviews?page%5Blimit%5D={limit}"
-        ) as data:
-            fetched_data = await data.json()
-            reviews = [
-                Review(self.id, self.entry_type, reviews)
-                for reviews in fetched_data["data"]
-            ]
-            return (reviews if limit > 1 else reviews[0]) if reviews else None
+        data = await self._http.get_data(
+            url=f"{self._http.BASE}/{self.entry_type}/{self.id}/reviews?page%5Blimit%5D={limit}"
+        )
+        reviews = [
+            Review(self.id, self.entry_type, reviews)
+            for reviews in data["data"]
+        ]
+        return (reviews if limit > 1 else reviews[0]) if reviews else None
 
 class Category:
     """

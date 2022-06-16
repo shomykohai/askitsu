@@ -24,11 +24,11 @@ DEALINGS IN THE SOFTWARE.
 
 __all__ = ("Anime", "StreamLink", "Episode")
 
-import aiohttp
 from datetime import datetime
 from typing import List, Optional, Union
-from .core import Entry, BASE
 
+from .core import Entry
+from .http import HTTPClient
 
 class StreamLink:
     """
@@ -243,28 +243,28 @@ class Anime(Entry):
         "rating",
         "age_rating",
         "subtype",
-        "_session",
+        "_http",
         "_titles",
         "_attributes"
     )
 
-    def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args) -> None:
+    def __init__(self, attributes: dict, http: HTTPClient, *args) -> None:
         data = attributes["attributes"]
-        self._session = session
+        self._http = http
         self.entry_type = "anime"
         self.episode_count: int = data["episodeCount"]
         self.episode_length: int = data["episodeLength"]
         self.total_length: int = data["totalLength"]
         self.nsfw: bool = data["nsfw"]
         self.yt_id: str = data["youtubeVideoId"]
-        super().__init__(attributes["id"], self.entry_type, data, session, *args)
+        super().__init__(attributes["id"], self.entry_type, data, http, *args)
 
     @property
     def youtube_url(self) -> Optional[str]:
         return f"https://www.youtube.com/watch?v={self.yt_id}" if self.yt_id else None
 
     async def _fetch_stream_links(self) -> Optional[List[StreamLink]]:
-        async with self._session.get(
+        async with self.__session.get_data(
             url=f"{BASE}/anime/{self.id}/streaming-links"
         ) as data:
             fetched_data = await data.json()
@@ -287,7 +287,7 @@ class Anime(Entry):
         limit: :class:`int`
             Limit of episodes to fetch. Defaults to 12 (Max 25).
         """
-        async with self._session.get(
+        async with self._http.get_data(
             url=f"{BASE}/anime/{self.id}/episodes?page[limit]={limit}"
         ) as data:
             fetched_data = await data.json()

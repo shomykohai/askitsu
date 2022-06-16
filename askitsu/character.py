@@ -25,7 +25,7 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Optional
 from .images import Image
 
 

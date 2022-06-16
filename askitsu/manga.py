@@ -24,10 +24,11 @@ DEALINGS IN THE SOFTWARE.
 
 __all__ = ("Manga", "Chapter")
 
-import aiohttp
 from datetime import datetime
 from typing import Union, List, Optional
-from .core import Entry, BASE
+
+from .core import Entry
+from .http import HTTPClient
 
 
 class Chapter:
@@ -209,19 +210,19 @@ class Manga(Entry):
         "rating",
         "age_rating",
         "subtype",
-        "_session",
+        "_http",
         "_titles",
         "_attributes"
     )
 
-    def __init__(self, attributes: dict, session: aiohttp.ClientSession, *args) -> None:
+    def __init__(self, attributes: dict, http: HTTPClient, *args) -> None:
         data = attributes["attributes"]
-        self._session = session
+        self._http = http
         self.entry_type: str = "manga"
         self.chapter_count: int = data["chapterCount"]
         self.volume_count: int = data["volumeCount"]
         self.serialization: str = data["serialization"]
-        super().__init__(attributes["id"], self.entry_type, data, session, *args)
+        super().__init__(attributes["id"], self.entry_type, data, http, *args)
 
     async def chapters(self, limit: int = 12) -> Union[Chapter, List[Chapter]]:
         """
@@ -232,9 +233,8 @@ class Manga(Entry):
         limit: :class:`int`
             Limit of chapters to fetch. Defaults to 12 (Max 20).
         """
-        async with self._session.get(
-            url=f"{BASE}/manga/{self.id}/chapters?page[limit]={limit}"
-        ) as data:
-            fetched_data = await data.json()
-            chapters = [Chapter(attributes) for attributes in fetched_data["data"]]
-            return chapters if len(chapters) > 1 else chapters[0]
+        data = await self._http.get_data(
+            url=f"{self._http.BASE}/manga/{self.id}/chapters?page[limit]={limit}"
+        )
+        chapters = [Chapter(attributes) for attributes in data["data"]]
+        return chapters if len(chapters) > 1 else chapters[0]

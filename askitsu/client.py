@@ -32,15 +32,16 @@ from typing import (
     overload,
     Union
 )
+
 from .anime import Anime, StreamLink
 from .character import Character
-from .core import Review, BASE
+from .core import Review
 from .error import (
     BadApiRequest, 
     InvalidArgument,
     NotAuthenticated
 )
-from . import __version__
+from .http import HTTPClient
 from .manga import Manga
 
 
@@ -71,27 +72,18 @@ class Client:
             "manga": Manga,
             "characters": Character
         }
-        self.__authorization = f"Bearer {token}" if token else ""
-        self._session: aiohttp.ClientSession = session or aiohttp.ClientSession()
-        self.__headers = {
-            "Accept": "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "User-Agent": f"askitsu (https://github.com/ShomyKohai/askitsu {__version__})",
-            "Authorization": self.__authorization
-        }
-        self.token = token
+        self.http: HTTPClient = HTTPClient(
+            session=session or aiohttp.ClientSession(),
+            token=token
+        )
 
-    async def _get_data(self, url: str) -> Any:
-        async with self._session.get(url=url, headers=self.__headers) as response:
-            response_data = await response.json()
-            if response.status == 200:
-                return response_data
-            if response.status == 404:
-                return None
-            if response.status == 401:
-                raise NotAuthenticated
-            if response.status == 400:
-                raise BadApiRequest(response_data["errors"][0])
+    @property
+    def session(self) -> aiohttp.ClientSession:
+        return self.http.session
+
+    @property
+    def token(self) -> Optional[str]:
+        return self.http.token
 
     @overload
     async def search(
@@ -152,15 +144,15 @@ class Client:
         type_lower = type.lower()
         entry = self._entries.get(type_lower)
         filter = "name" if type_lower == "characters" else "text"
-        fetched_data = await self._get_data(
-            f"{BASE}/{type_lower}?filter%5B{filter}%5D={query}&page%5Blimit%5D={limit}"
+        fetched_data = await self.http.get_data(
+            f"{self.http.BASE}/{type_lower}?filter%5B{filter}%5D={query}&page%5Blimit%5D={limit}"
         )
         if not fetched_data["data"]:
             return None
         if len(fetched_data["data"]) == 1:
-            return entry(fetched_data["data"][0], self._session)
+            return entry(fetched_data["data"][0], self.http)
         return [
-            entry(attributes=attributes, session=self._session)
+            entry(attributes=attributes, hhtp=self.http)
             for attributes in fetched_data["data"]
         ]
 
@@ -288,9 +280,9 @@ class Client:
         """
         type_lower = type.lower()
         entry = self._entries.get(type_lower)
-        fetched_data = await self._get_data(f"{BASE}/{type_lower}/{id}")
+        fetched_data = await self.http.get_data(f"{self.http.BASE}/{type_lower}/{id}")
         return (
-            entry(attributes=fetched_data["data"], session=self._session)
+            entry(attributes=fetched_data["data"], http=self.http)
             if fetched_data
             else None
         )
@@ -336,8 +328,8 @@ class Client:
                 f"{Fore.RED}'{anime}' is not an istance of Anime\n"
                 f"Make sure you pass a valid argument to {Fore.LIGHTCYAN_EX}get_stream_links{Style.RESET_ALL}"
             )
-        fetched_data = await self._get_data(
-            url=f"{BASE}/anime/{anime.id}/streaming-links"
+        fetched_data = await self.http.get_data(
+            url=f"{self.http.BASE}/anime/{anime.id}/streaming-links"
         )
         return [StreamLink(links) for links in fetched_data["data"]]
 
@@ -368,8 +360,8 @@ class Client:
         limit: :class:`int`
             Number of characters' fetch
         """
-        fetched_data = await self._get_data(
-            url=f"{BASE}/{entry.entry_type}/{entry.id}/characters?include=character&page%5Blimit%5D={limit}"
+        fetched_data = await self.http.get_data(
+            url=f"{self.http.BASE}/{entry.entry_type}/{entry.id}/characters?include=character&page%5Blimit%5D={limit}"
         )
         characters_roles = [link["attributes"]["role"] for link in fetched_data["data"]]
         characters = [
@@ -411,9 +403,9 @@ class Client:
                 f"Please pass 'anime' or 'manga' as parameter to {Fore.LIGHTCYAN_EX}get_trending_entry{Style.RESET_ALL}"
             )
         entry = self._entries.get(type_lower)
-        fetched_data = await self._get_data(f"{BASE}/trending/{type_lower}")
+        fetched_data = await self.http.get_data(f"{self.http.BASE}/trending/{type_lower}")
         return [
-            entry(attributes=attributes, session=self._session)
+            entry(attributes=attributes, http=self.http)
             for attributes in fetched_data["data"]
         ]
 
@@ -447,8 +439,8 @@ class Client:
         limit: :class:`int`
             Limit to reviews to fetch
         """
-        fetched_data = await self._get_data(
-            url=f"{BASE}/{entry.entry_type}/{entry.id}/reviews?page%5Blimit%5D={limit}"
+        fetched_data = await self.http.get_data(
+            url=f"{self.http.BASE}/{entry.entry_type}/{entry.id}/reviews?page%5Blimit%5D={limit}"
         )
         reviews = [
             Review(entry.id, entry.entry_type, reviews)
@@ -460,4 +452,4 @@ class Client:
         """
         Close client connection
         """
-        return await self._session.close()
+        return await self.http.close()
