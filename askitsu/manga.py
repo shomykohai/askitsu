@@ -40,8 +40,6 @@ class Chapter:
     -----------
     id: :class:`int`
         ID of the chapter
-    created_at: Optional[:class:`datetime`]
-    updated_at: Optional[:class:`datetime`]
     published: Optional[:class:`datetime`]
         When the chapter got published (YYYY-mm-dd)
     synopsis: :class:`str`
@@ -62,11 +60,8 @@ class Chapter:
 
     __slots__ = (
         "id",
-        "created_at",
-        "updated_at",
         "synopsis",
         "description",
-        "published",
         "title",
         "volume_number",
         "chapter",
@@ -77,21 +72,6 @@ class Chapter:
     def __init__(self, attributes: dict) -> None:
         data = attributes["attributes"]
         self.id: int = int(attributes["id"])
-        self.created_at: Optional[datetime] = (
-            datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if (data["createdAt"])
-            else None
-        )
-        self.updated_at: Optional[datetime] = (
-            datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if (data["updatedAt"])
-            else None
-        )
-        self.published: Optional[datetime] = (
-            datetime.strptime(data["published"], "%Y-%m-%d")
-            if (data["published"])
-            else None
-        )
         self.synopsis: str = data["synopsis"]
         self.description: str = data["description"]
         self.title: str = data["canonicalTitle"]
@@ -101,6 +81,29 @@ class Chapter:
         self.thumbnail: str = (
             data["thumbnail"]["original"] if data["thumbnail"] else None
         )
+
+    @property
+    def created_at(self) -> Optional[datetime]:
+        """Date when a chapter got added on Kitsu DB"""
+        try:
+            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None
+
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        try:
+            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None
+
+    @property
+    def published(self) -> Optional[datetime]:
+        """Date when a Chapter got published (YYYY-mm-dd)"""
+        try:
+            return datetime.strptime(self._attributes["published"], "%Y-%m-%d")
+        except ValueError:
+            return None
 
 
 class Manga(Entry):
@@ -112,10 +115,10 @@ class Manga(Entry):
         ID of the manga
     status: :class:`str`
         Actual status of the given manga (Ex. "finished")
-    created_at: Optional[:class:`datetime`]
-    updated_at: Optional[:class:`datetime`]
     started_at: Optional[:class:`datetime`]
+        Date when the manga started
     ended_at: Optional[:class:`datetime`]
+        Date when the manga ended
     slug: :class:`str`
         String identifier. Work as id to fetch data
     synopsis: :class:`str`
@@ -195,10 +198,6 @@ class Manga(Entry):
         "id",
         "entry_type",
         "status",
-        "created_at",
-        "updated_at",
-        "started_at",
-        "ended_at",
         "slug",
         "synopsis",
         "canonical_title",

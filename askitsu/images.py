@@ -55,35 +55,35 @@ class Image:
     def tiny(self) -> Optional[str]:
         try:
             return self._data.get("tiny", None)
-        except:
+        except KeyError:
             return None
     
     @property
     def small(self) -> Optional[str]:
         try:
             return self._data.get("small", None)
-        except:
+        except KeyError:
             return None
 
     @property
     def medium(self) -> Optional[str]:
         try:
             return self._data.get("medium", None)
-        except:
+        except KeyError:
             return None
 
     @property
     def large(self) -> Optional[str]:
         try:
             return self._data.get("large", None)
-        except:
+        except KeyError:
             return None
 
     @property
     def original(self) -> Optional[str]:
         try:
             return self._data.get("original", None)
-        except:
+        except KeyError:
             return None
 
 class PosterImage:
@@ -117,35 +117,35 @@ class PosterImage:
     def tiny(self) -> Optional[str]:
         try:
             return self._data.get("tiny", None)
-        except:
+        except KeyError:
             return None
     
     @property
     def small(self) -> Optional[str]:
         try:
             return self._data.get("small", None)
-        except:
+        except KeyError:
             return None
 
     @property
     def medium(self) -> Optional[str]:
         try:
             return self._data.get("medium", None)
-        except:
+        except KeyError:
             return None
 
     @property
     def large(self) -> Optional[str]:
         try:
             return self._data.get("large", None)
-        except:
+        except KeyError:
             return None
 
     @property
     def original(self) -> Optional[str]:
         try:
             return self._data.get("original", None)
-        except:
+        except KeyError:
             return None
 
     def dimension(
@@ -154,7 +154,7 @@ class PosterImage:
     ) -> Optional[dict]:
         try:
             return self._data["meta"]["dimensions"][size]
-        except:
+        except KeyError:
             return None
 
 
@@ -189,21 +189,21 @@ class CoverImage:
     def tiny(self) -> Optional[str]:
         try:
             return self._data.get("tiny", None)
-        except:
+        except KeyError:
             return None
     
     @property
     def small(self) -> Optional[str]:
         try:
             return self._data.get("small", None)
-        except:
+        except KeyError:
             return None
 
     @property
     def large(self) -> Optional[str]:
         try:
             return self._data.get("large", None)
-        except:
+        except KeyError:
             return None
 
     @property
@@ -219,5 +219,5 @@ class CoverImage:
     ) -> Optional[dict]:
         try:
             return self._data["meta"]["dimensions"][size]
-        except:
+        except KeyError:
             return None

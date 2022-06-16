@@ -38,10 +38,6 @@ class Entry:
         "id",
         "entry_type",
         "status",
-        "created_at",
-        "updated_at",
-        "started_at",
-        "ended_at",
         "slug",
         "synopsis",
         "canonical_title",
@@ -59,21 +55,6 @@ class Entry:
         self.id = int(_id)
         self.entry_type = _type
         self.status: str = attributes["status"]
-        self.created_at: Optional[datetime] = (
-            datetime.strptime(attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if (attributes["createdAt"])
-            else None
-        )
-        self.updated_at: Optional[datetime] = (
-            datetime.strptime(attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if (attributes["updatedAt"])
-            else None
-        )
-        self.ended_at: Optional[datetime] = (
-            datetime.strptime(attributes["endDate"], "%Y-%m-%d")
-            if (attributes["endDate"])
-            else None
-        )
         self.slug: str = attributes["slug"]
         self.synopsis: str = attributes["synopsis"]
         self.canonical_title: str = attributes["canonicalTitle"]
@@ -83,6 +64,33 @@ class Entry:
         self.age_rating: Literal["G", "PG", "R", "R18"] = attributes["ageRating"]
         self.subtype: str = attributes["subtype"]
 
+    @property
+    def created_at(self) -> Optional[datetime]:
+        try:
+            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None
+
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        try:
+            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None
+
+    @property
+    def started_at(self) -> Optional[datetime]:
+        try:
+            return datetime.strptime(self._attributes["startDate"], "%Y-%m-%d")
+        except ValueError:
+            return None
+
+    @property
+    def ended_at(self) -> Optional[datetime]:
+        try:
+            return datetime.strptime(self._attributes["endDate"], "%Y-%m-%d")
+        except ValueError:
+            return None
 
     @property
     def url(self) -> str:
@@ -145,8 +153,6 @@ class Category:
 
     Attributes
     ------------
-    created_at: :class:`datetime`
-    updated_at: :class:`datetime`
     title: :class:`str`
         Title of the category
     description: :class:`str`
@@ -157,25 +163,30 @@ class Category:
         If the category is NSFW or not
     """
 
-    __slots__ = ("created_at", "updated_at", "title", "description", "slug", "nsfw")
+    __slots__ = ("title", "description", "slug", "nsfw")
 
     def __init__(self, attributes: dict) -> None:
-        data = attributes["attributes"]
-        self.created_at: Optional[datetime] = (
-            datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if (data["createdAt"])
-            else None
-        )
-        self.updated_at: Optional[datetime] = (
-            datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if (data["updatedAt"])
-            else None
-        )
-        self.title: str = data["title"]
-        self.description: str = data["description"]
-        self.slug: str = data["slug"]
-        self.nsfw: bool = data["nsfw"]
+        self._attributes = attributes["data"]
+        self.title: str = self._attributes["title"]
+        self.description: str = self._attributes["description"]
+        self.slug: str = self._attributes["slug"]
+        self.nsfw: bool = self._attributes["nsfw"]
 
+    @property
+    def created_at(self) -> Optional[datetime]:
+        """When a category got added in Kitu DB"""
+        try:
+            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None
+
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        """Last time a category got updated"""
+        try:
+            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None
 
 class Review:
     """Represents a :class:`Review` instance.

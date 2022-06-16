@@ -52,8 +52,6 @@ class Character:
         Character ID on My Anime List
     image: :class:`str`
         Return character's image
-    created_at: Optional[:class:`datetime`]
-    updated_at: Optional[:class:`datetime`]
     """
 
     __slots__ = (
@@ -66,8 +64,6 @@ class Character:
         "role",
         "slug",
         "mal_id",
-        "created_at",
-        "updated_at",
         "_data"
     )
 
@@ -82,17 +78,23 @@ class Character:
         self.role: str = role
         self.slug: str = data["slug"]
         self.mal_id: int = int(data["malId"])
-        self.created_at: Optional[datetime] = (
-            datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if (data["createdAt"])
-            else None
-        )
-        self.updated_at: Optional[datetime] = (
-            datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if (data["updatedAt"])
-            else None
-        )
 
     @property
     def image(self) -> Image:
         return Image(self._data["image"])
+
+    @property
+    def created_at(self) -> Optional[datetime]:
+        """When a character got added in Kitu DB"""
+        try:
+            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None
+
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        """Last time a character got updated"""
+        try:
+            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None

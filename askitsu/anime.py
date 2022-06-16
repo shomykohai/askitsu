@@ -67,8 +67,6 @@ class Episode:
     -----------
     id: :class:`int`
         ID of the episode
-    created_at: Optional[:class:`datetime`]
-    updated_at: Optional[:class:`datetime`]
     synopsis: :class:`str`
         Synopsis of the episode
     description: :class:`str`
@@ -87,8 +85,6 @@ class Episode:
 
     __slots__ = (
         "id",
-        "created_at",
-        "updated_at",
         "synopsis",
         "description",
         "title",
@@ -99,27 +95,33 @@ class Episode:
     )
 
     def __init__(self, attributes: dict) -> None:
-        data = attributes["attributes"]
+        self._attributes = attributes["attributes"]
         self.id: int = int(attributes["id"])
-        self.created_at: Optional[datetime] = (
-            datetime.strptime(data["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if (data["createdAt"])
-            else None
-        )
-        self.updated_at: Optional[datetime] = (
-            datetime.strptime(data["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if (data["updatedAt"])
-            else None
-        )
-        self.synopsis: str = data["synopsis"]
-        self.description: str = data["description"]
-        self.title: str = data["canonicalTitle"]
-        self.season: int = data["seasonNumber"]
-        self.number: int = data["number"]
-        self.length: int = data["length"]
+        self.synopsis: str = self._attributes["synopsis"]
+        self.description: str = self._attributes["description"]
+        self.title: str = self._attributes["canonicalTitle"]
+        self.season: int = self._attributes["seasonNumber"]
+        self.number: int = self._attributes["number"]
+        self.length: int = self._attributes["length"]
         self.thumbnail: str = (
-            data["thumbnail"]["original"] if data["thumbnail"] else None
+            self._attributes["thumbnail"]["original"] if self._attributes["thumbnail"] else None
         )
+    
+    @property
+    def created_at(self) -> Optional[datetime]:
+        """Date when this episode got added on Kitsu"""
+        try:
+            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None
+
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        """Last time when this episode got updated on Kitu"""
+        try:
+            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None
 
 
 class Anime(Entry):
@@ -130,11 +132,11 @@ class Anime(Entry):
     id: :class:`int`
         ID of the anime
     status: :class:`str`
-        Actual status of the given anime (Ex. "finished")
-    created_at: Optional[:class:`datetime`]
-    updated_at: Optional[:class:`datetime`]
+        Actual status of the given anime (Ex. "finished"
     started_at: Optional[:class:`datetime`]
+        Date when the anime started
     ended_at: Optional[:class:`datetime`]
+        Date when the anime ended
     slug: :class:`str`
         String identifier. Work as id to fetch data
     synopsis: :class:`str`
@@ -226,10 +228,6 @@ class Anime(Entry):
         "id",
         "entry_type",
         "status",
-        "created_at",
-        "updated_at",
-        "started_at",
-        "ended_at",
         "slug",
         "synopsis",
         "canonical_title",
@@ -263,20 +261,16 @@ class Anime(Entry):
     def youtube_url(self) -> Optional[str]:
         return f"https://www.youtube.com/watch?v={self.yt_id}" if self.yt_id else None
 
-    async def _fetch_stream_links(self) -> Optional[List[StreamLink]]:
-        async with self.__session.get_data(
-            url=f"{BASE}/anime/{self.id}/streaming-links"
-        ) as data:
-            fetched_data = await data.json()
-            return (
-                [StreamLink(links) for links in fetched_data["data"]]
-                if fetched_data
-                else None
-            )
-
     @property
     async def stream_links(self) -> Optional[List[StreamLink]]:
-        return await self._fetch_stream_links()
+        data = await self._http.get_data(
+            url=f"{self._http.BASE}/anime/{self.id}/streaming-links"
+        )
+        return (
+            [StreamLink(links) for links in data["data"]]
+            if data
+            else None
+        )
 
     async def episodes(self, limit: int = 12) -> Union[Episode, List[Episode]]:
         """
@@ -288,7 +282,7 @@ class Anime(Entry):
             Limit of episodes to fetch. Defaults to 12 (Max 25).
         """
         async with self._http.get_data(
-            url=f"{BASE}/anime/{self.id}/episodes?page[limit]={limit}"
+            url=f"{self._http.BASE}/anime/{self.id}/episodes?page[limit]={limit}"
         ) as data:
             fetched_data = await data.json()
             episodes = [Episode(attributes) for attributes in fetched_data["data"]]
