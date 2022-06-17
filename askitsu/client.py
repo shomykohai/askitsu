@@ -250,7 +250,7 @@ class Client:
         data = await self.http.get_data(
             url=f"users?filter%5Bslug%5D={name}"
         )
-        return User(data["data"][0]) if data["data"] else None
+        return User(data["data"][0], http=self.http) if data["data"] else None
 
     @overload
     async def get_entry(
@@ -469,7 +469,7 @@ class Client:
         data = await self.http.get_data(
             url=f"users/{id}"
         )
-        return User(data["data"]) if data["data"] else None
+        return User(data["data"], http=self.http) if data["data"] else None
 
     async def check_user(self, slug: str) -> bool:
         """|coro|

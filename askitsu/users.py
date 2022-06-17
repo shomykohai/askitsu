@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime
-import aiohttp
-from typing import Optional
+from typing import List, Optional
 from .http import HTTPClient
 from .images import CoverImage, Image
 
@@ -83,10 +84,12 @@ class User:
         "profile_completed",
         "feed_completed",
         "sfw_filter",
-        "_data"
+        "_data",
+        "_http"
     )
 
-    def __init__(self, attributes: dict) -> None:
+    def __init__(self, attributes: dict, http: HTTPClient) -> None:
+        self._http = http
         self._data = attributes["attributes"]
         self.id: int = int(attributes["id"])
         self.entry_type: str = "users" 
@@ -148,4 +151,36 @@ class User:
                 entry_type=self.entry_type
             )
         else:
+            return None
+        
+    @property
+    def url(self) -> str:
+        return f"https://kitsu.io/users/{self.slug}"
+
+    @property
+    async def profile_links(self) -> Optional[List[UserProfile]]:
+        data = await self._http.get_data(
+            url=f"users/{self.id}/profile-links"
+        )
+        return [UserProfile(attributes["attributes"]) for attributes in data["data"]]
+
+
+
+class UserProfile:
+    def __init__(self, attributes: dict) -> None:
+        self._attributes = attributes
+        self.url: str = attributes["url"]
+
+    @property
+    def created_at(self) -> Optional[datetime]:
+        try:
+            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return None
+
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        try:
+            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
             return None

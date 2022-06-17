@@ -77,6 +77,13 @@ Titles
 .. autoclass:: askitsu.Title
    :members:
 
+Assets
+===============
+Image
+---------------------
+.. autoclass:: askitsu.Image
+   :members:
+
 CoverImage
 ---------------------
 .. autoclass:: askitsu.CoverImage
