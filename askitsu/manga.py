@@ -40,8 +40,6 @@ class Chapter:
     -----------
     id: :class:`int`
         ID of the chapter
-    published: Optional[:class:`datetime`]
-        When the chapter got published (YYYY-mm-dd)
     synopsis: :class:`str`
         Synopsis of the chapter
     description: :class:`str`
