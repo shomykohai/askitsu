@@ -147,7 +147,7 @@ class Client:
         if len(fetched_data["data"]) == 1:
             return entry(fetched_data["data"][0], self.http)
         return [
-            entry(attributes=attributes, hhtp=self.http)
+            entry(attributes=attributes, http=self.http)
             for attributes in fetched_data["data"]
         ]
 
