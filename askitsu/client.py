@@ -25,24 +25,19 @@ DEALINGS IN THE SOFTWARE.
 import aiohttp
 from colorama import Fore, Style
 from typing import (
-    Any, 
     List,
     Literal,
     Optional,
     overload,
     Union
 )
-
 from .anime import Anime, StreamLink
 from .character import Character
 from .core import Review
-from .error import (
-    BadApiRequest, 
-    InvalidArgument,
-    NotAuthenticated
-)
+from .error import InvalidArgument
 from .http import HTTPClient
 from .manga import Manga
+from .users import User
 
 
 
@@ -245,6 +240,11 @@ class Client:
         """
         return await self.search("characters", query=query, limit=limit)
 
+    async def search_user(self, name: str) -> Optional[User]:
+        data = await self.http.get_data(
+            url=f"users?filter%5Bslug%5D={name}"
+        )
+        return User(data["data"][0]) if data["data"] else None
 
     @overload
     async def get_entry(
@@ -447,6 +447,12 @@ class Client:
             for reviews in fetched_data["data"]
         ]
         return (reviews if limit > 1 else reviews[0]) if reviews else None
+
+    async def get_user(self, id: int) -> Optional[User]:
+        data = await self.http.get_data(
+            url=f"users/{id}"
+        )
+        return User(data["data"]) if data["data"] else None
 
     async def close(self) -> None:
         """

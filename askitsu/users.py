@@ -68,7 +68,7 @@ class User:
     def birthday(self) -> Optional[datetime]:
         try:
             return datetime.strptime(self._data["birthday"], "%Y-%m-%d")
-        except ValueError:
+        except TypeError:
             return None
     
     @property

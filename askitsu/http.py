@@ -1,7 +1,7 @@
 import aiohttp
 from typing import Any, Optional
 from . import __version__
-from .error import BadApiRequest, NotAuthenticated
+from .error import BadApiRequest, HTTPError, NotAuthenticated, NotFound
 
 class HTTPClient:
 
@@ -28,7 +28,7 @@ class HTTPClient:
             if response.status == 200:
                 return response_data
             if response.status == 404:
-                return None
+                raise NotFound
             if response.status == 401:
                 raise NotAuthenticated
             if response.status == 400:

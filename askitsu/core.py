@@ -32,6 +32,8 @@ from .http import HTTPClient
 from .images import CoverImage, PosterImage
 
 
+__all__ = ("Category", "Review", "Title")
+
 class Entry:
 
     __slots__ = (

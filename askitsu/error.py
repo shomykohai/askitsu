@@ -95,3 +95,17 @@ class BadApiRequest(HTTPError):
             f"{response['detail']} - Response code: {400}{Style.RESET_ALL}",
             400
         )
+
+
+class NotFound(HTTPError):
+    """
+    Raises when a 404 error code takes place
+
+    .. versionadded:: 0.5.0
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            f"{Fore.RED}Resource not found.\n",
+            404
+        )
