@@ -241,6 +241,12 @@ class Client:
         return await self.search("characters", query=query, limit=limit)
 
     async def search_user(self, name: str) -> Optional[User]:
+        """
+        Fetch a user by their username
+
+        name: :class:`str`
+            Nickname of the user to fetch
+        """
         data = await self.http.get_data(
             url=f"users?filter%5Bslug%5D={name}"
         )
@@ -449,12 +455,34 @@ class Client:
         return (reviews if limit > 1 else reviews[0]) if reviews else None
 
     async def get_user(self, id: int) -> Optional[User]:
+        """|coro|
+
+        Get a user by their id
+
+        .. versionadded:: 0.5.0
+
+        Parameters
+        -----------
+        id: :class:`int`
+            The id of the user to fetch
+        """
         data = await self.http.get_data(
             url=f"users/{id}"
         )
         return User(data["data"]) if data["data"] else None
 
     async def check_user(self, slug: str) -> bool:
+        """|coro|
+
+        Check if the user exists on Kitsu
+
+        .. versionadded:: 0.5.0
+
+        Parameters
+        -----------
+        slug: :class:`str`
+            Nickname of the user
+        """
         data = await self.http.get_data(
             url=f"users?filter%5Bslug%5D={slug}"
         )
