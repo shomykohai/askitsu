@@ -335,9 +335,9 @@ class Client:
                 f"Make sure you pass a valid argument to {Fore.LIGHTCYAN_EX}get_stream_links{Style.RESET_ALL}"
             )
         fetched_data = await self.http.get_data(
-            url=f"anime/{anime.id}/streaming-links"
+            url=f"anime/{anime.id}/streaming-links?include=streamer"
         )
-        return [StreamLink(links) for links in fetched_data["data"]]
+        return [StreamLink(links, included["attributes"]) for links, included in zip(fetched_data["data"], fetched_data["included"])]
 
 
     @overload

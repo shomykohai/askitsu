@@ -45,13 +45,16 @@ class StreamLink:
         Avaiable subs
     dub: :class:`list`
         Avaiable dub in streaming service
+    name: :class:`str`
+        Name of the stream service
     """
 
-    __slots__ = ("id", "url", "subs", "dub")
+    __slots__ = ("id", "url", "subs", "dub", "name")
 
-    def __init__(self, attributes: dict):
+    def __init__(self, attributes: dict, included: dict):
         data = attributes["attributes"]
         self.id: int = int(attributes["id"])
+        self.name: str = included["siteName"]
         self.url: str = data["url"]
         self.subs: list = data["subs"]
         self.dub: list = data["dubs"]
@@ -106,7 +109,7 @@ class Episode:
         self.thumbnail: str = (
             self._attributes["thumbnail"]["original"] if self._attributes["thumbnail"] else None
         )
-    
+
     @property
     def created_at(self) -> Optional[datetime]:
         """Date when this episode got added on Kitsu"""
@@ -257,6 +260,9 @@ class Anime(Entry):
         self.yt_id: str = data["youtubeVideoId"]
         super().__init__(attributes["id"], self.entry_type, data, http, *args)
 
+    def __repr__(self) -> str:
+        return f"<Anime name='{self.canonical_title}' id={self.id}>"
+
     @property
     def youtube_url(self) -> Optional[str]:
         return f"https://www.youtube.com/watch?v={self.yt_id}" if self.yt_id else None
@@ -264,13 +270,9 @@ class Anime(Entry):
     @property
     async def stream_links(self) -> Optional[List[StreamLink]]:
         data = await self._http.get_data(
-            url=f"anime/{self.id}/streaming-links"
+            url=f"anime/{self.id}/streaming-links?include=streamer"
         )
-        return (
-            [StreamLink(links) for links in data["data"]]
-            if data
-            else None
-        )
+        return [StreamLink(links, included["attributes"]) for links, included in zip(data["data"], data["included"])]
 
     async def episodes(self, limit: int = 12) -> Union[Episode, List[Episode]]:
         """

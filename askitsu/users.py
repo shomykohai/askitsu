@@ -115,6 +115,9 @@ class User:
         self.feed_completed: bool = self._data["feedCompleted"]
         self.sfw_filter: str = self._data["sfwFilterPreference"]
 
+    def __repr__(self) -> str:
+        return f"<User slug='{self.slug}' id={self.id}"
+
     @property
     def past_names(self) -> Optional[list]:
         """Past names of the user (if avaiable)"""
@@ -160,16 +163,25 @@ class User:
     @property
     async def profile_links(self) -> Optional[List[UserProfile]]:
         data = await self._http.get_data(
-            url=f"users/{self.id}/profile-links"
+            url=f"users/{self.id}/profile-links?include=profileLinkSite"
         )
-        return [UserProfile(attributes["attributes"]) for attributes in data["data"]]
+        return [
+            UserProfile(attributes["id"], attributes["attributes"], self.slug, included) 
+            for attributes, included in zip(data["data"], data["included"])
+        ]
 
 
 
 class UserProfile:
-    def __init__(self, attributes: dict) -> None:
+    def __init__(self, id: int, attributes: dict, user: str, included: dict) -> None:
         self._attributes = attributes
+        self.id: int = int(id)
+        self.name: str = included["attributes"]["name"]
+        self.user: str = user
         self.url: str = attributes["url"]
+
+    def __repr__(self) -> str:
+        return f"<UserProfile id={self.id} slug={self.user}>"
 
     @property
     def created_at(self) -> Optional[datetime]:

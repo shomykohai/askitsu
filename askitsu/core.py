@@ -180,6 +180,9 @@ class Category:
         self.slug: str = self._attributes["slug"]
         self.nsfw: bool = self._attributes["nsfw"]
 
+    def __repr__(self) -> str:
+        return f"<Category title={self.title}"
+
     @property
     def created_at(self) -> Optional[datetime]:
         """When a category got added in Kitu DB"""

@@ -221,6 +221,9 @@ class Manga(Entry):
         self.serialization: str = data["serialization"]
         super().__init__(attributes["id"], self.entry_type, data, http, *args)
 
+    def __repr__(self) -> str:
+        return f"<Manga name='{self.canonical_title}' id={self.id}>"
+
     async def chapters(self, limit: int = 12) -> Union[Chapter, List[Chapter]]:
         """
         Returns a chapter list of chapters
