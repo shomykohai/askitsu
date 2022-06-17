@@ -165,10 +165,16 @@ class Category:
         If the category is NSFW or not
     """
 
-    __slots__ = ("title", "description", "slug", "nsfw")
+    __slots__ = (
+        "title", 
+        "description", 
+        "slug", 
+        "nsfw",
+        "_attributes"
+    )
 
     def __init__(self, attributes: dict) -> None:
-        self._attributes = attributes["data"]
+        self._attributes = attributes["attributes"]
         self.title: str = self._attributes["title"]
         self.description: str = self._attributes["description"]
         self.slug: str = self._attributes["slug"]
