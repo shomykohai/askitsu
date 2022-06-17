@@ -454,6 +454,12 @@ class Client:
         )
         return User(data["data"]) if data["data"] else None
 
+    async def check_user(self, slug: str) -> bool:
+        data = await self.http.get_data(
+            url=f"users?filter%5Bslug%5D={slug}"
+        )
+        return bool(data["data"])
+
     async def close(self) -> None:
         """
         Close client connection
