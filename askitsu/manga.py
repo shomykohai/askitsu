@@ -233,7 +233,7 @@ class Manga(Entry):
             Limit of chapters to fetch. Defaults to 12 (Max 20).
         """
         data = await self._http.get_data(
-            url=f"{self._http.BASE}/manga/{self.id}/chapters?page[limit]={limit}"
+            url=f"manga/{self.id}/chapters?page[limit]={limit}"
         )
         chapters = [Chapter(attributes) for attributes in data["data"]]
         return chapters if len(chapters) > 1 else chapters[0]

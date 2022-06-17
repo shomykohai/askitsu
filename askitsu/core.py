@@ -119,14 +119,14 @@ class Entry:
     @property
     async def categories(self) -> List[Category]:
         data = await self._http.get_data(
-            url=f"{self._http.BASE}/{self.entry_type}/{self.id}/categories"
+            url=f"{self.entry_type}/{self.id}/categories"
         )
         return [Category(attributes) for attributes in data["data"]]
 
     @property
     async def characters(self) -> Union[Character, List[Character]]:
         data = await self._http.get_data(
-            url=f"{self._http.BASE}/{self.entry_type}/{self.id}/characters?include=character&page%5Blimit%5D=20"
+            url=f"{self.entry_type}/{self.id}/characters?include=character&page%5Blimit%5D=20"
         )
         characters_roles = [link["attributes"]["role"] for link in data["data"]]
         characters = [
@@ -137,7 +137,7 @@ class Entry:
 
     async def reviews(self, limit: int = 1) -> Optional[Union[Review, List[Review]]]:
         data = await self._http.get_data(
-            url=f"{self._http.BASE}/{self.entry_type}/{self.id}/reviews?page%5Blimit%5D={limit}"
+            url=f"{self.entry_type}/{self.id}/reviews?page%5Blimit%5D={limit}"
         )
         reviews = [
             Review(self.id, self.entry_type, reviews)

@@ -210,7 +210,7 @@ class CoverImage:
     def original(self) -> Optional[str]:
         try:
             return self._data.get("original", None)
-        except:
+        except KeyError:
             return None
 
     def dimension(

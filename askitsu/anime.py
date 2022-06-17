@@ -264,7 +264,7 @@ class Anime(Entry):
     @property
     async def stream_links(self) -> Optional[List[StreamLink]]:
         data = await self._http.get_data(
-            url=f"{self._http.BASE}/anime/{self.id}/streaming-links"
+            url=f"anime/{self.id}/streaming-links"
         )
         return (
             [StreamLink(links) for links in data["data"]]
@@ -282,7 +282,7 @@ class Anime(Entry):
             Limit of episodes to fetch. Defaults to 12 (Max 25).
         """
         async with self._http.get_data(
-            url=f"{self._http.BASE}/anime/{self.id}/episodes?page[limit]={limit}"
+            url=f"anime/{self.id}/episodes?page[limit]={limit}"
         ) as data:
             fetched_data = await data.json()
             episodes = [Episode(attributes) for attributes in fetched_data["data"]]

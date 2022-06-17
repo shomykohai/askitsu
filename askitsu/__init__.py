@@ -18,7 +18,9 @@ __version__ = "0.4.1"
 
 from .anime import *
 from .client import *
+from .character import *
 from .core import *
 from .error import *
 from .images import *
 from .manga import *
+from .users import *

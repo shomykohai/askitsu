@@ -23,7 +23,7 @@ class HTTPClient:
         return self.__session
 
     async def get_data(self, url: str) -> Any:
-        async with self.__session.get(url=url, headers=self.__headers) as response:
+        async with self.__session.get(url=f"{self.BASE}{url}", headers=self.__headers) as response:
             response_data = await response.json()
             if response.status == 200:
                 return response_data

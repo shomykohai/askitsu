@@ -145,7 +145,7 @@ class Client:
         entry = self._entries.get(type_lower)
         filter = "name" if type_lower == "characters" else "text"
         fetched_data = await self.http.get_data(
-            f"{self.http.BASE}/{type_lower}?filter%5B{filter}%5D={query}&page%5Blimit%5D={limit}"
+            f"{type_lower}?filter%5B{filter}%5D={query}&page%5Blimit%5D={limit}"
         )
         if not fetched_data["data"]:
             return None
@@ -280,7 +280,7 @@ class Client:
         """
         type_lower = type.lower()
         entry = self._entries.get(type_lower)
-        fetched_data = await self.http.get_data(f"{self.http.BASE}/{type_lower}/{id}")
+        fetched_data = await self.http.get_data(f"{type_lower}/{id}")
         return (
             entry(attributes=fetched_data["data"], http=self.http)
             if fetched_data
@@ -329,7 +329,7 @@ class Client:
                 f"Make sure you pass a valid argument to {Fore.LIGHTCYAN_EX}get_stream_links{Style.RESET_ALL}"
             )
         fetched_data = await self.http.get_data(
-            url=f"{self.http.BASE}/anime/{anime.id}/streaming-links"
+            url=f"anime/{anime.id}/streaming-links"
         )
         return [StreamLink(links) for links in fetched_data["data"]]
 
@@ -361,7 +361,7 @@ class Client:
             Number of characters' fetch
         """
         fetched_data = await self.http.get_data(
-            url=f"{self.http.BASE}/{entry.entry_type}/{entry.id}/characters?include=character&page%5Blimit%5D={limit}"
+            url=f"{entry.entry_type}/{entry.id}/characters?include=character&page%5Blimit%5D={limit}"
         )
         characters_roles = [link["attributes"]["role"] for link in fetched_data["data"]]
         characters = [
@@ -403,7 +403,7 @@ class Client:
                 f"Please pass 'anime' or 'manga' as parameter to {Fore.LIGHTCYAN_EX}get_trending_entry{Style.RESET_ALL}"
             )
         entry = self._entries.get(type_lower)
-        fetched_data = await self.http.get_data(f"{self.http.BASE}/trending/{type_lower}")
+        fetched_data = await self.http.get_data(f"trending/{type_lower}")
         return [
             entry(attributes=attributes, http=self.http)
             for attributes in fetched_data["data"]
@@ -440,7 +440,7 @@ class Client:
             Limit to reviews to fetch
         """
         fetched_data = await self.http.get_data(
-            url=f"{self.http.BASE}/{entry.entry_type}/{entry.id}/reviews?page%5Blimit%5D={limit}"
+            url=f"{entry.entry_type}/{entry.id}/reviews?page%5Blimit%5D={limit}"
         )
         reviews = [
             Review(entry.id, entry.entry_type, reviews)
