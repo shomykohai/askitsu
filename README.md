@@ -63,10 +63,10 @@ import asyncio
 
 async def search():
     client = askitsu.Client()
-    anime = client.search_anime("attack on titan")
+    anime = await client.search_anime("attack on titan")
     print(anime.episode_count)
     print(anime.status)
-    client.close()
+    await client.close()
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(search())
