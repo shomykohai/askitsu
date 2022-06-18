@@ -95,6 +95,7 @@ class Episode:
         "number",
         "length",
         "thumbnail",
+        "_attributes"
     )
 
     def __init__(self, attributes: dict) -> None:
