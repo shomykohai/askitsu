@@ -337,7 +337,10 @@ class Client:
         fetched_data = await self.http.get_data(
             url=f"anime/{anime.id}/streaming-links?include=streamer"
         )
-        return [StreamLink(links, included["attributes"]) for links, included in zip(fetched_data["data"], fetched_data["included"])]
+        try:
+            return [StreamLink(links, included["attributes"]) for links, included in zip(fetched_data["data"], fetched_data["included"])]
+        except KeyError:
+            return None
 
 
     @overload

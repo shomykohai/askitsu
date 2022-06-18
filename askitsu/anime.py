@@ -272,7 +272,10 @@ class Anime(Entry):
         data = await self._http.get_data(
             url=f"anime/{self.id}/streaming-links?include=streamer"
         )
-        return [StreamLink(links, included["attributes"]) for links, included in zip(data["data"], data["included"])]
+        try:
+            return [StreamLink(links, included["attributes"]) for links, included in zip(data["data"], data["included"])]
+        except KeyError:
+            return []
 
     async def episodes(self, limit: int = 12) -> Union[Episode, List[Episode]]:
         """
@@ -283,9 +286,8 @@ class Anime(Entry):
         limit: :class:`int`
             Limit of episodes to fetch. Defaults to 12 (Max 25).
         """
-        async with self._http.get_data(
+        data = await self._http.get_data(
             url=f"anime/{self.id}/episodes?page[limit]={limit}"
-        ) as data:
-            fetched_data = await data.json()
-            episodes = [Episode(attributes) for attributes in fetched_data["data"]]
-            return episodes if len(episodes) > 1 else episodes[0]
+        )
+        episodes = [Episode(attributes) for attributes in data["data"]]
+        return episodes if len(episodes) > 1 else episodes[0]
