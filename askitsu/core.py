@@ -32,7 +32,7 @@ from .http import HTTPClient
 from .images import CoverImage, PosterImage
 
 
-__all__ = ("Category", "Review", "Title")
+__all__ = ("Category", "Review", "Title", "Object")
 
 class Entry:
 
@@ -181,7 +181,7 @@ class Category:
         self.nsfw: bool = self._attributes["nsfw"]
 
     def __repr__(self) -> str:
-        return f"<Category title={self.title}"
+        return f"<Category title={self.title}>"
 
     @property
     def created_at(self) -> Optional[datetime]:
@@ -290,3 +290,29 @@ class Title:
     @property
     def ja_jp(self) -> Optional[str]:
         return self.__data.get("ja_jp")
+
+
+class Object:
+    """
+    Represent a generic Object.
+    This can be useful if you want to use some methods that require a 
+    specific istance.
+    
+    Example:
+    If you want to fetch the characters using :meth:`askitsu.Client.get_characters`
+    without a :class:`Manga` or :class:`Anime` istance, you can use this class by giving
+    an id and an entry_type
+
+    Attributes
+    --------------
+    id: :class:`int`
+        The id of the object
+    entry_type: Optional[:class:`str`]
+        The type of the object
+    """
+    def __init__(self, id: int, *, type: str = None) -> None:
+        self.id: int = id
+        self.entry_type: Optional[str] = type
+
+    def __repr__(self) -> str:
+        return f"<Object id={self.id} entry_type={self.entry_type}>"

@@ -33,7 +33,7 @@ from typing import (
 )
 from .anime import Anime, StreamLink
 from .character import Character
-from .core import Review
+from .core import Object, Review
 from .error import InvalidArgument
 from .http import HTTPClient
 from .manga import Manga
@@ -329,7 +329,7 @@ class Client:
         anime: :class:`Anime`
             The anime to get stream links
         """
-        if not isinstance(anime, Anime):
+        if not isinstance(anime, Anime) and not isinstance(anime, Object):
             raise InvalidArgument(
                 f"{Fore.RED}'{anime}' is not an istance of Anime\n"
                 f"Make sure you pass a valid argument to {Fore.LIGHTCYAN_EX}get_stream_links{Style.RESET_ALL}"
