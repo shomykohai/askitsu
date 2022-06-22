@@ -64,7 +64,7 @@ class User:
         "media_reaction",
         "pro",
         "pro_tier",
-        "url",
+        # "url",
         "_attributes",
         "_http"
     )
@@ -88,10 +88,14 @@ class User:
         self.media_reaction: int = attributes["mediaReactions"]["totalCount"]
         self.pro: bool = True if attributes["proTier"] else False
         self.pro_tier: Optional[str] = attributes["proTier"]
-        self.url: str = attributes["url"]
+        # self.url: str = attributes["url"]
 
     def __repr__(self) -> str:
         return f"<User slug='{self.slug}' id={self.id}"
+
+    @property
+    def url(self) -> str:
+        return f"https://kitsu.io/users/{self.slug}"
 
     @property
     def birthday(self) -> Optional[datetime]:
