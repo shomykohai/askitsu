@@ -27,6 +27,8 @@ __all__ = ("Manga", "Chapter")
 from datetime import datetime
 from typing import Union, List, Optional
 
+from askitsu.queries import BASE_URL, MANGA_BY_ID_CHAPTERS
+
 from .core import Entry
 from .http import HTTPClient
 
@@ -68,40 +70,38 @@ class Chapter:
     )
 
     def __init__(self, attributes: dict) -> None:
-        data = attributes["attributes"]
         self.id: int = int(attributes["id"])
-        self.synopsis: str = data["synopsis"]
-        self.description: str = data["description"]
-        self.title: str = data["canonicalTitle"]
-        self.volume_number: int = data["volumeNumber"]
-        self.chapter: int = data["number"]
-        self.length: int = data["length"]
+        self.description: str = attributes["description"]["en"]
+        self.title: str = attributes["titles"]["romanized"]
+        self.volume_number: int = attributes["volume"]
+        self.chapter: int = attributes["number"]
+        # self.length: int = attributes["length"]
         self.thumbnail: str = (
-            data["thumbnail"]["original"] if data["thumbnail"] else None
+            attributes["thumbnail"]["original"]["url"] if attributes["thumbnail"] else None
         )
 
     @property
     def created_at(self) -> Optional[datetime]:
         """Date when a chapter got added on Kitsu DB"""
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             return None
 
     @property
     def updated_at(self) -> Optional[datetime]:
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             return None
 
-    @property
-    def published(self) -> Optional[datetime]:
-        """Date when a Chapter got published (YYYY-mm-dd)"""
-        try:
-            return datetime.strptime(self._attributes["published"], "%Y-%m-%d")
-        except ValueError:
-            return None
+    # @property
+    # def published(self) -> Optional[datetime]:
+    #     """Date when a Chapter got published (YYYY-mm-dd)"""
+    #     try:
+    #         return datetime.strptime(self._attributes["published"], "%Y-%m-%d")
+    #     except ValueError:
+    #         return None
 
 
 class Manga(Entry):
@@ -213,18 +213,17 @@ class Manga(Entry):
     )
 
     def __init__(self, attributes: dict, http: HTTPClient, *args) -> None:
-        data = attributes["attributes"]
         self._http = http
         self.entry_type: str = "manga"
-        self.chapter_count: int = data["chapterCount"]
-        self.volume_count: int = data["volumeCount"]
-        self.serialization: str = data["serialization"]
-        super().__init__(attributes["id"], self.entry_type, data, http, *args)
+        self.chapter_count: int = attributes["chapterCount"]
+        self.volume_count: int = attributes["volumeCount"]
+        # self.serialization: str = data["serialization"]
+        super().__init__(attributes["id"], self.entry_type, attributes, http, *args)
 
     def __repr__(self) -> str:
         return f"<Manga name='{self.canonical_title}' id={self.id}>"
 
-    async def chapters(self, limit: int = 12) -> Union[Chapter, List[Chapter]]:
+    async def chapters(self, limit: int = 12) -> List[Chapter]:
         """
         Returns a chapter list of chapters
 
@@ -233,8 +232,9 @@ class Manga(Entry):
         limit: :class:`int`
             Limit of chapters to fetch. Defaults to 12 (Max 20).
         """
-        data = await self._http.get_data(
-            url=f"manga/{self.id}/chapters?page[limit]={limit}"
+        variables = {"id" : self.id}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data={"query" : MANGA_BY_ID_CHAPTERS, "variables" : variables}
         )
-        chapters = [Chapter(attributes) for attributes in data["data"]]
-        return chapters if len(chapters) > 1 else chapters[0]
+        return [Chapter(attributes) for attributes in data["data"]["findMangaById"]["chapters"]["nodes"]]

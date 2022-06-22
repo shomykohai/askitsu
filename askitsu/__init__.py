@@ -16,6 +16,8 @@ __license__ = "MIT"
 __copyright__ = "Copyright 2022-present ShomyKohai"
 __version__ = "0.4.1"
 
+# __all__
+
 from .anime import *
 from .client import *
 from .character import *

@@ -22,13 +22,25 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+from .queries import (
+    ANIME_BY_ID_CATEGORIES,
+    ANIME_BY_ID_CHARACTERS,
+    ANIME_BY_ID_EPISODES,
+    ANIME_BY_ID_REVIEWS,
+    ANIME_BY_ID_STREAMLINKS,
+    BASE_URL
+)
+
 __all__ = ("Anime", "StreamLink", "Episode")
 
 from datetime import datetime
 from typing import List, Optional, Union
 
-from .core import Entry
+
+from .character import Character
+from .core import Category, Entry, Review
 from .http import HTTPClient
+
 
 class StreamLink:
     """
@@ -51,13 +63,12 @@ class StreamLink:
 
     __slots__ = ("id", "url", "subs", "dub", "name")
 
-    def __init__(self, attributes: dict, included: dict):
-        data = attributes["attributes"]
+    def __init__(self, attributes: dict):
         self.id: int = int(attributes["id"])
-        self.name: str = included["siteName"]
-        self.url: str = data["url"]
-        self.subs: list = data["subs"]
-        self.dub: list = data["dubs"]
+        self.name: str = attributes["streamer"]["siteName"]
+        self.url: str = attributes["url"]
+        self.subs: list = attributes["subs"]
+        self.dub: list = attributes["dubs"]
 
 
 class Episode:
@@ -88,7 +99,6 @@ class Episode:
 
     __slots__ = (
         "id",
-        "synopsis",
         "description",
         "title",
         "season",
@@ -99,23 +109,18 @@ class Episode:
     )
 
     def __init__(self, attributes: dict) -> None:
-        self._attributes = attributes["attributes"]
         self.id: int = int(attributes["id"])
-        self.synopsis: str = self._attributes["synopsis"]
-        self.description: str = self._attributes["description"]
-        self.title: str = self._attributes["canonicalTitle"]
-        self.season: int = self._attributes["seasonNumber"]
-        self.number: int = self._attributes["number"]
-        self.length: int = self._attributes["length"]
-        self.thumbnail: str = (
-            self._attributes["thumbnail"]["original"] if self._attributes["thumbnail"] else None
-        )
+        self.description: str = attributes["description"]
+        self.title: str = attributes["titles"]["canonical"]
+        self.number: int = attributes["number"]
+        self.length: int = attributes["length"]
+        self.thumbnail: str = attributes["thumbnail"]["original"]["url"]
 
     @property
     def created_at(self) -> Optional[datetime]:
         """Date when this episode got added on Kitsu"""
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             return None
 
@@ -123,7 +128,7 @@ class Episode:
     def updated_at(self) -> Optional[datetime]:
         """Last time when this episode got updated on Kitu"""
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             return None
 
@@ -143,8 +148,6 @@ class Anime(Entry):
         Date when the anime ended
     slug: :class:`str`
         String identifier. Work as id to fetch data
-    synopsis: :class:`str`
-        Description of the given anime
     title: :class:`str`
         Return canon title of the given anime
 
@@ -233,7 +236,7 @@ class Anime(Entry):
         "entry_type",
         "status",
         "slug",
-        "synopsis",
+        "description",
         "canonical_title",
         "episode_count",
         "episode_length",
@@ -251,15 +254,14 @@ class Anime(Entry):
     )
 
     def __init__(self, attributes: dict, http: HTTPClient, *args) -> None:
-        data = attributes["attributes"]
         self._http = http
         self.entry_type = "anime"
-        self.episode_count: int = data["episodeCount"]
-        self.episode_length: int = data["episodeLength"]
-        self.total_length: int = data["totalLength"]
-        self.nsfw: bool = data["nsfw"]
-        self.yt_id: str = data["youtubeVideoId"]
-        super().__init__(attributes["id"], self.entry_type, data, http, *args)
+        self.episode_count: int = attributes["episodeCount"]
+        self.episode_length: int = attributes["episodeLength"]
+        self.total_length: int = attributes["totalLength"]
+        self.nsfw: bool = not attributes["sfw"]
+        self.yt_id: Optional[str] = attributes["youtubeTrailerVideoId"]
+        super().__init__(attributes["id"], self.entry_type, attributes, http, *args)
 
     def __repr__(self) -> str:
         return f"<Anime name='{self.canonical_title}' id={self.id}>"
@@ -270,15 +272,54 @@ class Anime(Entry):
 
     @property
     async def stream_links(self) -> Optional[List[StreamLink]]:
-        data = await self._http.get_data(
-            url=f"anime/{self.id}/streaming-links?include=streamer"
+        variables = {"id" : self.id}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data={"query" : ANIME_BY_ID_STREAMLINKS, "variables" : variables}
+
         )
         try:
-            return [StreamLink(links, included["attributes"]) for links, included in zip(data["data"], data["included"])]
+            return [StreamLink(attributes) for attributes in data["data"]["findAnimeById"]["streamingLinks"]["nodes"]]
         except KeyError:
-            return []
+            return None
 
-    async def episodes(self, limit: int = 12) -> Union[Episode, List[Episode]]:
+    @property
+    async def categories(self) -> List[Category]:
+        variables = {"id" : self.id}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data={"query" : ANIME_BY_ID_CATEGORIES, "variables" : variables}
+        )
+        return [
+            Category(attributes)
+            for attributes in data["data"]["findAnimeById"]["categories"]["nodes"]
+        ]
+
+    @property
+    async def characters(self) -> List[Character]:
+        variables = {"id" : self.id}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data={"query" : ANIME_BY_ID_CHARACTERS, "variables" : variables}
+        )
+        return [
+            Character(attributes, entry_id=self.id)
+            for attributes in data["data"]["findAnimeById"]["characters"]["nodes"]
+        ]        
+
+
+    async def reviews(self, limit: int = 1) -> List[Review]:
+        variables = {"id" : self.id, "limit" : limit}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data={"query" : ANIME_BY_ID_REVIEWS, "variables" : variables}
+        )
+        return [
+            Review(self.id, self.entry_type, attributes)
+            for attributes in data["data"]["findAnimeById"]["reactions"]["nodes"]
+        ]
+
+    async def episodes(self, limit: int = 12) -> List[Episode]:
         """
         Returns a a episode or a list of episodes
 
@@ -287,8 +328,10 @@ class Anime(Entry):
         limit: :class:`int`
             Limit of episodes to fetch. Defaults to 12 (Max 25).
         """
-        data = await self._http.get_data(
-            url=f"anime/{self.id}/episodes?page[limit]={limit}"
+        variables = {"id" : self.id, "limit" : limit}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data={"query" : ANIME_BY_ID_EPISODES, "variables" : variables}
         )
-        episodes = [Episode(attributes) for attributes in data["data"]]
-        return episodes if len(episodes) > 1 else episodes[0]
+        return [Episode(attributes) for attributes in data["data"]["findAnimeById"]["episodes"]["nodes"]]
+

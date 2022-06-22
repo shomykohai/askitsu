@@ -106,6 +106,6 @@ class NotFound(HTTPError):
 
     def __init__(self) -> None:
         super().__init__(
-            f"{Fore.RED}Resource not found.\n",
+            f"{Fore.RED}Resource not found.\n{Style.RESET_ALL}",
             404
         )

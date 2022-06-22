@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import List, Optional
+
+from askitsu.queries import BASE_URL, USERS_BY_ID_SOCIAL
 from .http import HTTPClient
 from .images import CoverImage, Image
 
@@ -36,29 +38,14 @@ class User:
         Number of comment posted by the user
     favorites_count: :class:`int`
         Number of favorites media of the user
-    likes_given: :class:`int`
-        Number of likes given by the user
-    likes_received: :class:`int`
-        Number of likes received by the user
     posts_count: :class:`int`
         Number of posts
-    rating_count: :class:`int`
-        ...
     media_reaction: :class:`int`
         Number of interaction with medias
     pro: :class:`bool`
         Return if the user has pro tier
-    status: :class:`str`
-        Status of the user (if they're registered or not)
-    title: Optional[:class:`str`]
-        Title of the user (if has one)
-        Example: "Staff"
-    profile_completed: :class:`bool`
-        Return if the user has completed his profile
-    feed_completed: :class:`bool`
-        ...
-    sfw_filter: :class:`str`
-        Current SFW filter of the user
+    pro_tier: Optional[:class:`str`]
+        Return the typology of pro
     """
     __slots__ = (
         "id",
@@ -73,69 +60,51 @@ class User:
         "gender",
         "comments_count",
         "favorites_count",
-        "likes_given",
-        "likes_received",
         "posts_count",
-        "rating_count",
         "media_reaction",
         "pro",
-        "status",
-        "title",
-        "profile_completed",
-        "feed_completed",
-        "sfw_filter",
-        "_data",
+        "pro_tier",
+        "url",
+        "_attributes",
         "_http"
     )
 
     def __init__(self, attributes: dict, http: HTTPClient) -> None:
         self._http = http
-        self._data = attributes["attributes"]
+        self._attributes = attributes
         self.id: int = int(attributes["id"])
         self.entry_type: str = "users" 
-        self.name: str = self._data["name"]
-        self.slug: str = self._data["slug"]
-        self.about: str = self._data["about"]
-        self.location: Optional[str] = self._data["location"]
-        self.waifu_husbando: str = self._data["waifuOrHusbando"]
-        self.followers: int = self._data["followersCount"]
-        self.following: int = self._data["followingCount"]
-        self.gender: Optional[str] = self._data["gender"]
-        self.comments_count: int = self._data["commentsCount"]
-        self.favorites_count: int = self._data["favoritesCount"]
-        self.likes_given: int = self._data["likesGivenCount"]
-        self.likes_received: int = self._data["likesReceivedCount"]
-        self.posts_count: int = self._data["postsCount"]
-        self.rating_count: int = self._data["ratingsCount"]
-        self.media_reaction: int = self._data["mediaReactionsCount"]
-        self.pro: bool = True if self._data["proTier"] else False
-        self.status: str = self._data["status"]
-        self.title: Optional[str] = self._data["title"]
-        self.profile_completed: bool = self._data["profileCompleted"]
-        self.feed_completed: bool = self._data["feedCompleted"]
-        self.sfw_filter: str = self._data["sfwFilterPreference"]
+        self.name: str = attributes["name"]
+        self.slug: str = attributes["slug"]
+        self.about: str = attributes["about"]
+        self.location: Optional[str] = attributes["location"]
+        self.waifu_husbando: Optional[str] = attributes["waifuOrHusbando"]
+        self.followers: int = attributes["followers"]["totalCount"]
+        self.following: int = attributes["following"]["totalCount"]
+        self.gender: Optional[str] = attributes["gender"]
+        self.comments_count: int = attributes["comments"]["totalCount"]
+        self.favorites_count: int = attributes["favorites"]["totalCount"]
+        self.posts_count: int = attributes["posts"]["totalCount"]
+        self.media_reaction: int = attributes["mediaReactions"]["totalCount"]
+        self.pro: bool = True if attributes["proTier"] else False
+        self.pro_tier: Optional[str] = attributes["proTier"]
+        self.url: str = attributes["url"]
 
     def __repr__(self) -> str:
         return f"<User slug='{self.slug}' id={self.id}"
 
     @property
-    def past_names(self) -> Optional[list]:
-        """Past names of the user (if avaiable)"""
-        names = self._data["pastNames"]
-        return names if names else None
-
-    @property
     def birthday(self) -> Optional[datetime]:
         """Birthday of the user (if set)"""
         try:
-            return datetime.strptime(self._data["birthday"], "%Y-%m-%d")
+            return datetime.strptime(self._attributes["birthday"], "%Y-%m-%d")
         except TypeError:
             return None
     
     @property
     def avatar(self) -> Optional[Image]:
         """Avatar of the user"""
-        avatar = self._data["avatar"]
+        avatar = self._attributes["avatarImage"]
         if avatar:
             return Image(
                 avatar
@@ -146,37 +115,43 @@ class User:
     @property
     def cover_image(self) -> Optional[CoverImage]:
         """Background of the user profile"""
-        cover = self._data["coverImage"]
+        cover = self._attributes["bannerImage"]
         if cover:
             return CoverImage(
                 cover,
                 entry_id=self.id,
                 entry_type=self.entry_type
             )
-        else:
-            return None
-        
+        return None
+
     @property
-    def url(self) -> str:
-        return f"https://kitsu.io/users/{self.slug}"
+    def banner(self) -> Optional[CoverImage]:
+        """Same as :meth:`cover_image`"""
+        return self.cover_image
 
     @property
     async def profile_links(self) -> Optional[List[UserProfile]]:
-        data = await self._http.get_data(
-            url=f"users/{self.id}/profile-links?include=profileLinkSite"
+        """Social linked to the profile"""
+        variables = {"id" : self.id}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data = {"query" : USERS_BY_ID_SOCIAL, "variables" : variables}
         )
-        return [
-            UserProfile(attributes["id"], attributes["attributes"], self.slug, included) 
-            for attributes, included in zip(data["data"], data["included"])
-        ]
+        try:
+            return [
+                UserProfile(attributes, self.slug)
+                for attributes in data["data"]["findProfileById"]["siteLinks"]["nodes"]
+            ]
+        except KeyError:
+            return None
 
 
 
 class UserProfile:
-    def __init__(self, id: int, attributes: dict, user: str, included: dict) -> None:
+    def __init__(self, attributes: dict, user: str) -> None:
         self._attributes = attributes
-        self.id: int = int(id)
-        self.name: str = included["attributes"]["name"]
+        self.id: int = int(attributes["id"])
+        #self.name: str = _["attributes"]["name"]
         self.user: str = user
         self.url: str = attributes["url"]
 

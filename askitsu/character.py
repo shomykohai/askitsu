@@ -48,8 +48,6 @@ class Character:
         The character's description
     role: Literal[:class:`str`]
         Role of the character ("main" or "supporting")
-    mal_id: :class:`int`
-        Character ID on My Anime List
     image: :class:`str`
         Return character's image
     """
@@ -63,31 +61,28 @@ class Character:
         "description",
         "role",
         "slug",
-        "mal_id",
-        "_data"
+        "_attributes"
     )
 
-    def __init__(self, attributes: dict, *, role: str, entry_id: int = None):
-        data = attributes["attributes"]
-        self._data = data
+    def __init__(self, attributes: dict, *, entry_id: int = None):
+        self._attributes = attributes
         self.media_id = entry_id
-        self.id: int = int(attributes["id"])
+        self.id: int = int(attributes["character"]["id"])
         self.type: str = "characters"
-        self.name: str = data["canonicalName"]
-        self.description: str = data["description"]
-        self.role: str = role
-        self.slug: str = data["slug"]
-        self.mal_id: int = int(data["malId"])
+        self.name: str = attributes["character"]["names"]["canonical"]
+        self.description: str = attributes["character"]["description"]
+        self.role: str = attributes.get("role")
+        self.slug: str = attributes["character"]["slug"]
 
     @property
     def image(self) -> Image:
-        return Image(self._data["image"])
+        return Image(self._attributes["character"]["image"])
 
     @property
     def created_at(self) -> Optional[datetime]:
         """When a character got added in Kitu DB"""
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             return None
 
@@ -95,6 +90,6 @@ class Character:
     def updated_at(self) -> Optional[datetime]:
         """Last time a character got updated"""
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             return None

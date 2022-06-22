@@ -34,6 +34,15 @@ class HTTPClient:
             if response.status == 400:
                 raise BadApiRequest(response_data["errors"][0])
 
+    async def post_data(self, url: str, data: dict) -> Any:
+        async with self.__session.post(
+            url=url,
+            json=data,
+            headers=self.__headers
+        ) as response:
+            if response.status == 200:
+                return await response.json()
+
 
     async def close(self) -> None:
         return await self.__session.close()

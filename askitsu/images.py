@@ -26,16 +26,21 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
+def get_dimension(dim: str, values: dict) -> Optional[str]:
+    for dimensions in values:
+        if dim in dimensions.values():
+            try:
+                return dimensions.get("url", None)
+            except (KeyError, TypeError):
+                return None
+    return None
+
 class Image:
     """
     Represent a general image
 
     Attributes
     ---------------
-    entry_id: :class:`int`
-        The id which the poster image belongs to
-    entry_type: :class:`str`
-        The type of the media
     tiny: :class:`str`
         Poster image -- size: tiny
     small: :class:`str`
@@ -53,37 +58,25 @@ class Image:
 
     @property
     def tiny(self) -> Optional[str]:
-        try:
-            return self._data.get("tiny", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("tiny", self._data["views"])
     
     @property
     def small(self) -> Optional[str]:
-        try:
-            return self._data.get("small", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("small", self._data["views"])
 
     @property
     def medium(self) -> Optional[str]:
-        try:
-            return self._data.get("medium", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("medium", self._data["views"])
 
     @property
     def large(self) -> Optional[str]:
-        try:
-            return self._data.get("large", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("large", self._data["views"])
 
     @property
     def original(self) -> Optional[str]:
         try:
-            return self._data.get("original", None)
-        except (KeyError, AttributeError):
+            return self._data["original"].get("url", None)
+        except (KeyError, TypeError):
             return None
 
 class PosterImage:
@@ -115,37 +108,25 @@ class PosterImage:
 
     @property
     def tiny(self) -> Optional[str]:
-        try:
-            return self._data.get("tiny", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("tiny", self._data["views"])
     
     @property
     def small(self) -> Optional[str]:
-        try:
-            return self._data.get("small", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("small", self._data["views"])
 
     @property
     def medium(self) -> Optional[str]:
-        try:
-            return self._data.get("medium", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("medium", self._data["views"])
 
     @property
     def large(self) -> Optional[str]:
-        try:
-            return self._data.get("large", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("large", self._data["views"])
 
     @property
     def original(self) -> Optional[str]:
         try:
-            return self._data.get("original", None)
-        except (KeyError, AttributeError):
+            return self._data["original"].get("url", None)
+        except (KeyError, TypeError):
             return None
 
     def dimension(
@@ -187,30 +168,21 @@ class CoverImage:
 
     @property
     def tiny(self) -> Optional[str]:
-        try:
-            return self._data.get("tiny", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("tiny", self._data["views"])
     
     @property
     def small(self) -> Optional[str]:
-        try:
-            return self._data.get("small", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("small", self._data["views"])
 
     @property
     def large(self) -> Optional[str]:
-        try:
-            return self._data.get("large", None)
-        except (KeyError, AttributeError):
-            return None
+        return get_dimension("large", self._data["views"])
 
     @property
     def original(self) -> Optional[str]:
         try:
             return self._data.get("original", None)
-        except (KeyError, AttributeError):
+        except (KeyError, TypeError):
             return None
 
     def dimension(
