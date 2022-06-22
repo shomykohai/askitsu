@@ -27,10 +27,10 @@ __all__ = ("Manga", "Chapter")
 from datetime import datetime
 from typing import Union, List, Optional
 
-from .queries import BASE_URL, MANGA_BY_ID_CATEGORIES, MANGA_BY_ID_CHAPTERS, MANGA_BY_ID_CHARACTERS
+from .queries import BASE_URL, MANGA_BY_ID_CATEGORIES, MANGA_BY_ID_CHAPTERS, MANGA_BY_ID_CHARACTERS, MANGA_BY_ID_REVIEWS
 
 from .character import Character
-from .core import Category, Entry
+from .core import Category, Entry, Review
 from .http import HTTPClient
 
 
@@ -255,3 +255,14 @@ class Manga(Entry):
             Character(attributes, entry_id=self.id)
             for attributes in data["data"]["findAnimeById"]["characters"]["nodes"]
         ]     
+
+    async def reviews(self, limit: int = 1) -> List[Review]:
+        variables = {"id" : self.id, "limit" : limit}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data={"query" : MANGA_BY_ID_REVIEWS, "variables" : variables}
+        )
+        return [
+            Review(self.id, self.entry_type, attributes)
+            for attributes in data["data"]["findAnimeById"]["reactions"]["nodes"]
+        ]
