@@ -27,9 +27,10 @@ __all__ = ("Manga", "Chapter")
 from datetime import datetime
 from typing import Union, List, Optional
 
-from askitsu.queries import BASE_URL, MANGA_BY_ID_CHAPTERS
+from .queries import BASE_URL, MANGA_BY_ID_CATEGORIES, MANGA_BY_ID_CHAPTERS, MANGA_BY_ID_CHARACTERS
 
-from .core import Entry
+from .character import Character
+from .core import Category, Entry
 from .http import HTTPClient
 
 
@@ -42,8 +43,6 @@ class Chapter:
     -----------
     id: :class:`int`
         ID of the chapter
-    synopsis: :class:`str`
-        Synopsis of the chapter
     description: :class:`str`
         Full description of the chapter
     title: :class:`str`
@@ -52,8 +51,6 @@ class Chapter:
         Which volume the chapter belong to
     chapter: :class:`int`
         Chapter number
-    lenght: :class:`int`
-        Pages of the chapter
     thumbnail: :class:`str`
         Url of the thumbnail
     """
@@ -119,8 +116,6 @@ class Manga(Entry):
         Date when the manga ended
     slug: :class:`str`
         String identifier. Work as id to fetch data
-    synopsis: :class:`str`
-        Description of the given manga
     title: :class:`str`
         Return canon title of the given manga
 
@@ -136,8 +131,6 @@ class Manga(Entry):
         Number of chapters
     volume_count: :class:`int`
         Number of volumes
-    serialization: :class:`str`
-        Return manga serialization
     cover_image: :class:`CoverImage`
         Return cover image dict with all sizes
 
@@ -238,3 +231,27 @@ class Manga(Entry):
             data={"query" : MANGA_BY_ID_CHAPTERS, "variables" : variables}
         )
         return [Chapter(attributes) for attributes in data["data"]["findMangaById"]["chapters"]["nodes"]]
+
+    @property
+    async def categories(self) -> List[Category]:
+        variables = {"id" : self.id}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data={"query" : MANGA_BY_ID_CATEGORIES, "variables" : variables}
+        )
+        return [
+            Category(attributes)
+            for attributes in data["data"]["findAnimeById"]["categories"]["nodes"]
+        ]
+
+    @property
+    async def characters(self) -> List[Character]:
+        variables = {"id" : self.id}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data={"query" : MANGA_BY_ID_CHARACTERS, "variables" : variables}
+        )
+        return [
+            Character(attributes, entry_id=self.id)
+            for attributes in data["data"]["findAnimeById"]["characters"]["nodes"]
+        ]     

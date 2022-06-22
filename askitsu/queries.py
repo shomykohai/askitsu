@@ -158,7 +158,7 @@ ANIME_BY_ID_STREAMLINKS: str =  """
 # ================ MANGA ================
 
 MANGA_BY_ID: str = """
-        query animeByID ($id: ID!) {
+        query mangaByID ($id: ID!) {
         findMangaById(id: $id) {
             id
             slug
@@ -205,28 +205,74 @@ MANGA_BY_ID: str = """
 """
 
 MANGA_BY_ID_CHAPTERS = """
-query chapters ($id: ID!, $limit: Int) {
-  findMangaById(id: $id) {
-    chapters (first: $limit) {
-      nodes {
-        id
-        createdAt
-        updatedAt
-        titles {
-          romanized
-        }
+        query chapters ($id: ID!, $limit: Int) {
+        findMangaById(id: $id) {
+            chapters (first: $limit) {
+            nodes {
+                id
+                createdAt
+                updatedAt
+                titles {
+                romanized
+                }
 
-        description
-        number
-        thumbnail {
-          original {
-            url
+                description
+                number
+                thumbnail {
+                original {
+                    url
+                }
+            }
+            }
+            }
         }
-    }
-    }
-    }
-  }
-}
+        }
+"""
+
+MANGA_BY_ID_CHARACTERS: str = """
+            query characters ($id: ID!) {
+                findMangaById(id: $id) {
+                characters (first: 100) {
+                nodes {
+                    role
+                    character {
+                    createdAt
+                    updatedAt
+                    id
+                    slug
+                    description
+                    names {
+                        canonical
+                        localized
+                    }
+                    image {
+                        original {
+                        url
+                        }
+                        views {
+                        url
+                        }
+                    }
+                    }
+                }
+                }
+                }
+            }
+"""
+
+MANGA_BY_ID_CATEGORIES: str = """
+            query category ($id: ID!) {
+                findMangaById(id: $id) {
+                categories (first: 25) {
+                nodes {
+                    title
+                    slug
+                    description
+                    isNsfw
+                }
+                }
+                }
+            }
 """
 # ================ USERS ================
 
