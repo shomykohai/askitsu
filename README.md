@@ -12,6 +12,13 @@ askitsu
 
 ![askitsu](https://github.com/ShomyKohai/askitsu/blob/master/docs/images/dark.png?raw=true "askitsu")
   
+
+# IMPORTANT
+
+⚠️ askitsu is migrating to the new Kitsu API (using GraphQL)<br>
+Therefore this branch is not currently ready to be used.<br>
+If you with to use the library, please install the `master` branch.
+
 # Key features
 
 - Fully typed
