@@ -2,6 +2,7 @@
 
 BASE_URL = "https://kitsu.io/api/graphql"
 
+
 # ================ ANIME ================
 
 ANIME_BY_ID: str = """
@@ -16,7 +17,7 @@ ANIME_BY_ID: str = """
                     description
                     status
                     sfw
-                    subtype
+                    animesub: subtype
                     ageRating
                     endDate
                     season
@@ -92,9 +93,9 @@ ANIME_BY_ID_REVIEWS: str = """
 """
 
 ANIME_BY_ID_CHARACTERS: str = """
-            query characters ($id: ID!) {
+            query characters ($id: ID!, $limit: Int) {
                 findAnimeById(id: $id) {
-                characters (first: 100) {
+                characters (first: $limit) {
                 nodes {
                     role
                     character {
@@ -155,6 +156,57 @@ ANIME_BY_ID_STREAMLINKS: str =  """
             }
 """
 
+ANIME_BY_TITLE: str = """
+        query animeByTitle($title: String!, $limit: Int) {
+            searchAnimeByTitle(first: $limit, title: $title) {
+            nodes {
+                id
+                slug
+                createdAt
+                updatedAt
+                startDate
+                endDate
+                description
+                status
+                sfw
+                animesub: subtype
+                ageRating
+                endDate
+                season
+                episodeCount
+                episodeLength
+                totalLength
+                youtubeTrailerVideoId
+                averageRatingRank
+                averageRating
+                userCountRank
+                titles{
+                    canonical
+                    localized
+                }
+                posterImage {
+                    original {
+                        url
+                    }
+                    views {
+                        name
+                        url
+                    }
+                }
+                bannerImage {
+                original {
+                    url
+                }
+                views {
+                    name
+                    url
+                }      
+                }
+            }
+            }
+        }
+"""
+
 # ================ MANGA ================
 
 MANGA_BY_ID: str = """
@@ -169,7 +221,7 @@ MANGA_BY_ID: str = """
             description
             status
             sfw
-            subtype
+            mangasub: subtype
             ageRating
             endDate
             chapterCount
@@ -230,9 +282,9 @@ MANGA_BY_ID_CHAPTERS = """
 """
 
 MANGA_BY_ID_CHARACTERS: str = """
-            query characters ($id: ID!) {
+            query characters ($id: ID!, $limit: Int) {
                 findMangaById(id: $id) {
-                characters (first: 100) {
+                characters (first: $limit) {
                 nodes {
                     role
                     character {
@@ -274,10 +326,72 @@ MANGA_BY_ID_CATEGORIES: str = """
                 }
             }
 """
+
+MANGA_BY_ID_REVIEWS: str = """
+            query reviews ($id: ID!, $limit: Int!) {
+                findAnimeById(id: $id) {
+                reactions (first: $limit) {
+                nodes {
+                    id
+                    progress
+                    reaction
+                }
+                }
+                }
+            }
+"""
+
+MANGA_BY_TITLE: str = """
+            query mangaByTitle($title: String!, $limit: Int) {
+                searchMangaByTitle(first: $limit, title: $title) {
+                nodes {
+                    id
+                        slug
+                        createdAt
+                        updatedAt
+                        startDate
+                        endDate
+                        description
+                        status
+                        sfw
+                        mangasub: subtype
+                        ageRating
+                        endDate
+                        chapterCount
+                        volumeCount
+                        averageRatingRank
+                        averageRating
+                        userCountRank
+                        titles{
+                        canonical
+                        localized
+                        }
+                        posterImage {
+                        original {
+                            url
+                        }
+                        views {
+                            name
+                            url
+                        }
+                        }
+                        bannerImage {
+                        original {
+                            url
+                        }
+                        views {
+                            name
+                            url
+                        }      
+                        }
+                } 
+            }
+            }
+"""
 # ================ USERS ================
 
 USERS_BY_ID: str = """
-            query user ($id: ID!) {
+            query userByID ($id: ID!) {
             findProfileById (id: $id) {
                 id
                 name
@@ -330,7 +444,7 @@ USERS_BY_ID: str = """
 """
 
 USERS_BY_ID_SOCIAL = """
-            query user ($id: ID!) {
+            query socials ($id: ID!) {
             findProfileById (id: $id) {
                 siteLinks (first: 30) {
                 nodes {
@@ -341,3 +455,183 @@ USERS_BY_ID_SOCIAL = """
             }
             }
 """
+
+USER_BY_USERNAME = """
+            query userByUsername ($name: String!) {
+                searchProfileByUsername (first: 1, username: $name) {
+                nodes {
+                    id
+                    name
+                    slug
+                    birthday 
+                    about
+                    location
+                    waifuOrHusbando
+                    gender
+                    url
+                        proTier
+                    posts (first: 1) {
+                        totalCount
+                    }
+                    mediaReactions(first: 1){
+                        totalCount
+                    }
+                    comments (first: 1) {
+                        totalCount
+                    }
+                    followers (first: 1){
+                        totalCount
+                    }
+                    following (first: 1){
+                        totalCount
+                    }
+                    favorites (first: 1){
+                        totalCount
+                    }
+                    avatarImage {
+                        original {
+                            url
+                        }
+                        views {
+                            name
+                            url
+                        }
+                    }
+                    bannerImage {
+                        original {
+                            url
+                        }
+                        views {
+                            name
+                            url
+                        }
+                    }
+                    }
+                    }
+            }
+"""
+# ================ MISC ================
+
+TRENDING_ENTRY = """
+            query checkUser ($media: MediaTypeEnum!, $limit: Int) {
+            globalTrending (first: $limit, mediaType: $media) {
+                nodes {
+                ... on Anime {
+                        id
+                        slug
+                        createdAt
+                        updatedAt
+                        startDate
+                        endDate
+                        description
+                        status
+                        sfw
+                        animesub: subtype
+                        ageRating
+                        endDate
+                        season
+                        episodeCount
+                        episodeLength
+                        totalLength
+                        youtubeTrailerVideoId
+                        averageRatingRank
+                        averageRating
+                        userCountRank
+                        titles{
+                            canonical
+                            localized
+                        }
+                        posterImage {
+                            original {
+                                url
+                            }
+                            views {
+                                name
+                                url
+                            }
+                        }
+                        bannerImage {
+                        original {
+                            url
+                        }
+                        views {
+                            name
+                            url
+                        }      
+                        }
+                }
+                ... on Manga {
+                                id
+                        slug
+                        createdAt
+                        updatedAt
+                        startDate
+                        endDate
+                        description
+                        status
+                        sfw
+                        mangasub: subtype
+                        ageRating
+                        endDate
+                        chapterCount
+                        volumeCount
+                        averageRatingRank
+                        averageRating
+                        userCountRank
+                        titles{
+                        canonical
+                        localized
+                        }
+                        posterImage {
+                        original {
+                            url
+                        }
+                        views {
+                            name
+                            url
+                        }
+                        }
+                        bannerImage {
+                        original {
+                            url
+                        }
+                        views {
+                            name
+                            url
+                        }      
+                        }
+                }
+                }
+            }
+            }
+"""
+
+# ================ METHODS ================
+
+QUERY_METHODS = {
+    "anime_search": "searchAnimeByTitle",
+    "manga_search": "searchMangaByTitle",
+    "anime_id": "findAnimeById",
+    "manga_id": "findMangaById",
+    #"character_search": "findCharacterBySlug"
+}
+
+ENTRY_TITLE = {
+    "searchAnimeByTitle" : ANIME_BY_TITLE,
+    "searchMangaByTitle" : MANGA_BY_TITLE,
+}
+
+ENTRY_ID = {
+    "findAnimeById" : ANIME_BY_ID,
+    "findMangaById" : MANGA_BY_ID,
+}
+
+ENTRY_ID_REVIEWS = {
+    "findAnimeById" : ANIME_BY_ID_REVIEWS,
+    "findMangaById" : MANGA_BY_ID_REVIEWS,   
+}
+
+ENTRY_ID_CHARACTERS = {
+    "findAnimeById" : ANIME_BY_ID_CHARACTERS,
+    "findMangaById" : MANGA_BY_ID_CHARACTERS,
+}

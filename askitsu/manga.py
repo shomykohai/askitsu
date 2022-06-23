@@ -22,16 +22,21 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-__all__ = ("Manga", "Chapter")
-
 from datetime import datetime
-from typing import Union, List, Optional
-
-from .queries import BASE_URL, MANGA_BY_ID_CATEGORIES, MANGA_BY_ID_CHAPTERS, MANGA_BY_ID_CHARACTERS, MANGA_BY_ID_REVIEWS
+from typing import List, Optional
 
 from .character import Character
 from .core import Category, Entry, Review
 from .http import HTTPClient
+from .queries import (
+    BASE_URL,
+    MANGA_BY_ID_CATEGORIES,
+    MANGA_BY_ID_CHAPTERS,
+    MANGA_BY_ID_CHARACTERS,
+    MANGA_BY_ID_REVIEWS
+)
+
+__all__ = ("Manga", "Chapter")
 
 
 class Chapter:
@@ -210,6 +215,7 @@ class Manga(Entry):
         self.entry_type: str = "manga"
         self.chapter_count: int = attributes["chapterCount"]
         self.volume_count: int = attributes["volumeCount"]
+        self.subtype: str = attributes["mangasub"]
         # self.serialization: str = data["serialization"]
         super().__init__(attributes["id"], self.entry_type, attributes, http, *args)
 
@@ -246,7 +252,7 @@ class Manga(Entry):
 
     @property
     async def characters(self) -> List[Character]:
-        variables = {"id" : self.id}
+        variables = {"id" : self.id, "limit" : 100}
         data = await self._http.post_data(
             url=BASE_URL,
             data={"query" : MANGA_BY_ID_CHARACTERS, "variables" : variables}

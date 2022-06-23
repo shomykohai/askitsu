@@ -22,6 +22,13 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+from datetime import datetime
+from typing import List, Optional, Union
+
+
+from .character import Character
+from .core import Category, Entry, Review
+from .http import HTTPClient
 from .queries import (
     ANIME_BY_ID_CATEGORIES,
     ANIME_BY_ID_CHARACTERS,
@@ -31,15 +38,8 @@ from .queries import (
     BASE_URL
 )
 
+
 __all__ = ("Anime", "StreamLink", "Episode")
-
-from datetime import datetime
-from typing import List, Optional, Union
-
-
-from .character import Character
-from .core import Category, Entry, Review
-from .http import HTTPClient
 
 
 class StreamLink:
@@ -261,6 +261,7 @@ class Anime(Entry):
         self.total_length: int = attributes["totalLength"]
         self.nsfw: bool = not attributes["sfw"]
         self.yt_id: Optional[str] = attributes["youtubeTrailerVideoId"]
+        self.subtype: str = attributes["animesub"]
         super().__init__(attributes["id"], self.entry_type, attributes, http, *args)
 
     def __repr__(self) -> str:
@@ -297,7 +298,7 @@ class Anime(Entry):
 
     @property
     async def characters(self) -> List[Character]:
-        variables = {"id" : self.id}
+        variables = {"id" : self.id, "limit" : 100}
         data = await self._http.post_data(
             url=BASE_URL,
             data={"query" : ANIME_BY_ID_CHARACTERS, "variables" : variables}
@@ -326,7 +327,7 @@ class Anime(Entry):
         .. versionadded:: 0.4.0
 
         limit: :class:`int`
-            Limit of episodes to fetch. Defaults to 12 (Max 25).
+            Limit of episodes to fetch. Defaults to 12.
         """
         variables = {"id" : self.id, "limit" : limit}
         data = await self._http.post_data(
