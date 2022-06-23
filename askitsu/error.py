@@ -24,6 +24,16 @@ DEALINGS IN THE SOFTWARE.
 from colorama import Fore, Style
 
 
+__all__ = (
+    "AskitsuException",
+    "HTTPError",
+    "InvalidArgument",
+    "NotAuthenticated",
+    "BadApiRequest",
+    "NotFound"
+)
+
+
 class AskitsuException(Exception):
     """
     Base class for most of the library errors

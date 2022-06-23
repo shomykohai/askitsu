@@ -26,6 +26,10 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
+
+__all__ = ("Image", "PosterImage", "CoverImage")
+
+
 def get_dimension(dim: str, values: dict) -> Optional[str]:
     for dimensions in values:
         if dim in dimensions.values():

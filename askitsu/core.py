@@ -26,7 +26,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, Literal, Optional, Union
+from typing import List, Literal, Optional
 
 from .character import Character
 from .http import HTTPClient
@@ -191,7 +191,6 @@ class Entry(ABC):
         self.popularity_rank = attributes["userCountRank"]
         self.rating: float = attributes["averageRating"]
         self.age_rating: Literal["G", "PG", "R", "R18"] = attributes["ageRating"]
-        self.subtype: str = attributes["subtype"]
 
     @property
     def created_at(self) -> Optional[datetime]:

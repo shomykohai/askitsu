@@ -1,7 +1,11 @@
 import aiohttp
 from typing import Any, Optional
 from . import __version__
-from .error import BadApiRequest, HTTPError, NotAuthenticated, NotFound
+from .error import BadApiRequest, NotAuthenticated, NotFound
+
+
+__all__ = ("HTTPClient",)
+
 
 class HTTPClient:
 

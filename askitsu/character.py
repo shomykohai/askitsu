@@ -29,6 +29,9 @@ from typing import Optional
 from .images import Image
 
 
+__all__ = ("Character",)
+
+
 class Character:
     """Represents a :class:`Character` istance
 
