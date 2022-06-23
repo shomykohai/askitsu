@@ -99,30 +99,30 @@ Errors
 
 AskitsuException
 ------------------------
-.. autoclass:: askitsu.AskitsuException
+.. ..autoexception:: askitsu.AskitsuException
    :members:
    :undoc-members:
 
 HTTPError
 ------------------------
-.. autoclass:: askitsu.HTTPError
+.. autoexception:: askitsu.HTTPError
    :members:
    :undoc-members:
 
 InvalidArgument
 ------------------------
-.. autoclass:: askitsu.InvalidArgument
+.. autoexception:: askitsu.InvalidArgument
    :members:
    :undoc-members:
 
 NotAuthenticated
 ------------------------
-.. autoclass:: askitsu.NotAuthenticated
+.. autoexception:: askitsu.NotAuthenticated
    :members:
    :undoc-members:
 
 BadApiRequest
 ------------------------
-.. autoclass:: askitsu.BadApiRequest
+.. autoexception:: askitsu.BadApiRequest
    :members:
    :undoc-members:
