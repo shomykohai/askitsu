@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
 
@@ -119,7 +120,7 @@ class User:
         # self.url: str = attributes["url"]
 
     def __repr__(self) -> str:
-        return f"<User slug='{self.slug}' id={self.id}"
+        return f"<User slug='{self.slug}' id={self.id}>"
 
     @property
     def url(self) -> str:
@@ -179,11 +180,12 @@ class User:
 
 
 
+@dataclass()
 class UserProfile:
     def __init__(self, attributes: dict, user: str) -> None:
         self._attributes = attributes
         self.id: int = int(attributes["id"])
-        #self.name: str = _["attributes"]["name"]
+        #self.name: str = _["attributes"]["name"] #Needs to be re-added (wait for kitsu fix) 
         self.user: str = user
         self.url: str = attributes["url"]
 

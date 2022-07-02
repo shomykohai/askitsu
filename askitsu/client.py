@@ -40,6 +40,7 @@ from .queries import (
     ENTRY_ID_REVIEWS,
     ENTRY_TITLE,
     TRENDING_ENTRY,
+    USERS_BY_ID,
     USER_BY_USERNAME
 )
 from .anime import Anime, StreamLink
@@ -507,10 +508,12 @@ class Client:
         id: :class:`int`
             The id of the user to fetch
         """
-        data = await self.http.get_data(
-            url=f"users/{id}"
+        variables = {"id" : id}
+        data = await self.http.post_data(
+            url=BASE_URL,
+            data={"query" : USERS_BY_ID, "variables" : variables}
         )
-        return User(data["data"], http=self.http) if data["data"] else None
+        return User(data["data"]["findProfileById"], http=self.http) if data["data"] else None
 
     async def check_user(self, slug: str) -> bool:
         """|coro|
