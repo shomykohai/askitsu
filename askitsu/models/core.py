@@ -29,9 +29,8 @@ from datetime import datetime
 from typing import List, Literal, Optional
 
 from .character import Character
-from .http import HTTPClient
 from .images import CoverImage, PosterImage
-
+from ..http import HTTPClient
 
 __all__ = ("Category", "Review", "Title", "Object")
 

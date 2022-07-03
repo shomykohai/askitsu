@@ -25,66 +25,100 @@ DEALINGS IN THE SOFTWARE.
 from datetime import datetime
 from typing import List, Optional
 
+
 from .character import Character
 from .core import Category, Entry, Review
-from .http import HTTPClient
-from .queries import (
-    BASE_URL,
-    MANGA_BY_ID_CATEGORIES,
-    MANGA_BY_ID_CHAPTERS,
-    MANGA_BY_ID_CHARACTERS,
-    MANGA_BY_ID_REVIEWS
+from ..http import HTTPClient
+from ..queries import (
+    ANIME_BY_ID_CATEGORIES,
+    ANIME_BY_ID_CHARACTERS,
+    ANIME_BY_ID_EPISODES,
+    ANIME_BY_ID_REVIEWS,
+    ANIME_BY_ID_STREAMLINKS,
+    BASE_URL
 )
 
-__all__ = ("Manga", "Chapter")
+
+__all__ = ("Anime", "StreamLink", "Episode")
 
 
-class Chapter:
+class StreamLink:
     """
-    Represent a :class:`Manga` chapter
+    Represent an :class:`Anime` stream link
 
 
     Attributes
     -----------
     id: :class:`int`
-        ID of the chapter
+        ID of Anime Stream links
+    url: :class:`str`
+        URL of streaming service
+    subs: :class:`list`
+        Avaiable subs
+    dub: :class:`list`
+        Avaiable dub in streaming service
+    name: :class:`str`
+        Name of the stream service
+    """
+
+    __slots__ = ("id", "url", "subs", "dub", "name")
+
+    def __init__(self, attributes: dict):
+        self.id: int = int(attributes["id"])
+        self.name: str = attributes["streamer"]["siteName"]
+        self.url: str = attributes["url"]
+        self.subs: list = attributes["subs"]
+        self.dub: list = attributes["dubs"]
+
+
+class Episode:
+    """
+    Represent an :class:`Anime` episode
+
+    .. versionadded:: 0.4.0
+
+    Attributes
+    -----------
+    id: :class:`int`
+        ID of the episode
+    synopsis: :class:`str`
+        Synopsis of the episode
     description: :class:`str`
-        Full description of the chapter
+        Full description of the episode
     title: :class:`str`
-        Title of the chapter
-    volume_number: :class:`int`
-        Which volume the chapter belong to
-    chapter: :class:`int`
-        Chapter number
+        Title of the episode
+    season: :class:`int`
+        Season which the episode belong to
+    number: :class:`int`
+        Episode's number
+    lenght: :class:`int`
+        Lenght of the episode (in minutes)
     thumbnail: :class:`str`
         Url of the thumbnail
     """
 
     __slots__ = (
         "id",
-        "synopsis",
         "description",
         "title",
-        "volume_number",
-        "chapter",
+        "season",
+        "number",
         "length",
         "thumbnail",
+        "_attributes"
     )
 
     def __init__(self, attributes: dict) -> None:
         self.id: int = int(attributes["id"])
-        self.description: str = attributes["description"]["en"]
-        self.title: str = attributes["titles"]["romanized"]
-        self.volume_number: int = attributes["volume"]
-        self.chapter: int = attributes["number"]
-        # self.length: int = attributes["length"]
-        self.thumbnail: str = (
-            attributes["thumbnail"]["original"]["url"] if attributes["thumbnail"] else None
-        )
+        self.description: str = attributes["description"]
+        self.title: str = attributes["titles"]["canonical"]
+        self.number: int = attributes["number"]
+        self.length: int = attributes["length"]
+        self.thumbnail: str = attributes["thumbnail"]["original"]["url"]
 
     @property
     def created_at(self) -> Optional[datetime]:
-        """Date when a chapter got added on Kitsu DB"""
+        """Date when this episode got added on Kitsu"""
         try:
             return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
@@ -92,50 +126,50 @@ class Chapter:
 
     @property
     def updated_at(self) -> Optional[datetime]:
+        """Last time when this episode got updated on Kitu"""
         try:
             return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             return None
 
-    # @property
-    # def published(self) -> Optional[datetime]:
-    #     """Date when a Chapter got published (YYYY-mm-dd)"""
-    #     try:
-    #         return datetime.strptime(self._attributes["published"], "%Y-%m-%d")
-    #     except ValueError:
-    #         return None
 
-
-class Manga(Entry):
-    """Represents a :class:`Manga` instance
+class Anime(Entry):
+    """Represents an :class:`Anime` instance
 
     Attributes
     -----------
     id: :class:`int`
-        ID of the manga
+        ID of the anime
     status: :class:`str`
-        Actual status of the given manga (Ex. "finished")
+        Actual status of the given anime (Ex. "finished"
     started_at: Optional[:class:`datetime`]
-        Date when the manga started
+        Date when the anime started
     ended_at: Optional[:class:`datetime`]
-        Date when the manga ended
+        Date when the anime ended
     slug: :class:`str`
         String identifier. Work as id to fetch data
     title: :class:`str`
-        Return canon title of the given manga
+        Return canon title of the given anime
 
         .. versionchanged:: 0.4.1
 
         Now it returns an instance of :class:`askitsu.Title`
     canonical_title: :class:`str`
-        Returns canonical title of the given manga
+        Returns canonical title of the given anime
 
         .. versionadded:: 0.4.1
-        
-    chapter_count: :class:`int`
-        Number of chapters
-    volume_count: :class:`int`
-        Number of volumes
+
+    episode_count: :class:`int`
+        Episode number
+    episode_lenght: :class:`int`
+        Lenght of a single episode of the anime
+    total_lenght: :class:`int`
+        Total lenght of all episodes (minutes)
+    nsfw: :class:`bool`
+        Check if the anime is NSFW or SFW
+        Return True | False
+    yt_id: :class:`str`
+        Return id of the YouTube trailer
     cover_image: :class:`CoverImage`
         Return cover image dict with all sizes
 
@@ -151,11 +185,18 @@ class Manga(Entry):
         Now it returns a poster image object
 
     rating_rank: :class:`int`
-        Return rating rank
+        Return rating rank (Position on the leaderboard based on rating)
     popularity_rank: :class:`int`
-        Return popularity rank position
+        Return popularity rank (Position on the leaderboard based on user preferences)
+    youtube_url: Optional[:class:`str`]
+        Return full url of YouTube trailer
     url: :class:`str`
         Returns url to Kitsu.io website
+
+        .. versionadded:: 0.4.0
+
+    stream_links: List[:class:`StreamLink`]
+        Return a list of :class:StreamLink
 
         .. versionadded:: 0.4.0
 
@@ -165,17 +206,17 @@ class Manga(Entry):
         .. versionadded:: 0.4.0
 
     age_rating: Literal['G', 'PG', 'R', 'R18']
-        Age rating of the manga
+        Age rating of the anime
 
         .. versionadded:: 0.4.0
 
     categories: List[:class:`Category`]
-        Categories of the manga
+        Categories of the anime
 
         .. versionadded:: 0.4.0
 
-    subtype: Literal['doujin', 'manga', 'manhua', 'manhwa', 'novel', 'oel', 'oneshot']
-        The subtype of the manga
+    subtype: Literal['ONA', 'OVA', 'TV', 'movie', 'music', 'special']
+        The subtype of the show
 
         .. versionadded:: 0.4.1
 
@@ -195,13 +236,15 @@ class Manga(Entry):
         "entry_type",
         "status",
         "slug",
-        "synopsis",
+        "description",
         "canonical_title",
+        "episode_count",
+        "episode_length",
+        "total_length",
+        "nsfw",
+        "yt_id",
         "rating_rank",
         "popularity_rank",
-        "chapter_count",
-        "volume_count",
-        "serialization",
         "rating",
         "age_rating",
         "subtype",
@@ -212,38 +255,41 @@ class Manga(Entry):
 
     def __init__(self, attributes: dict, http: HTTPClient, *args) -> None:
         self._http = http
-        self.entry_type: str = "manga"
-        self.chapter_count: int = attributes["chapterCount"]
-        self.volume_count: int = attributes["volumeCount"]
-        self.subtype: str = attributes["mangasub"]
-        # self.serialization: str = data["serialization"]
+        self.entry_type = "anime"
+        self.episode_count: int = attributes["episodeCount"]
+        self.episode_length: int = attributes["episodeLength"]
+        self.total_length: int = attributes["totalLength"]
+        self.nsfw: bool = not attributes["sfw"]
+        self.yt_id: Optional[str] = attributes["youtubeTrailerVideoId"]
+        self.subtype: str = attributes["animesub"]
         super().__init__(attributes["id"], self.entry_type, attributes, http, *args)
 
     def __repr__(self) -> str:
-        return f"<Manga name='{self.canonical_title}' id={self.id}>"
+        return f"<Anime name='{self.canonical_title}' id={self.id}>"
 
-    async def chapters(self, limit: int = 12) -> List[Chapter]:
-        """
-        Returns a chapter list of chapters
+    @property
+    def youtube_url(self) -> Optional[str]:
+        return f"https://www.youtube.com/watch?v={self.yt_id}" if self.yt_id else None
 
-        .. versionadded:: 0.4.0
-
-        limit: :class:`int`
-            Limit of chapters to fetch. Defaults to 12 (Max 20).
-        """
+    @property
+    async def stream_links(self) -> Optional[List[StreamLink]]:
         variables = {"id" : self.id}
         data = await self._http.post_data(
             url=BASE_URL,
-            data={"query" : MANGA_BY_ID_CHAPTERS, "variables" : variables}
+            data={"query" : ANIME_BY_ID_STREAMLINKS, "variables" : variables}
+
         )
-        return [Chapter(attributes) for attributes in data["data"]["findMangaById"]["chapters"]["nodes"]]
+        try:
+            return [StreamLink(attributes) for attributes in data["data"]["findAnimeById"]["streamingLinks"]["nodes"]]
+        except KeyError:
+            return None
 
     @property
     async def categories(self) -> List[Category]:
         variables = {"id" : self.id}
         data = await self._http.post_data(
             url=BASE_URL,
-            data={"query" : MANGA_BY_ID_CATEGORIES, "variables" : variables}
+            data={"query" : ANIME_BY_ID_CATEGORIES, "variables" : variables}
         )
         return [
             Category(attributes)
@@ -255,20 +301,38 @@ class Manga(Entry):
         variables = {"id" : self.id, "limit" : 100}
         data = await self._http.post_data(
             url=BASE_URL,
-            data={"query" : MANGA_BY_ID_CHARACTERS, "variables" : variables}
+            data={"query" : ANIME_BY_ID_CHARACTERS, "variables" : variables}
         )
         return [
             Character(attributes, entry_id=self.id)
             for attributes in data["data"]["findAnimeById"]["characters"]["nodes"]
-        ]     
+        ]        
+
 
     async def reviews(self, limit: int = 1) -> List[Review]:
         variables = {"id" : self.id, "limit" : limit}
         data = await self._http.post_data(
             url=BASE_URL,
-            data={"query" : MANGA_BY_ID_REVIEWS, "variables" : variables}
+            data={"query" : ANIME_BY_ID_REVIEWS, "variables" : variables}
         )
         return [
             Review(self.id, self.entry_type, attributes)
             for attributes in data["data"]["findAnimeById"]["reactions"]["nodes"]
         ]
+
+    async def episodes(self, limit: int = 12) -> List[Episode]:
+        """
+        Returns a a episode or a list of episodes
+
+        .. versionadded:: 0.4.0
+
+        limit: :class:`int`
+            Limit of episodes to fetch. Defaults to 12.
+        """
+        variables = {"id" : self.id, "limit" : limit}
+        data = await self._http.post_data(
+            url=BASE_URL,
+            data={"query" : ANIME_BY_ID_EPISODES, "variables" : variables}
+        )
+        return [Episode(attributes) for attributes in data["data"]["findAnimeById"]["episodes"]["nodes"]]
+

@@ -77,6 +77,9 @@ class Character:
         self.role: str = attributes.get("role")
         self.slug: str = attributes["character"]["slug"]
 
+    def __repr__(self) -> str:
+        return f"<Character name='{self.name}' media_id={self.media_id}>"
+
     @property
     def image(self) -> Image:
         return Image(self._attributes["character"]["image"])

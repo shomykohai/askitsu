@@ -18,11 +18,11 @@ __version__ = "0.4.1"
 
 # __all__
 
-from .anime import *
 from .client import *
-from .character import *
-from .core import *
 from .error import *
-from .images import *
-from .manga import *
-from .users import *
+from .models.anime import *
+from .models.character import *
+from .models.core import *
+from .models.images import *
+from .models.manga import *
+from .models.users import *

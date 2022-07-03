@@ -28,9 +28,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
 
-from .http import HTTPClient
 from .images import CoverImage, Image
-from .queries import BASE_URL, USERS_BY_ID_SOCIAL
+from ..http import HTTPClient
+from ..queries import BASE_URL, USERS_BY_ID_SOCIAL
 
 
 __all__ = ("User", "UserProfile")
