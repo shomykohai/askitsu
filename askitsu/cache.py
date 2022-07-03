@@ -34,8 +34,13 @@ class CacheResult:
         self.name = name
         self.value = value
 
-    async def as_dict(self) -> dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         return {self.name : self.value}
+
+    @property
+    def size(self) -> int:
+        cache = self.as_dict()
+        return cache.__sizeof__()
 
 class Cache:
     def __init__(self, expiration: Optional[int] = None) -> None:
@@ -46,6 +51,9 @@ class Cache:
         await asyncio.sleep(seconds)
         await self.remove(name)
 
+    @property
+    def size(self) -> int:
+        return self.__sizeof__()
 
     @property
     def cache(self) -> dict[str, Any]:
