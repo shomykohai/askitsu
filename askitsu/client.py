@@ -31,6 +31,9 @@ from typing import (
     overload,
     Union
 )
+
+from .cache import Cache
+
 from .queries import (
     BASE_URL,
     QUERY_METHODS,
@@ -43,13 +46,13 @@ from .queries import (
     USERS_BY_ID,
     USER_BY_USERNAME
 )
-from .anime import Anime, StreamLink
-from .character import Character
-from .core import Object, Review
 from .error import InvalidArgument
 from .http import HTTPClient
-from .manga import Manga
-from .users import User
+from .models.anime import Anime, StreamLink
+from .models.character import Character
+from .models.core import Object, Review
+from .models.manga import Manga
+from .models.users import User
 
 
 __all__ = ("Client",)
@@ -74,7 +77,7 @@ class Client:
     token: :class:`str`
         Token passed to the session.
     """
-    def __init__(self, token: str = None, *, session: Optional[aiohttp.ClientSession] = None) -> None:
+    def __init__(self, token: str = None, *, session: Optional[aiohttp.ClientSession] = None, cache_expiration: int = 300) -> None:
         self._entries: dict[str, Union[Anime, Manga, Character]] = {
             "anime": Anime,
             "manga": Manga,
@@ -84,6 +87,8 @@ class Client:
             session=session or aiohttp.ClientSession(),
             token=token
         )
+        self._cache: Cache = Cache(expiration=cache_expiration)
+        self._cache_expiration = cache_expiration
 
     @property
     def session(self) -> aiohttp.ClientSession:
@@ -96,6 +101,9 @@ class Client:
     async def __search_entry(
         self, type: str, query: str, limit: int, method: str
     ):
+        cache_res = await self._cache.get(f"{type}_{query.replace(' ', '_')}_{limit}")
+        if cache_res:
+            return cache_res.value if len(cache_res.value) > 1 else cache_res.value[0]
         entry = self._entries.get(type)
         variables = {"title" : query, "limit" : limit}
         query_fetch = ENTRY_TITLE.get(method)
@@ -109,6 +117,11 @@ class Client:
             entry(attributes=attributes, http=self.http)
             for attributes in data["data"][method]["nodes"]
         ]
+        await self._cache.add(
+            f"{type}_{query.replace(' ', '_')}_{limit}", 
+            fetched,
+            remove_after=self._cache_expiration
+        )
         return fetched if len(fetched) > 1 else fetched[0]
 
     @overload
@@ -245,14 +258,22 @@ class Client:
         name: :class:`str`
             Nickname of the user to fetch
         """
+        cache_res = await self._cache.get(f"user_{name}")
+        if cache_res:
+            return cache_res.value
         variables = {"name" : name}
         data = await self.http.post_data(
             url=BASE_URL,
             data={"query" : USER_BY_USERNAME, "variables" : variables}
         )
-        return User(data["data"]["searchProfileByUsername"]["nodes"][0], http=self.http)
+        user = User(data["data"]["searchProfileByUsername"]["nodes"][0], http=self.http)
+        await self._cache.add(f"user_{name}", user, remove_after=self._cache_expiration)
+        return user
 
     async def __get_entry_fetch(self, type: str, id: int, method: str) -> Union[Anime, Manga, Character]:
+        cache_res = await self._cache.get(f"{type}_{id}")
+        if cache_res:
+            return cache_res.value
         entry = self._entries.get(type)
         variables = {"id" : id}
         query_fetch = ENTRY_ID.get(method)
@@ -262,8 +283,9 @@ class Client:
         )
         if not data["data"][method]:
             return None
-
-        return entry(attributes=data["data"][method], http=self.http)
+        fetched_entry = entry(attributes=data["data"][method], http=self.http)
+        await self._cache.add(f"{type}_{id}", fetched_entry)
+        return fetched_entry
 
 
     @overload
@@ -351,16 +373,21 @@ class Client:
                 f"{Fore.RED}'{anime}' is not an istance of Anime\n"
                 f"Make sure you pass a valid argument to {Fore.LIGHTCYAN_EX}get_stream_links{Style.RESET_ALL}"
             )
+        cache_res = await self._cache.get(f"anime_{anime.id}_streamlinks")
+        if cache_res:
+            return cache_res.value
         variables = {"id": anime.id, "limit" : 50}
         data = await self.http.post_data(
             url=BASE_URL,
             data={"query" : ANIME_BY_ID_STREAMLINKS, "variables" : variables}
         )
         try:
-            return [
+            links = [
                 StreamLink(attributes=attributes) 
                 for attributes in data["data"]["findAnimeById"]["streamingLinks"]["nodes"]
             ]
+            await self._cache.add(f"anime_{anime.id}_streamlinks", links)
+            return links
         except KeyError:
             return None
 
@@ -456,6 +483,9 @@ class Client:
     async def __get_characters_fetch(
         self, entry: Union[Manga, Anime], method: str, limit: int = 1
     ) -> List[Character]:
+        cache_res = await self._cache.get(f"{entry.entry_type}_characters_{limit}")
+        if cache_res:
+            return cache_res.value
         variables = {"id" : entry.id, "limit" : limit}
         query_fetch = ENTRY_ID_CHARACTERS.get(method)
         data = await self.http.post_data(
@@ -464,10 +494,12 @@ class Client:
         )
         if not data["data"][method]:
             return None
-        return [
+        character = [
             Character(attributes, entry_id=entry.id)
             for attributes in data["data"][method]["characters"]["nodes"]
         ]
+        await self._cache.add(f"{entry.entry_type}_characters_{limit}", character)
+        return character
 
     async def get_characters(
         self, entry: Union[Anime, Manga], limit: int = 10
@@ -508,12 +540,17 @@ class Client:
         id: :class:`int`
             The id of the user to fetch
         """
+        cache_res = await self._cache.get(f"user_{id}")
+        if cache_res:
+            return cache_res.value
         variables = {"id" : id}
         data = await self.http.post_data(
             url=BASE_URL,
             data={"query" : USERS_BY_ID, "variables" : variables}
         )
-        return User(data["data"]["findProfileById"], http=self.http) if data["data"] else None
+        user = User(data["data"]["findProfileById"], http=self.http) if data["data"] else None
+        await self._cache.add(f"user_{id}", user)
+        return user
 
     async def check_user(self, slug: str) -> bool:
         """|coro|
@@ -534,11 +571,16 @@ class Client:
                 }
             }
         """
+        cache_res = await self._cache.get(f"user_{slug}")
+        if cache_res:
+            return True
         variables = {"slug" : slug}
         data = await self.http.post_data(
             url=BASE_URL,
             data={"query" : query, "variables" : variables}
         )
+        if data["data"]["findProfileBySlug"] is not None:
+            await self._cache.add(f"user_{slug}", data)
         return bool(data["data"]["findProfileBySlug"])
 
     async def close(self) -> None:
