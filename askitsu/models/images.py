@@ -62,19 +62,31 @@ class Image:
 
     @property
     def tiny(self) -> Optional[str]:
-        return get_dimension("tiny", self._data["views"])
+        try:
+            return get_dimension("tiny", self._data["views"])
+        except KeyError:
+            return None
     
     @property
     def small(self) -> Optional[str]:
-        return get_dimension("small", self._data["views"])
+        try:
+            return get_dimension("small", self._data["views"])
+        except KeyError:
+            return None
 
     @property
     def medium(self) -> Optional[str]:
-        return get_dimension("medium", self._data["views"])
+        try:
+            return get_dimension("medium", self._data["views"])
+        except KeyError:
+            return None
 
     @property
     def large(self) -> Optional[str]:
-        return get_dimension("large", self._data["views"])
+        try:
+            return get_dimension("large", self._data["views"])
+        except KeyError:
+            return None
 
     @property
     def original(self) -> Optional[str]:
@@ -112,19 +124,31 @@ class PosterImage:
 
     @property
     def tiny(self) -> Optional[str]:
-        return get_dimension("tiny", self._data["views"])
+        try:
+            return get_dimension("tiny", self._data["views"])
+        except KeyError:
+            return None
     
     @property
     def small(self) -> Optional[str]:
-        return get_dimension("small", self._data["views"])
+        try:
+            return get_dimension("small", self._data["views"])
+        except KeyError:
+            return None
 
     @property
     def medium(self) -> Optional[str]:
-        return get_dimension("medium", self._data["views"])
+        try:
+            return get_dimension("medium", self._data["views"])
+        except KeyError:
+            return None
 
     @property
     def large(self) -> Optional[str]:
-        return get_dimension("large", self._data["views"])
+        try:
+            return get_dimension("large", self._data["views"])
+        except KeyError:
+            return None
 
     @property
     def original(self) -> Optional[str]:
@@ -157,8 +181,6 @@ class CoverImage:
         Cover image -- size: tiny
     small: :class:`str`
         Cover image -- size: small
-    medium: :class:`str`
-        Cover image -- size: medium
     large: :class:`str`
         Cover image -- size: large
     original: :class:`str`
@@ -172,15 +194,24 @@ class CoverImage:
 
     @property
     def tiny(self) -> Optional[str]:
-        return get_dimension("tiny", self._data["views"])
+        try:
+            return get_dimension("tiny", self._data["views"])
+        except KeyError:
+            return None
     
     @property
     def small(self) -> Optional[str]:
-        return get_dimension("small", self._data["views"])
+        try:
+            return get_dimension("small", self._data["views"])
+        except KeyError:
+            return None
 
     @property
     def large(self) -> Optional[str]:
-        return get_dimension("large", self._data["views"])
+        try:
+            return get_dimension("large", self._data["views"])
+        except KeyError:
+            return None
 
     @property
     def original(self) -> Optional[str]:
