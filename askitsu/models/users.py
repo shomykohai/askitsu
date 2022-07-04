@@ -181,7 +181,7 @@ class User:
                 links,
                 remove_after=self._cache.expiration
             )
-            return 
+            return links
         except KeyError:
             return None
 
