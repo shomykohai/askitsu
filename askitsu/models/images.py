@@ -64,28 +64,28 @@ class Image:
     def tiny(self) -> Optional[str]:
         try:
             return get_dimension("tiny", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
     
     @property
     def small(self) -> Optional[str]:
         try:
             return get_dimension("small", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
 
     @property
     def medium(self) -> Optional[str]:
         try:
             return get_dimension("medium", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
 
     @property
     def large(self) -> Optional[str]:
         try:
             return get_dimension("large", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
 
     @property
@@ -126,28 +126,28 @@ class PosterImage:
     def tiny(self) -> Optional[str]:
         try:
             return get_dimension("tiny", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
     
     @property
     def small(self) -> Optional[str]:
         try:
             return get_dimension("small", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
 
     @property
     def medium(self) -> Optional[str]:
         try:
             return get_dimension("medium", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
 
     @property
     def large(self) -> Optional[str]:
         try:
             return get_dimension("large", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
 
     @property
@@ -196,21 +196,21 @@ class CoverImage:
     def tiny(self) -> Optional[str]:
         try:
             return get_dimension("tiny", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
     
     @property
     def small(self) -> Optional[str]:
         try:
             return get_dimension("small", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
 
     @property
     def large(self) -> Optional[str]:
         try:
             return get_dimension("large", self._data["views"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
 
     @property
