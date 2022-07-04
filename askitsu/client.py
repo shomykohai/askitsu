@@ -114,7 +114,7 @@ class Client:
         if not data["data"][method]:
             return None
         fetched = [
-            entry(attributes=attributes, http=self.http)
+            entry(attributes=attributes, http=self.http, cache=self._cache)
             for attributes in data["data"][method]["nodes"]
         ]
         await self._cache.add(
@@ -542,13 +542,19 @@ class Client:
         """
         cache_res = await self._cache.get(f"user_{id}")
         if cache_res:
-            return cache_res.value
+            if cache_res.value is not None:
+                return cache_res.value
+            await self._cache.remove(f"user_{id}")
         variables = {"id" : id}
         data = await self.http.post_data(
             url=BASE_URL,
             data={"query" : USERS_BY_ID, "variables" : variables}
         )
-        user = User(data["data"]["findProfileById"], http=self.http) if data["data"] else None
+        user = User(
+            data["data"]["findProfileById"],
+            http=self.http,
+            cache=self._cache
+        ) if data["data"] else None
         await self._cache.add(f"user_{id}", user)
         return user
 
@@ -580,7 +586,7 @@ class Client:
             data={"query" : query, "variables" : variables}
         )
         if data["data"]["findProfileBySlug"] is not None:
-            await self._cache.add(f"user_{slug}", data)
+            await self._cache.add(f"user_{slug}", None)
         return bool(data["data"]["findProfileBySlug"])
 
     async def close(self) -> None:
