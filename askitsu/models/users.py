@@ -29,6 +29,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from .images import CoverImage, Image
+from ..cache import Cache
 from ..http import HTTPClient
 from ..queries import BASE_URL, USERS_BY_ID_SOCIAL
 
@@ -95,10 +96,12 @@ class User:
         "pro_tier",
         # "url",
         "_attributes",
-        "_http"
+        "_http",
+        "_cache"
     )
 
-    def __init__(self, attributes: dict, http: HTTPClient) -> None:
+    def __init__(self, attributes: dict, http: HTTPClient, cache: Cache) -> None:
+        self._cache = cache
         self._http = http
         self._attributes = attributes
         self.id: int = int(attributes["id"])
@@ -138,24 +141,19 @@ class User:
     def avatar(self) -> Optional[Image]:
         """Avatar of the user"""
         avatar = self._attributes["avatarImage"]
-        if avatar:
-            return Image(
-                avatar
-            )
-        else:
-            None
+        return Image(
+            avatar
+        ) if avatar else None
     
     @property
     def cover_image(self) -> Optional[CoverImage]:
         """Background of the user profile"""
         cover = self._attributes["bannerImage"]
-        if cover:
-            return CoverImage(
-                cover,
-                entry_id=self.id,
-                entry_type=self.entry_type
-            )
-        return None
+        return CoverImage(
+            cover,
+            entry_id=self.id,
+            entry_type=self.entry_type
+        ) if cover else None
 
     @property
     def banner(self) -> Optional[CoverImage]:
@@ -165,16 +163,25 @@ class User:
     @property
     async def profile_links(self) -> Optional[List[UserProfile]]:
         """Social linked to the profile"""
+        cache_res = await self._cache.get(f"user_{self.slug}_profilelinks")
+        if cache_res:
+            return cache_res
         variables = {"id" : self.id}
         data = await self._http.post_data(
             url=BASE_URL,
             data = {"query" : USERS_BY_ID_SOCIAL, "variables" : variables}
         )
         try:
-            return [
+            links = [
                 UserProfile(attributes, self.slug)
                 for attributes in data["data"]["findProfileById"]["siteLinks"]["nodes"]
             ]
+            await self._cache.add(
+                f"user_{self.slug}_profilelinks",
+                links,
+                remove_after=self._cache.expiration
+            )
+            return 
         except KeyError:
             return None
 

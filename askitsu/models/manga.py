@@ -27,6 +27,7 @@ from typing import List, Optional
 
 from .character import Character
 from .core import Category, Entry, Review
+from ..cache import Cache
 from ..http import HTTPClient
 from ..queries import (
     BASE_URL,
@@ -207,17 +208,25 @@ class Manga(Entry):
         "subtype",
         "_http",
         "_titles",
-        "_attributes"
+        "_attributes",
+        "_cache"
     )
 
-    def __init__(self, attributes: dict, http: HTTPClient, *args) -> None:
+    def __init__(self, attributes: dict, http: HTTPClient, cache: Cache, *args) -> None:
         self._http = http
         self.entry_type: str = "manga"
         self.chapter_count: int = attributes["chapterCount"]
         self.volume_count: int = attributes["volumeCount"]
         self.subtype: str = attributes["mangasub"]
         # self.serialization: str = data["serialization"]
-        super().__init__(attributes["id"], self.entry_type, attributes, http, *args)
+        super().__init__(
+            _id=attributes["id"],
+            _type=self.entry_type,
+            attributes=attributes,
+            http=http,
+            cache=cache,
+            *args
+        )
 
     def __repr__(self) -> str:
         return f"<Manga name='{self.canonical_title}' id={self.id}>"
@@ -231,36 +240,63 @@ class Manga(Entry):
         limit: :class:`int`
             Limit of chapters to fetch. Defaults to 12 (Max 20).
         """
+        cache_res = await self._cache.get(f"manga_{self.id}_chapters_{limit}")
+        if cache_res:
+            return cache_res.value
         variables = {"id" : self.id}
         data = await self._http.post_data(
             url=BASE_URL,
             data={"query" : MANGA_BY_ID_CHAPTERS, "variables" : variables}
         )
-        return [Chapter(attributes) for attributes in data["data"]["findMangaById"]["chapters"]["nodes"]]
+        chapters = [Chapter(attributes) for attributes in data["data"]["findMangaById"]["chapters"]["nodes"]]
+        await self._cache.add(
+            f"manga_{self.id}_chapters_{limit}",
+            chapters,
+            remove_after=self._cache.expiration
+        )
+        return chapters
 
     @property
     async def categories(self) -> List[Category]:
+        cache_res = await self._cache.get(f"manga_{self.id}_categories")
+        if cache_res:
+            return cache_res.value
         variables = {"id" : self.id}
         data = await self._http.post_data(
             url=BASE_URL,
             data={"query" : MANGA_BY_ID_CATEGORIES, "variables" : variables}
         )
-        return [
+        categories =  [
             Category(attributes)
-            for attributes in data["data"]["findAnimeById"]["categories"]["nodes"]
+            for attributes in data["data"]["findMangaById"]["categories"]["nodes"]
         ]
+        await self._cache.add(
+            f"manga_{self.id}_categories",
+            categories,
+            remove_after=self._cache.expiration       
+        )
+        return categories
 
     @property
     async def characters(self) -> List[Character]:
+        cache_res = await self._cache.get(f"manga_{self.id}_characters")
+        if cache_res:
+            return cache_res.value
         variables = {"id" : self.id, "limit" : 100}
         data = await self._http.post_data(
             url=BASE_URL,
             data={"query" : MANGA_BY_ID_CHARACTERS, "variables" : variables}
         )
-        return [
+        characters = [
             Character(attributes, entry_id=self.id)
-            for attributes in data["data"]["findAnimeById"]["characters"]["nodes"]
-        ]     
+            for attributes in data["data"]["findMangaById"]["characters"]["nodes"]
+        ]
+        await self._cache.add(
+            f"manga_{self.id}_characters",
+            characters,
+            remove_after=self._cache.expiration
+        )
+        return characters 
 
     async def reviews(self, limit: int = 1) -> List[Review]:
         variables = {"id" : self.id, "limit" : limit}

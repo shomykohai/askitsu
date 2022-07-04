@@ -28,8 +28,10 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Literal, Optional
 
+
 from .character import Character
 from .images import CoverImage, PosterImage
+from ..cache import Cache
 from ..http import HTTPClient
 
 __all__ = ("Category", "Review", "Title", "Object")
@@ -176,8 +178,9 @@ class Entry(ABC):
         "subtype"
     )
 
-    def __init__(self, _id: int, _type: str, attributes: dict, http: HTTPClient):
-        self._http = http
+    def __init__(self, _id: int, _type: str, attributes: dict, http: HTTPClient, cache: Cache):
+        self._cache: Cache = cache
+        self._http: HTTPClient = http
         self._attributes = attributes
         self._titles: dict = attributes["titles"]["localized"]
         self.id = int(_id)

@@ -26,8 +26,10 @@ from datetime import datetime
 from typing import List, Optional
 
 
+
 from .character import Character
 from .core import Category, Entry, Review
+from ..cache import Cache
 from ..http import HTTPClient
 from ..queries import (
     ANIME_BY_ID_CATEGORIES,
@@ -250,11 +252,11 @@ class Anime(Entry):
         "subtype",
         "_http",
         "_titles",
-        "_attributes"
+        "_attributes",
+        "_cache"
     )
 
-    def __init__(self, attributes: dict, http: HTTPClient, *args) -> None:
-        self._http = http
+    def __init__(self, attributes: dict, http: HTTPClient, cache: Cache, *args) -> None:
         self.entry_type = "anime"
         self.episode_count: int = attributes["episodeCount"]
         self.episode_length: int = attributes["episodeLength"]
@@ -262,7 +264,14 @@ class Anime(Entry):
         self.nsfw: bool = not attributes["sfw"]
         self.yt_id: Optional[str] = attributes["youtubeTrailerVideoId"]
         self.subtype: str = attributes["animesub"]
-        super().__init__(attributes["id"], self.entry_type, attributes, http, *args)
+        super().__init__(
+            _id=attributes["id"],
+            _type=self.entry_type,
+            attributes=attributes,
+            http=http,
+            cache=cache,
+            *args
+        )
 
     def __repr__(self) -> str:
         return f"<Anime name='{self.canonical_title}' id={self.id}>"
@@ -273,6 +282,9 @@ class Anime(Entry):
 
     @property
     async def stream_links(self) -> Optional[List[StreamLink]]:
+        cache_res = await self._cache.get(f"anime_{self.id}_streamlinks")
+        if cache_res:
+            return cache_res.value
         variables = {"id" : self.id}
         data = await self._http.post_data(
             url=BASE_URL,
@@ -280,33 +292,56 @@ class Anime(Entry):
 
         )
         try:
-            return [StreamLink(attributes) for attributes in data["data"]["findAnimeById"]["streamingLinks"]["nodes"]]
+            links = [
+                StreamLink(attributes=attributes) 
+                for attributes in data["data"]["findAnimeById"]["streamingLinks"]["nodes"]
+            ]
+            await self._cache.add(f"anime_{self.id}_streamlinks", links)
+            return links
         except KeyError:
             return None
 
     @property
     async def categories(self) -> List[Category]:
+        cache_res = await self._cache.get(f"anime_{self.id}_categories")
+        if cache_res:
+            return cache_res.value
         variables = {"id" : self.id}
         data = await self._http.post_data(
             url=BASE_URL,
             data={"query" : ANIME_BY_ID_CATEGORIES, "variables" : variables}
         )
-        return [
+        categories =  [
             Category(attributes)
             for attributes in data["data"]["findAnimeById"]["categories"]["nodes"]
         ]
+        await self._cache.add(
+            f"anime_{self.id}_categories",
+            categories,
+            remove_after=self._cache.expiration       
+        )
+        return categories
 
     @property
     async def characters(self) -> List[Character]:
+        cache_res = await self._cache.get(f"anime_{self.id}_characters")
+        if cache_res:
+            return cache_res.value
         variables = {"id" : self.id, "limit" : 100}
         data = await self._http.post_data(
             url=BASE_URL,
             data={"query" : ANIME_BY_ID_CHARACTERS, "variables" : variables}
         )
-        return [
+        characters = [
             Character(attributes, entry_id=self.id)
             for attributes in data["data"]["findAnimeById"]["characters"]["nodes"]
-        ]        
+        ]
+        await self._cache.add(
+            f"anime_{self.id}_characters",
+            characters,
+            remove_after=self._cache.expiration
+        )
+        return characters
 
 
     async def reviews(self, limit: int = 1) -> List[Review]:
@@ -322,17 +357,26 @@ class Anime(Entry):
 
     async def episodes(self, limit: int = 12) -> List[Episode]:
         """
-        Returns a a episode or a list of episodes
+        Returns a list of episodes
 
         .. versionadded:: 0.4.0
 
         limit: :class:`int`
             Limit of episodes to fetch. Defaults to 12.
         """
+        cache_res = await self._cache.get(f"anime_{self.id}_episodes_{limit}")
+        if cache_res:
+            return cache_res.value
         variables = {"id" : self.id, "limit" : limit}
         data = await self._http.post_data(
             url=BASE_URL,
             data={"query" : ANIME_BY_ID_EPISODES, "variables" : variables}
         )
-        return [Episode(attributes) for attributes in data["data"]["findAnimeById"]["episodes"]["nodes"]]
+        episodes = [Episode(attributes) for attributes in data["data"]["findAnimeById"]["episodes"]["nodes"]]
+        await self._cache.add(
+            f"anime_{self.id}_episodes_{limit}",
+            episodes,
+            remove_after=self._cache.expiration
+        )
+        return episodes
 
