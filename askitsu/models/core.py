@@ -241,7 +241,7 @@ class Entry(ABC):
     @property
     def cover_image(self) -> CoverImage:
         return CoverImage(
-            self._attributes["coverImage"],
+            self._attributes["bannerImage"],
             self.id,
             self.entry_type
         )
