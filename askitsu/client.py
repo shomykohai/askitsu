@@ -266,7 +266,11 @@ class Client:
             url=BASE_URL,
             data={"query" : USER_BY_USERNAME, "variables" : variables}
         )
-        user = User(data["data"]["searchProfileByUsername"]["nodes"][0], http=self.http)
+        user = User(
+            data["data"]["searchProfileByUsername"]["nodes"][0],
+            http=self.http,
+            cache=self._cache
+        )
         await self._cache.add(f"user_{name}", user, remove_after=self._cache_expiration)
         return user
 
@@ -283,7 +287,11 @@ class Client:
         )
         if not data["data"][method]:
             return None
-        fetched_entry = entry(attributes=data["data"][method], http=self.http)
+        fetched_entry = entry(
+            attributes=data["data"][method],
+            http=self.http,
+            cache=self._cache
+        )
         await self._cache.add(f"{type}_{id}", fetched_entry)
         return fetched_entry
 
