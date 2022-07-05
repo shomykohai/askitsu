@@ -30,6 +30,7 @@ from typing import List, Optional, Union
 from .core import Entry
 from .http import HTTPClient
 
+
 class StreamLink:
     """
     Represent an :class:`Anime` stream link
@@ -95,7 +96,7 @@ class Episode:
         "number",
         "length",
         "thumbnail",
-        "_attributes"
+        "_attributes",
     )
 
     def __init__(self, attributes: dict) -> None:
@@ -108,14 +109,18 @@ class Episode:
         self.number: int = self._attributes["number"]
         self.length: int = self._attributes["length"]
         self.thumbnail: str = (
-            self._attributes["thumbnail"]["original"] if self._attributes["thumbnail"] else None
+            self._attributes["thumbnail"]["original"]
+            if self._attributes["thumbnail"]
+            else None
         )
 
     @property
     def created_at(self) -> Optional[datetime]:
         """Date when this episode got added on Kitsu"""
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
         except ValueError:
             return None
 
@@ -123,7 +128,9 @@ class Episode:
     def updated_at(self) -> Optional[datetime]:
         """Last time when this episode got updated on Kitu"""
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(
+                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
         except ValueError:
             return None
 
@@ -247,7 +254,7 @@ class Anime(Entry):
         "subtype",
         "_http",
         "_titles",
-        "_attributes"
+        "_attributes",
     )
 
     def __init__(self, attributes: dict, http: HTTPClient, *args) -> None:
@@ -274,7 +281,10 @@ class Anime(Entry):
             url=f"anime/{self.id}/streaming-links?include=streamer"
         )
         try:
-            return [StreamLink(links, included["attributes"]) for links, included in zip(data["data"], data["included"])]
+            return [
+                StreamLink(links, included["attributes"])
+                for links, included in zip(data["data"], data["included"])
+            ]
         except KeyError:
             return []
 

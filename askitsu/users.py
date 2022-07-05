@@ -5,6 +5,7 @@ from typing import List, Optional
 from .http import HTTPClient
 from .images import CoverImage, Image
 
+
 class User:
     """
     Represents a user of Kitsu
@@ -60,6 +61,7 @@ class User:
     sfw_filter: :class:`str`
         Current SFW filter of the user
     """
+
     __slots__ = (
         "id",
         "entry_type",
@@ -85,14 +87,14 @@ class User:
         "feed_completed",
         "sfw_filter",
         "_data",
-        "_http"
+        "_http",
     )
 
     def __init__(self, attributes: dict, http: HTTPClient) -> None:
         self._http = http
         self._data = attributes["attributes"]
         self.id: int = int(attributes["id"])
-        self.entry_type: str = "users" 
+        self.entry_type: str = "users"
         self.name: str = self._data["name"]
         self.slug: str = self._data["slug"]
         self.about: str = self._data["about"]
@@ -131,31 +133,25 @@ class User:
             return datetime.strptime(self._data["birthday"], "%Y-%m-%d")
         except TypeError:
             return None
-    
+
     @property
     def avatar(self) -> Optional[Image]:
         """Avatar of the user"""
         avatar = self._data["avatar"]
         if avatar:
-            return Image(
-                avatar
-            )
+            return Image(avatar)
         else:
-            None
-    
+            return None
+
     @property
     def cover_image(self) -> Optional[CoverImage]:
         """Background of the user profile"""
         cover = self._data["coverImage"]
         if cover:
-            return CoverImage(
-                cover,
-                entry_id=self.id,
-                entry_type=self.entry_type
-            )
+            return CoverImage(cover, entry_id=self.id, entry_type=self.entry_type)
         else:
             return None
-        
+
     @property
     def url(self) -> str:
         return f"https://kitsu.io/users/{self.slug}"
@@ -166,10 +162,9 @@ class User:
             url=f"users/{self.id}/profile-links?include=profileLinkSite"
         )
         return [
-            UserProfile(attributes["id"], attributes["attributes"], self.slug, included) 
+            UserProfile(attributes["id"], attributes["attributes"], self.slug, included)
             for attributes, included in zip(data["data"], data["included"])
         ]
-
 
 
 class UserProfile:
@@ -186,13 +181,17 @@ class UserProfile:
     @property
     def created_at(self) -> Optional[datetime]:
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
         except ValueError:
             return None
 
     @property
     def updated_at(self) -> Optional[datetime]:
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(
+                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
         except ValueError:
             return None

@@ -65,10 +65,12 @@ class Chapter:
         "chapter",
         "length",
         "thumbnail",
+        "_attributes",
     )
 
     def __init__(self, attributes: dict) -> None:
         data = attributes["attributes"]
+        self._attributes = attributes
         self.id: int = int(attributes["id"])
         self.synopsis: str = data["synopsis"]
         self.description: str = data["description"]
@@ -84,14 +86,18 @@ class Chapter:
     def created_at(self) -> Optional[datetime]:
         """Date when a chapter got added on Kitsu DB"""
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
         except ValueError:
             return None
 
     @property
     def updated_at(self) -> Optional[datetime]:
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(
+                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
         except ValueError:
             return None
 
@@ -131,7 +137,7 @@ class Manga(Entry):
         Returns canonical title of the given manga
 
         .. versionadded:: 0.4.1
-        
+
     chapter_count: :class:`int`
         Number of chapters
     volume_count: :class:`int`
@@ -209,7 +215,7 @@ class Manga(Entry):
         "subtype",
         "_http",
         "_titles",
-        "_attributes"
+        "_attributes",
     )
 
     def __init__(self, attributes: dict, http: HTTPClient, *args) -> None:

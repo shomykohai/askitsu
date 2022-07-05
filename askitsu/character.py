@@ -64,30 +64,34 @@ class Character:
         "role",
         "slug",
         "mal_id",
-        "_data"
+        "_attributes",
     )
 
-    def __init__(self, attributes: dict, *, role: str, entry_id: int = None):
+    def __init__(
+        self, attributes: dict, *, role: str = None, entry_id: int = None, **kwargs
+    ):
         data = attributes["attributes"]
-        self._data = data
+        self._attributes = attributes
         self.media_id = entry_id
         self.id: int = int(attributes["id"])
         self.type: str = "characters"
         self.name: str = data["canonicalName"]
         self.description: str = data["description"]
-        self.role: str = role
+        self.role: Optional[str] = role
         self.slug: str = data["slug"]
         self.mal_id: int = int(data["malId"])
 
     @property
     def image(self) -> Image:
-        return Image(self._data["image"])
+        return Image(self._attributes["image"])
 
     @property
     def created_at(self) -> Optional[datetime]:
         """When a character got added in Kitu DB"""
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
         except ValueError:
             return None
 
@@ -95,6 +99,8 @@ class Character:
     def updated_at(self) -> Optional[datetime]:
         """Last time a character got updated"""
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(
+                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
         except ValueError:
             return None

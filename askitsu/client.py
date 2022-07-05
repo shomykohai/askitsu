@@ -23,14 +23,8 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import aiohttp
-from colorama import Fore, Style
-from typing import (
-    List,
-    Literal,
-    Optional,
-    overload,
-    Union
-)
+from colorama import Fore, Style  # type: ignore
+from typing import Dict, List, Literal, Optional, overload, Type, Union
 from .anime import Anime, StreamLink
 from .character import Character
 from .core import Object, Review
@@ -40,7 +34,6 @@ from .manga import Manga
 from .users import User
 
 
-
 class Client:
     """Represents a client connection to get data from Kitsu.io API
 
@@ -48,28 +41,29 @@ class Client:
     -----------
     token: :class:`str`
         Access token to make authenticated requests.\n
-        Useful when you need to fetch NSFW content, interact with users or post something. 
+        Useful when you need to fetch NSFW content, interact with users or post something.
 
         .. versionadded:: 0.4.1
 
     session: Optional[:class:`aiohttp.ClientSession`]
         An object that represents the effective connection
-    
+
     Attributes
     -----------
     token: :class:`str`
         Token passed to the session.
     """
 
-    def __init__(self, token: str = None, *, session: Optional[aiohttp.ClientSession] = None) -> None:
-        self._entries = {
+    def __init__(
+        self, token: str = None, *, session: Optional[aiohttp.ClientSession] = None
+    ) -> None:
+        self._entries: Dict[str, Union[Type[Anime], Type[Manga], Type[Character]]] = {
             "anime": Anime,
             "manga": Manga,
-            "characters": Character
+            "characters": Character,
         }
         self.http: HTTPClient = HTTPClient(
-            session=session or aiohttp.ClientSession(),
-            token=token
+            session=session or aiohttp.ClientSession(), token=token
         )
 
     @property
@@ -81,41 +75,36 @@ class Client:
         return self.http.token
 
     @overload
-    async def search(
-       self, type: Literal["anime"], query: str
-    ) -> Optional[Anime]:
-        ...
-    
-    @overload
-    async def search(
-       self, type: Literal["anime"], query: str, limit: int = ...
-    ) -> Optional[List[Anime]]:
+    async def search(self, type: Literal["anime"], query: str) -> Optional[Anime]:
         ...
 
     @overload
     async def search(
-       self, type: Literal["manga"], query: str
-    ) -> Optional[Manga]:
+        self, type: Literal["anime"], query: str, limit: int
+    ) -> Optional[List[Anime]]:
         ...
-    
+
+    @overload
+    async def search(self, type: Literal["manga"], query: str) -> Optional[Manga]:
+        ...
+
     @overload
     async def search(
-       self, type: Literal["manga"], query: str, limit: int = ...
+        self, type: Literal["manga"], query: str, limit: int
     ) -> Optional[List[Manga]]:
         ...
-    
+
     @overload
     async def search(
-       self, type: Literal["characters"], query: str
+        self, type: Literal["characters"], query: str
     ) -> Optional[Character]:
         ...
-    
+
     @overload
     async def search(
-       self, type: Literal["characters"], query: str, limit: int = ...
+        self, type: Literal["characters"], query: str, limit: int
     ) -> Optional[List[Character]]:
-        ...    
-       
+        ...
 
     async def search(
         self, type: Literal["anime", "manga", "characters"], query: str, limit: int = 1
@@ -137,7 +126,10 @@ class Client:
 
         """
         type_lower = type.lower()
-        entry = self._entries.get(type_lower)
+        try:
+            entry = self._entries[type_lower]
+        except (KeyError, TypeError):
+            return None
         filter = "name" if type_lower == "characters" else "text"
         fetched_data = await self.http.get_data(
             f"{type_lower}?filter%5B{filter}%5D={query}&page%5Blimit%5D={limit}"
@@ -145,24 +137,20 @@ class Client:
         if not fetched_data["data"]:
             return None
         if len(fetched_data["data"]) == 1:
-            return entry(fetched_data["data"][0], self.http)
+            return entry(fetched_data["data"][0], http=self.http)
         return [
             entry(attributes=attributes, http=self.http)
             for attributes in fetched_data["data"]
-        ]
+        ]  # type: ignore
 
     @overload
-    async def search_anime(
-        self, query: str
-    ) -> Optional[Anime]:
+    async def search_anime(self, query: str) -> Optional[Anime]:
         ...
 
     @overload
-    async def search_anime(
-        self, query: str, limit: int = ...
-    ) -> Optional[List[Anime]]:
+    async def search_anime(self, query: str, limit: int) -> Optional[List[Anime]]:
         ...
-   
+
     async def search_anime(
         self, query: str, limit: int = 1
     ) -> Optional[Union[Anime, List[Anime]]]:
@@ -180,15 +168,12 @@ class Client:
         return await self.search("anime", query=query, limit=limit)
 
     @overload
-    async def search_manga(
-        self, query: str
-    ) -> Optional[Manga]:
+    async def search_manga(self, query: str) -> Optional[Manga]:
         ...
+
     @overload
-    async def search_manga(
-        self, query: str, limit: int = ...
-    ) -> Optional[List[Manga]]:
-        ...    
+    async def search_manga(self, query: str, limit: int) -> Optional[List[Manga]]:
+        ...
 
     async def search_manga(
         self, query: str, limit: int = 1
@@ -207,14 +192,12 @@ class Client:
         return await self.search("manga", query=query, limit=limit)
 
     @overload
-    async def search_character(
-        self, query: str
-    ) -> Optional[Character]:
+    async def search_character(self, query: str) -> Optional[Character]:
         ...
 
     @overload
     async def search_character(
-        self, query: str, limit: int = ...
+        self, query: str, limit: int
     ) -> Optional[List[Character]]:
         ...
 
@@ -247,32 +230,24 @@ class Client:
         name: :class:`str`
             Nickname of the user to fetch
         """
-        data = await self.http.get_data(
-            url=f"users?filter%5Bslug%5D={name}"
-        )
+        data = await self.http.get_data(url=f"users?filter%5Bslug%5D={name}")
         return User(data["data"][0], http=self.http) if data["data"] else None
 
     @overload
-    async def get_entry(
-        self, type: Literal["anime"], id: int
-    ) -> Anime:
+    async def get_entry(self, type: Literal["anime"], id: int) -> Anime:
         ...
 
     @overload
-    async def get_entry(
-        self, type: Literal["manga"], id: int
-    ) -> Manga:
-        ... 
+    async def get_entry(self, type: Literal["manga"], id: int) -> Manga:
+        ...
 
     @overload
-    async def get_entry(
-        self, type: Literal["characters"], id: int
-    ) -> Character:
+    async def get_entry(self, type: Literal["characters"], id: int) -> Character:
         ...
 
     async def get_entry(
         self, type: Literal["anime", "manga", "characters"], id: int
-    ) -> Union[Anime, Manga, Character]:
+    ) -> Optional[Union[Anime, Manga, Character]]:
         """|coro|
 
         Get an entry object (`Anime` | `Manga` | `Character`) by an id
@@ -285,7 +260,10 @@ class Client:
             ID of the media
         """
         type_lower = type.lower()
-        entry = self._entries.get(type_lower)
+        try:
+            entry = self._entries[type_lower]
+        except (KeyError, TypeError):
+            return None
         fetched_data = await self.http.get_data(f"{type_lower}/{id}")
         return (
             entry(attributes=fetched_data["data"], http=self.http)
@@ -319,7 +297,7 @@ class Client:
         """
         return await self.get_entry("manga", id=id)
 
-    async def get_stream_links(self, anime: Anime) -> List[StreamLink]:
+    async def get_stream_links(self, anime: Anime) -> Optional[List[StreamLink]]:
         """|coro|
 
         Return all streaming link of an Anime object
@@ -338,20 +316,22 @@ class Client:
             url=f"anime/{anime.id}/streaming-links?include=streamer"
         )
         try:
-            return [StreamLink(links, included["attributes"]) for links, included in zip(fetched_data["data"], fetched_data["included"])]
+            return [
+                StreamLink(links, included["attributes"])
+                for links, included in zip(
+                    fetched_data["data"], fetched_data["included"]
+                )
+            ]
         except KeyError:
             return None
 
-
     @overload
-    async def get_characters(
-        self, entry: Union[Anime, Manga]
-    ) -> Character:
+    async def get_characters(self, entry: Union[Anime, Manga]) -> Character:
         ...
 
     @overload
     async def get_characters(
-        self, entry: Union[Anime, Manga], limit: int = ...
+        self, entry: Union[Anime, Manga], limit: int
     ) -> List[Character]:
         ...
 
@@ -374,23 +354,19 @@ class Client:
         )
         characters_roles = [link["attributes"]["role"] for link in fetched_data["data"]]
         characters = [
-            Character(attributes, role=role, entry_id=entry.id) 
+            Character(attributes, role=role, entry_id=entry.id)
             for attributes, role in zip(fetched_data["included"], characters_roles)
         ]
         return characters if len(characters) > 1 else characters[0]
 
     @overload
-    async def get_trending_entry(
-        self, type: Literal["anime"]
-    ) -> Optional[List[Anime]]:
+    async def get_trending_entry(self, type: Literal["anime"]) -> Optional[List[Anime]]:
         ...
 
     @overload
-    async def get_trending_entry(
-        self, type: Literal["manga"]
-    ) -> Optional[List[Manga]]:
+    async def get_trending_entry(self, type: Literal["manga"]) -> Optional[List[Manga]]:
         ...
-    
+
     async def get_trending_entry(
         self, type: Literal["anime", "manga"]
     ) -> Union[List[Anime], List[Manga], None]:
@@ -406,29 +382,28 @@ class Client:
             Entry to fetch its trending
         """
         type_lower = type.lower()
-        if type_lower == "characters":
+        if type_lower not in ("anime", "manga"):
             raise InvalidArgument(
-                f"{Fore.RED}Characters can't be fetched in trending list\n"
+                f"{Fore.RED}{type.capitalize} can't be fetched in trending list\n"
                 f"Please pass 'anime' or 'manga' as parameter to {Fore.LIGHTCYAN_EX}get_trending_entry{Style.RESET_ALL}"
             )
-        entry = self._entries.get(type_lower)
+        try:
+            entry = self._entries[type_lower]
+        except (KeyError, TypeError):
+            return None
         fetched_data = await self.http.get_data(f"trending/{type_lower}")
         return [
             entry(attributes=attributes, http=self.http)
             for attributes in fetched_data["data"]
-        ]
-
+        ]  # type: ignore
 
     @overload
-    async def get_reviews(
-        self, 
-        entry: Union[Manga, Anime]
-    ) -> Optional[Review]:
+    async def get_reviews(self, entry: Union[Manga, Anime]) -> Optional[Review]:
         ...
 
     @overload
     async def get_reviews(
-        self, entry: Union[Manga, Anime], limit: int = ...
+        self, entry: Union[Manga, Anime], limit: int
     ) -> Optional[List[Review]]:
         ...
 
@@ -469,9 +444,7 @@ class Client:
         id: :class:`int`
             The id of the user to fetch
         """
-        data = await self.http.get_data(
-            url=f"users/{id}"
-        )
+        data = await self.http.get_data(url=f"users/{id}")
         return User(data["data"], http=self.http) if data["data"] else None
 
     async def check_user(self, slug: str) -> bool:
@@ -486,9 +459,7 @@ class Client:
         slug: :class:`str`
             Nickname of the user
         """
-        data = await self.http.get_data(
-            url=f"users?filter%5Bslug%5D={slug}"
-        )
+        data = await self.http.get_data(url=f"users?filter%5Bslug%5D={slug}")
         return bool(data["data"])
 
     async def close(self) -> None:

@@ -3,6 +3,7 @@ from typing import Any, Optional
 from . import __version__
 from .error import BadApiRequest, HTTPError, NotAuthenticated, NotFound
 
+
 class HTTPClient:
 
     BASE: str = "https://kitsu.io/api/edge/"
@@ -14,7 +15,7 @@ class HTTPClient:
             "Accept": "application/vnd.api+json",
             "Content-Type": "application/vnd.api+json",
             "User-Agent": f"askitsu (https://github.com/ShomyKohai/askitsu {__version__})",
-            "Authorization": self.__authorization
+            "Authorization": self.__authorization,
         }
         self.token: Optional[str] = token
 
@@ -23,7 +24,9 @@ class HTTPClient:
         return self.__session
 
     async def get_data(self, url: str) -> Any:
-        async with self.__session.get(url=f"{self.BASE}{url}", headers=self.__headers) as response:
+        async with self.__session.get(
+            url=f"{self.BASE}{url}", headers=self.__headers
+        ) as response:
             response_data = await response.json()
             if response.status == 200:
                 return response_data
@@ -33,7 +36,6 @@ class HTTPClient:
                 raise NotAuthenticated
             if response.status == 400:
                 raise BadApiRequest(response_data["errors"][0])
-
 
     async def close(self) -> None:
         return await self.__session.close()
