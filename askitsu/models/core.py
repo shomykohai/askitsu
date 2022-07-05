@@ -55,13 +55,7 @@ class Category:
         If the category is NSFW or not
     """
 
-    __slots__ = (
-        "title", 
-        "description", 
-        "slug", 
-        "nsfw",
-        "_attributes"
-    )
+    __slots__ = ("title", "description", "slug", "nsfw", "_attributes")
 
     def __init__(self, attributes: dict) -> None:
         self._attributes = attributes
@@ -77,7 +71,9 @@ class Category:
     def created_at(self) -> Optional[datetime]:
         """When a category got added in Kitu DB"""
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ")
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
         except ValueError:
             return None
 
@@ -85,9 +81,12 @@ class Category:
     def updated_at(self) -> Optional[datetime]:
         """Last time a category got updated"""
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ")
+            return datetime.strptime(
+                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
         except ValueError:
             return None
+
 
 class Review:
     """Represents a :class:`Review` instance.
@@ -141,7 +140,10 @@ class Title:
     ja_jp: :class:`str`
         The title of the media in Japanese
     """
-    def __init__(self, data: dict, entry_id: int = None, entry_type: str = None) -> None:
+
+    def __init__(
+        self, data: dict, entry_id: int = None, entry_type: str = None
+    ) -> None:
         self.__data = data
         self.entry_id = entry_id
         self.entry_type = entry_type
@@ -162,6 +164,7 @@ class Title:
     def ja_jp(self) -> Optional[str]:
         return self.__data.get("ja_jp")
 
+
 class Entry(ABC):
 
     __slots__ = (
@@ -175,10 +178,12 @@ class Entry(ABC):
         "popularity_rank",
         "rating",
         "age_rating",
-        "subtype"
+        "subtype",
     )
 
-    def __init__(self, _id: int, _type: str, attributes: dict, http: HTTPClient, cache: Cache):
+    def __init__(
+        self, _id: int, _type: str, attributes: dict, http: HTTPClient, cache: Cache
+    ):
         self._cache: Cache = cache
         self._http: HTTPClient = http
         self._attributes = attributes
@@ -197,14 +202,18 @@ class Entry(ABC):
     @property
     def created_at(self) -> Optional[datetime]:
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ")
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
         except ValueError:
             return None
 
     @property
     def updated_at(self) -> Optional[datetime]:
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ")
+            return datetime.strptime(
+                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
         except ValueError:
             return None
 
@@ -229,27 +238,19 @@ class Entry(ABC):
     @property
     def title(self) -> Title:
         return Title(self._titles, self.id, self.entry_type)
-    
+
     @property
     def poster_image(self) -> PosterImage:
-        return PosterImage(
-            self._attributes["posterImage"],
-            self.id,
-            self.entry_type
-        )
+        return PosterImage(self._attributes["posterImage"], self.id, self.entry_type)
 
     @property
     def cover_image(self) -> CoverImage:
-        return CoverImage(
-            self._attributes["bannerImage"],
-            self.id,
-            self.entry_type
-        )
+        return CoverImage(self._attributes["bannerImage"], self.id, self.entry_type)
 
     @property
     @abstractmethod
     async def categories(self) -> List[Category]:
-       ...
+        ...
 
     @property
     @abstractmethod
@@ -264,9 +265,9 @@ class Entry(ABC):
 class Object:
     """
     Represent a generic Object.
-    This can be useful if you want to use some methods that require a 
+    This can be useful if you want to use some methods that require a
     specific istance.
-    
+
     Example:
     If you want to fetch the characters using :meth:`askitsu.Client.get_characters`
     without a :class:`Manga` or :class:`Anime` istance, you can use this class by giving
@@ -279,6 +280,7 @@ class Object:
     entry_type: Optional[:class:`str`]
         The type of the object
     """
+
     def __init__(self, id: int, *, type: str = None) -> None:
         self.id: int = id
         self.entry_type: Optional[str] = type

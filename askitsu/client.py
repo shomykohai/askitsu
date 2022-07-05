@@ -23,14 +23,8 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import aiohttp
-from colorama import Fore, Style
-from typing import (
-    List,
-    Literal,
-    Optional,
-    overload,
-    Union
-)
+from colorama import Fore, Style  # type: ignore
+from typing import Dict, List, Literal, Optional, overload, Type, Union
 
 from .cache import Cache
 
@@ -44,7 +38,7 @@ from .queries import (
     ENTRY_TITLE,
     TRENDING_ENTRY,
     USERS_BY_ID,
-    USER_BY_USERNAME
+    USER_BY_USERNAME,
 )
 from .error import InvalidArgument
 from .http import HTTPClient
@@ -65,27 +59,33 @@ class Client:
     -----------
     token: :class:`str`
         Access token to make authenticated requests.\n
-        Useful when you need to fetch NSFW content, interact with users or post something. 
+        Useful when you need to fetch NSFW content, interact with users or post something.
 
         .. versionadded:: 0.4.1
 
     session: Optional[:class:`aiohttp.ClientSession`]
         An object that represents the effective connection
-    
+
     Attributes
     -----------
     token: :class:`str`
         Token passed to the session.
     """
-    def __init__(self, token: str = None, *, session: Optional[aiohttp.ClientSession] = None, cache_expiration: int = 300) -> None:
-        self._entries: dict[str, Union[Anime, Manga, Character]] = {
+
+    def __init__(
+        self,
+        token: str = None,
+        *,
+        session: Optional[aiohttp.ClientSession] = None,
+        cache_expiration: int = 300,
+    ) -> None:
+        self._entries: Dict[str, Union[Type[Anime], Type[Manga], Type[Character]]] = {
             "anime": Anime,
             "manga": Manga,
-            "characters": Character
+            "characters": Character,
         }
         self.http: HTTPClient = HTTPClient(
-            session=session or aiohttp.ClientSession(),
-            token=token
+            session=session or aiohttp.ClientSession(), token=token
         )
         self._cache: Cache = Cache(expiration=cache_expiration)
         self._cache_expiration = cache_expiration
@@ -98,18 +98,18 @@ class Client:
     def token(self) -> Optional[str]:
         return self.http.token
 
-    async def __search_entry(
-        self, type: str, query: str, limit: int, method: str
-    ):
+    async def __search_entry(self, type: str, query: str, limit: int, method: str):
         cache_res = await self._cache.get(f"{type}_{query.replace(' ', '_')}_{limit}")
         if cache_res:
             return cache_res.value if len(cache_res.value) > 1 else cache_res.value[0]
-        entry = self._entries.get(type)
-        variables = {"title" : query, "limit" : limit}
+        try:
+            entry = self._entries[type]
+        except (KeyError, TypeError):
+            raise InvalidArgument
+        variables = {"title": query, "limit": limit}
         query_fetch = ENTRY_TITLE.get(method)
         data = await self.http.post_data(
-            url=BASE_URL,
-            data={"query" : query_fetch, "variables" : variables}
+            url=BASE_URL, data={"query": query_fetch, "variables": variables}
         )
         if not data["data"][method]:
             return None
@@ -118,47 +118,43 @@ class Client:
             for attributes in data["data"][method]["nodes"]
         ]
         await self._cache.add(
-            f"{type}_{query.replace(' ', '_')}_{limit}", 
+            f"{type}_{query.replace(' ', '_')}_{limit}",
             fetched,
-            remove_after=self._cache_expiration
+            remove_after=self._cache_expiration,
         )
         return fetched if len(fetched) > 1 else fetched[0]
 
     @overload
-    async def search(
-       self, type: Literal["anime"], query: str
-    ) -> Optional[Anime]:
-        ...
-    
-    @overload
-    async def search(
-       self, type: Literal["anime"], query: str, limit: int = ...
-    ) -> Optional[List[Anime]]:
+    async def search(self, type: Literal["anime"], query: str) -> Optional[Anime]:
         ...
 
     @overload
     async def search(
-       self, type: Literal["manga"], query: str
-    ) -> Optional[Manga]:
+        self, type: Literal["anime"], query: str, limit: int
+    ) -> Optional[List[Anime]]:
         ...
-    
+
+    @overload
+    async def search(self, type: Literal["manga"], query: str) -> Optional[Manga]:
+        ...
+
     @overload
     async def search(
-       self, type: Literal["manga"], query: str, limit: int = ...
+        self, type: Literal["manga"], query: str, limit: int
     ) -> Optional[List[Manga]]:
         ...
-    
+
     @overload
     async def search(
-       self, type: Literal["characters"], query: str
+        self, type: Literal["characters"], query: str
     ) -> Optional[Character]:
         ...
-    
+
     @overload
     async def search(
-       self, type: Literal["characters"], query: str, limit: int = ...
+        self, type: Literal["characters"], query: str, limit: int
     ) -> Optional[List[Character]]:
-        ... 
+        ...
 
     async def search(
         self, type: Literal["anime", "manga", "characters"], query: str, limit: int = 1
@@ -181,27 +177,20 @@ class Client:
         """
         type_lower = type.lower()
         try:
-            method = QUERY_METHODS.get(f"{type_lower}_search")
+            method = QUERY_METHODS[f"{type_lower}_search"]
         except (KeyError, TypeError):
             raise InvalidArgument
         else:
             return await self.__search_entry(
-                type=type_lower,
-                query=query,
-                limit=limit,
-                method=method
+                type=type_lower, query=query, limit=limit, method=method
             )
 
     @overload
-    async def search_anime(
-        self, query: str
-    ) -> Optional[Anime]:
+    async def search_anime(self, query: str) -> Optional[Anime]:
         ...
 
     @overload
-    async def search_anime(
-        self, query: str, limit: int = ...
-    ) -> Optional[List[Anime]]:
+    async def search_anime(self, query: str, limit: int) -> Optional[List[Anime]]:
         ...
 
     async def search_anime(
@@ -221,15 +210,12 @@ class Client:
         return await self.search("anime", query=query, limit=limit)
 
     @overload
-    async def search_manga(
-        self, query: str
-    ) -> Optional[Manga]:
+    async def search_manga(self, query: str) -> Optional[Manga]:
         ...
+
     @overload
-    async def search_manga(
-        self, query: str, limit: int = ...
-    ) -> Optional[List[Manga]]:
-        ... 
+    async def search_manga(self, query: str, limit: int) -> Optional[List[Manga]]:
+        ...
 
     async def search_manga(
         self, query: str, limit: int = 1
@@ -247,9 +233,9 @@ class Client:
         """
         return await self.search("manga", query=query, limit=limit)
 
-#############################
-#    SEARCH CHARACTERS ?    #
-#############################
+    #############################
+    #    SEARCH CHARACTERS ?    #
+    #############################
 
     async def search_user(self, name: str) -> Optional[User]:
         """
@@ -261,62 +247,56 @@ class Client:
         cache_res = await self._cache.get(f"user_{name}")
         if cache_res:
             return cache_res.value
-        variables = {"name" : name}
+        variables = {"name": name}
         data = await self.http.post_data(
-            url=BASE_URL,
-            data={"query" : USER_BY_USERNAME, "variables" : variables}
+            url=BASE_URL, data={"query": USER_BY_USERNAME, "variables": variables}
         )
         user = User(
             data["data"]["searchProfileByUsername"]["nodes"][0],
             http=self.http,
-            cache=self._cache
+            cache=self._cache,
         )
         await self._cache.add(f"user_{name}", user, remove_after=self._cache_expiration)
         return user
 
-    async def __get_entry_fetch(self, type: str, id: int, method: str) -> Union[Anime, Manga, Character]:
+    async def __get_entry_fetch(
+        self, type: str, id: int, method: str
+    ) -> Optional[Union[Anime, Manga, Character]]:
         cache_res = await self._cache.get(f"{type}_{id}")
         if cache_res:
             return cache_res.value
-        entry = self._entries.get(type)
-        variables = {"id" : id}
+        try:
+            entry = self._entries[type]
+        except (KeyError, TypeError):
+            raise InvalidArgument
+        variables = {"id": id}
         query_fetch = ENTRY_ID.get(method)
         data = await self.http.post_data(
-            url=BASE_URL,
-            data={"query" : query_fetch, "variables" : variables}
+            url=BASE_URL, data={"query": query_fetch, "variables": variables}
         )
         if not data["data"][method]:
             return None
         fetched_entry = entry(
-            attributes=data["data"][method],
-            http=self.http,
-            cache=self._cache
+            attributes=data["data"][method], http=self.http, cache=self._cache
         )
         await self._cache.add(f"{type}_{id}", fetched_entry)
         return fetched_entry
 
-
     @overload
-    async def get_entry(
-        self, type: Literal["anime"], id: int
-    ) -> Anime:
+    async def get_entry(self, type: Literal["anime"], id: int) -> Anime:
         ...
 
     @overload
-    async def get_entry(
-        self, type: Literal["manga"], id: int
-    ) -> Manga:
+    async def get_entry(self, type: Literal["manga"], id: int) -> Manga:
         ...
 
     @overload
-    async def get_entry(
-        self, type: Literal["characters"], id: int
-    ) -> Character:
+    async def get_entry(self, type: Literal["characters"], id: int) -> Character:
         ...
 
     async def get_entry(
         self, type: Literal["anime", "manga", "characters"], id: int
-    ) -> Union[Anime, Manga, Character]:
+    ) -> Optional[Union[Anime, Manga, Character]]:
         """|coro|
 
         Get an entry object (`Anime` | `Manga` | `Character`) by an id
@@ -330,15 +310,11 @@ class Client:
         """
         type_lower = type.lower()
         try:
-            method = QUERY_METHODS.get(f"{type_lower}_id")
+            method = QUERY_METHODS[f"{type_lower}_id"]
         except (KeyError, TypeError):
             raise InvalidArgument
         else:
-            return await self.__get_entry_fetch(
-                type=type_lower,
-                id=id,
-                method=method
-            )
+            return await self.__get_entry_fetch(type=type_lower, id=id, method=method)
 
     async def get_anime_entry(self, id: int) -> Anime:
         """|coro|
@@ -384,21 +360,22 @@ class Client:
         cache_res = await self._cache.get(f"anime_{anime.id}_streamlinks")
         if cache_res:
             return cache_res.value
-        variables = {"id": anime.id, "limit" : 50}
+        variables = {"id": anime.id, "limit": 50}
         data = await self.http.post_data(
             url=BASE_URL,
-            data={"query" : ANIME_BY_ID_STREAMLINKS, "variables" : variables}
+            data={"query": ANIME_BY_ID_STREAMLINKS, "variables": variables},
         )
         try:
             links = [
-                StreamLink(attributes=attributes) 
-                for attributes in data["data"]["findAnimeById"]["streamingLinks"]["nodes"]
+                StreamLink(attributes=attributes)
+                for attributes in data["data"]["findAnimeById"]["streamingLinks"][
+                    "nodes"
+                ]
             ]
             await self._cache.add(f"anime_{anime.id}_streamlinks", links)
             return links
         except KeyError:
             return None
-
 
     @overload
     async def get_trending_entry(
@@ -414,7 +391,7 @@ class Client:
 
     async def get_trending_entry(
         self, type: Literal["anime", "manga"], limit: int = 10
-    ) -> Union[List[Anime], List[Manga], None]:
+    ) -> Optional[Union[List[Anime], List[Manga]]]:
         """|coro|
 
         Return a list of anime or manga (max of 10)
@@ -432,25 +409,31 @@ class Client:
                 f"{Fore.RED}{type_upper.capitalize} cannot be fetched in trending list\n"
                 f"Please pass 'anime' or 'manga' as parameter to {Fore.LIGHTCYAN_EX}get_trending_entry{Style.RESET_ALL}"
             )
-        entry = self._entries.get(type_upper.lower())
+        try:
+            entry = self._entries[type_upper.lower()]
+        except (KeyError, TypeError):
+            raise InvalidArgument
         variables = {"media": type_upper, "limit": limit}
         data = await self.http.post_data(
-            url=BASE_URL,
-            data={"query" : TRENDING_ENTRY, "variables" : variables}
+            url=BASE_URL, data={"query": TRENDING_ENTRY, "variables": variables}
         )
-        return [
-            entry(attributes=attributes, http=self.http)
-            for attributes in data["data"]["globalTrending"]["nodes"]
-        ]
-   
+        data_value = data["data"]["globalTrending"]["nodes"]
+        return (
+            [
+                entry(attributes=attributes, http=self.http, cache=self._cache)
+                for attributes in data_value
+            ]
+            if data_value
+            else None
+        )  # type: ignore
+
     async def __get_reviews_fetch(
         self, entry: Union[Manga, Anime], method: str, limit: int = 1
     ) -> Optional[List[Review]]:
-        variables = {"id" : entry.id, "limit" : limit}
+        variables = {"id": entry.id, "limit": limit}
         query_fetch = ENTRY_ID_REVIEWS.get(method)
         data = await self.http.post_data(
-            url=BASE_URL,
-            data={"query" : query_fetch, "variables" : variables}
+            url=BASE_URL, data={"query": query_fetch, "variables": variables}
         )
         if not data["data"][method]:
             return None
@@ -458,7 +441,6 @@ class Client:
             Review(entry.id, entry.entry_type, attributes)
             for attributes in data["data"][method]["reactions"]["nodes"]
         ]
-
 
     async def get_reviews(
         self, entry: Union[Manga, Anime], limit: int = 1
@@ -478,27 +460,24 @@ class Client:
         """
         type_lower = entry.entry_type.lower()
         try:
-            method = QUERY_METHODS.get(f"{type_lower}_id")
+            method = QUERY_METHODS[f"{type_lower}_id"]
         except (KeyError, TypeError):
             raise InvalidArgument
         else:
             return await self.__get_reviews_fetch(
-                entry=entry,
-                method=method,
-                limit=limit
+                entry=entry, method=method, limit=limit
             )
 
     async def __get_characters_fetch(
         self, entry: Union[Manga, Anime], method: str, limit: int = 1
-    ) -> List[Character]:
+    ) -> Optional[List[Character]]:
         cache_res = await self._cache.get(f"{entry.entry_type}_characters_{limit}")
         if cache_res:
             return cache_res.value
-        variables = {"id" : entry.id, "limit" : limit}
+        variables = {"id": entry.id, "limit": limit}
         query_fetch = ENTRY_ID_CHARACTERS.get(method)
         data = await self.http.post_data(
-            url=BASE_URL,
-            data={"query" : query_fetch, "variables" : variables}
+            url=BASE_URL, data={"query": query_fetch, "variables": variables}
         )
         if not data["data"][method]:
             return None
@@ -511,7 +490,7 @@ class Client:
 
     async def get_characters(
         self, entry: Union[Anime, Manga], limit: int = 10
-    ) -> List[Character]:
+    ) -> Optional[List[Character]]:
         """|coro|
 
         Return a :class:`Character` | List[:class:`Character`]
@@ -525,16 +504,13 @@ class Client:
         """
         type_lower = entry.entry_type.lower()
         try:
-            method = QUERY_METHODS.get(f"{type_lower}_id")
+            method = QUERY_METHODS[f"{type_lower}_id"]
         except (KeyError, TypeError):
             raise InvalidArgument
         else:
             return await self.__get_characters_fetch(
-                entry=entry,
-                method=method,
-                limit=limit
+                entry=entry, method=method, limit=limit
             )
-
 
     async def get_user(self, id: int) -> Optional[User]:
         """|coro|
@@ -553,16 +529,15 @@ class Client:
             if cache_res.value is not None:
                 return cache_res.value
             await self._cache.remove(f"user_{id}")
-        variables = {"id" : id}
+        variables = {"id": id}
         data = await self.http.post_data(
-            url=BASE_URL,
-            data={"query" : USERS_BY_ID, "variables" : variables}
+            url=BASE_URL, data={"query": USERS_BY_ID, "variables": variables}
         )
-        user = User(
-            data["data"]["findProfileById"],
-            http=self.http,
-            cache=self._cache
-        ) if data["data"] else None
+        user = (
+            User(data["data"]["findProfileById"], http=self.http, cache=self._cache)
+            if data["data"]
+            else None
+        )
         await self._cache.add(f"user_{id}", user)
         return user
 
@@ -588,10 +563,9 @@ class Client:
         cache_res = await self._cache.get(f"user_{slug}")
         if cache_res:
             return True
-        variables = {"slug" : slug}
+        variables = {"slug": slug}
         data = await self.http.post_data(
-            url=BASE_URL,
-            data={"query" : query, "variables" : variables}
+            url=BASE_URL, data={"query": query, "variables": variables}
         )
         if data["data"]["findProfileBySlug"] is not None:
             await self._cache.add(f"user_{slug}", None)

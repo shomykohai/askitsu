@@ -77,6 +77,7 @@ class User:
     pro_tier: Optional[:class:`str`]
         Return the typology of pro
     """
+
     __slots__ = (
         "id",
         "entry_type",
@@ -97,7 +98,7 @@ class User:
         # "url",
         "_attributes",
         "_http",
-        "_cache"
+        "_cache",
     )
 
     def __init__(self, attributes: dict, http: HTTPClient, cache: Cache) -> None:
@@ -105,7 +106,7 @@ class User:
         self._http = http
         self._attributes = attributes
         self.id: int = int(attributes["id"])
-        self.entry_type: str = "users" 
+        self.entry_type: str = "users"
         self.name: str = attributes["name"]
         self.slug: str = attributes["slug"]
         self.about: str = attributes["about"]
@@ -136,24 +137,22 @@ class User:
             return datetime.strptime(self._attributes["birthday"], "%Y-%m-%d")
         except TypeError:
             return None
-    
+
     @property
     def avatar(self) -> Optional[Image]:
         """Avatar of the user"""
         avatar = self._attributes["avatarImage"]
-        return Image(
-            avatar
-        ) if avatar else None
-    
+        return Image(avatar) if avatar else None
+
     @property
     def cover_image(self) -> Optional[CoverImage]:
         """Background of the user profile"""
         cover = self._attributes["bannerImage"]
-        return CoverImage(
-            cover,
-            entry_id=self.id,
-            entry_type=self.entry_type
-        ) if cover else None
+        return (
+            CoverImage(cover, entry_id=self.id, entry_type=self.entry_type)
+            if cover
+            else None
+        )
 
     @property
     def banner(self) -> Optional[CoverImage]:
@@ -165,11 +164,10 @@ class User:
         """Social linked to the profile"""
         cache_res = await self._cache.get(f"user_{self.slug}_profilelinks")
         if cache_res:
-            return cache_res
-        variables = {"id" : self.id}
+            return cache_res.value
+        variables = {"id": self.id}
         data = await self._http.post_data(
-            url=BASE_URL,
-            data = {"query" : USERS_BY_ID_SOCIAL, "variables" : variables}
+            url=BASE_URL, data={"query": USERS_BY_ID_SOCIAL, "variables": variables}
         )
         try:
             links = [
@@ -179,12 +177,11 @@ class User:
             await self._cache.add(
                 f"user_{self.slug}_profilelinks",
                 links,
-                remove_after=self._cache.expiration
+                remove_after=self._cache.expiration,
             )
             return links
         except KeyError:
             return None
-
 
 
 @dataclass()
@@ -192,7 +189,7 @@ class UserProfile:
     def __init__(self, attributes: dict, user: str) -> None:
         self._attributes = attributes
         self.id: int = int(attributes["id"])
-        #self.name: str = _["attributes"]["name"] #Needs to be re-added (wait for kitsu fix) 
+        # self.name: str = _["attributes"]["name"] #Needs to be re-added (wait for kitsu fix)
         self.user: str = user
         self.url: str = attributes["url"]
 
@@ -202,13 +199,17 @@ class UserProfile:
     @property
     def created_at(self) -> Optional[datetime]:
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
         except ValueError:
             return None
 
     @property
     def updated_at(self) -> Optional[datetime]:
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(
+                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
         except ValueError:
             return None

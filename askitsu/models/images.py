@@ -39,6 +39,7 @@ def get_dimension(dim: str, values: dict) -> Optional[str]:
                 return None
     return None
 
+
 class Image:
     """
     Represent a general image
@@ -66,7 +67,7 @@ class Image:
             return get_dimension("tiny", self._data["views"])
         except (KeyError, TypeError):
             return None
-    
+
     @property
     def small(self) -> Optional[str]:
         try:
@@ -95,6 +96,7 @@ class Image:
         except (KeyError, TypeError):
             return None
 
+
 class PosterImage:
     """
     Poster image of a media
@@ -117,7 +119,9 @@ class PosterImage:
         Poster image with original size
     """
 
-    def __init__(self, data: dict, entry_id: int = None, entry_type: str = None) -> None:
+    def __init__(
+        self, data: dict, entry_id: int = None, entry_type: str = None
+    ) -> None:
         self._data = data
         self.entry_id = entry_id
         self.entry_type = entry_type
@@ -128,7 +132,7 @@ class PosterImage:
             return get_dimension("tiny", self._data["views"])
         except (KeyError, TypeError):
             return None
-    
+
     @property
     def small(self) -> Optional[str]:
         try:
@@ -158,8 +162,7 @@ class PosterImage:
             return None
 
     def dimension(
-        self, 
-        size: Literal["tiny", "small", "medium", "large"]
+        self, size: Literal["tiny", "small", "medium", "large"]
     ) -> Optional[dict]:
         try:
             return self._data["meta"]["dimensions"][size]
@@ -187,7 +190,9 @@ class CoverImage:
         Cover image with original size
     """
 
-    def __init__(self, data: dict, entry_id: int = None, entry_type: str = None) -> None:
+    def __init__(
+        self, data: dict, entry_id: int = None, entry_type: str = None
+    ) -> None:
         self._data = data
         self.entry_id = entry_id
         self.entry_type = entry_type
@@ -198,7 +203,7 @@ class CoverImage:
             return get_dimension("tiny", self._data["views"])
         except (KeyError, TypeError):
             return None
-    
+
     @property
     def small(self) -> Optional[str]:
         try:
@@ -220,10 +225,7 @@ class CoverImage:
         except (KeyError, TypeError):
             return None
 
-    def dimension(
-        self, 
-        size: Literal["tiny", "small", "large"]
-    ) -> Optional[dict]:
+    def dimension(self, size: Literal["tiny", "small", "large"]) -> Optional[dict]:
         try:
             return self._data["meta"]["dimensions"][size]
         except (KeyError, TypeError):

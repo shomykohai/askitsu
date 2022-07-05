@@ -35,12 +35,13 @@ class CacheResult:
         self.value = value
 
     def as_dict(self) -> dict[str, Any]:
-        return {self.name : self.value}
+        return {self.name: self.value}
 
     @property
     def size(self) -> int:
         cache = self.as_dict()
         return cache.__sizeof__()
+
 
 class Cache:
     def __init__(self, expiration: Optional[int] = None) -> None:
@@ -70,7 +71,7 @@ class Cache:
     async def add(self, name: str, value: Any, remove_after: int = None) -> CacheResult:
         name = str(name)
         if name in self.__cache:
-            return self.get(name)
+            return await self.get(name)  # type: ignore
         self.__cache[name] = value
         if remove_after and remove_after > 0:
             asyncio.create_task(self.__remove_after(name, remove_after))

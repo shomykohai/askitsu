@@ -18,7 +18,7 @@ class HTTPClient:
             "Accept": "application/vnd.api+json",
             "Content-Type": "application/vnd.api+json",
             "User-Agent": f"askitsu (https://github.com/ShomyKohai/askitsu {__version__})",
-            "Authorization": self.__authorization
+            "Authorization": self.__authorization,
         }
         self.token: Optional[str] = token
 
@@ -27,7 +27,9 @@ class HTTPClient:
         return self.__session
 
     async def get_data(self, url: str) -> Any:
-        async with self.__session.get(url=f"{self.BASE}{url}", headers=self.__headers) as response:
+        async with self.__session.get(
+            url=f"{self.BASE}{url}", headers=self.__headers
+        ) as response:
             response_data = await response.json()
             if response.status == 200:
                 return response_data
@@ -40,13 +42,10 @@ class HTTPClient:
 
     async def post_data(self, url: str, data: dict) -> Any:
         async with self.__session.post(
-            url=url,
-            json=data,
-            headers=self.__headers
+            url=url, json=data, headers=self.__headers
         ) as response:
             if response.status == 200:
                 return await response.json()
-
 
     async def close(self) -> None:
         return await self.__session.close()

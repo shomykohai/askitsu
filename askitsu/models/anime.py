@@ -26,7 +26,6 @@ from datetime import datetime
 from typing import List, Optional
 
 
-
 from .character import Character
 from .core import Category, Entry, Review
 from ..cache import Cache
@@ -37,7 +36,7 @@ from ..queries import (
     ANIME_BY_ID_EPISODES,
     ANIME_BY_ID_REVIEWS,
     ANIME_BY_ID_STREAMLINKS,
-    BASE_URL
+    BASE_URL,
 )
 
 
@@ -107,10 +106,11 @@ class Episode:
         "number",
         "length",
         "thumbnail",
-        "_attributes"
+        "_attributes",
     )
 
     def __init__(self, attributes: dict) -> None:
+        self._attributes = attributes
         self.id: int = int(attributes["id"])
         self.description: str = attributes["description"]
         self.title: str = attributes["titles"]["canonical"]
@@ -122,7 +122,9 @@ class Episode:
     def created_at(self) -> Optional[datetime]:
         """Date when this episode got added on Kitsu"""
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ")
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
         except ValueError:
             return None
 
@@ -130,7 +132,9 @@ class Episode:
     def updated_at(self) -> Optional[datetime]:
         """Last time when this episode got updated on Kitu"""
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ")
+            return datetime.strptime(
+                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
         except ValueError:
             return None
 
@@ -253,10 +257,10 @@ class Anime(Entry):
         "_http",
         "_titles",
         "_attributes",
-        "_cache"
+        "_cache",
     )
 
-    def __init__(self, attributes: dict, http: HTTPClient, cache: Cache, *args) -> None:
+    def __init__(self, attributes: dict, http: HTTPClient, cache: Cache) -> None:
         self.entry_type = "anime"
         self.episode_count: int = attributes["episodeCount"]
         self.episode_length: int = attributes["episodeLength"]
@@ -270,7 +274,6 @@ class Anime(Entry):
             attributes=attributes,
             http=http,
             cache=cache,
-            *args
         )
 
     def __repr__(self) -> str:
@@ -285,16 +288,17 @@ class Anime(Entry):
         cache_res = await self._cache.get(f"anime_{self.id}_streamlinks")
         if cache_res:
             return cache_res.value
-        variables = {"id" : self.id}
+        variables = {"id": self.id}
         data = await self._http.post_data(
             url=BASE_URL,
-            data={"query" : ANIME_BY_ID_STREAMLINKS, "variables" : variables}
-
+            data={"query": ANIME_BY_ID_STREAMLINKS, "variables": variables},
         )
         try:
             links = [
-                StreamLink(attributes=attributes) 
-                for attributes in data["data"]["findAnimeById"]["streamingLinks"]["nodes"]
+                StreamLink(attributes=attributes)
+                for attributes in data["data"]["findAnimeById"]["streamingLinks"][
+                    "nodes"
+                ]
             ]
             await self._cache.add(f"anime_{self.id}_streamlinks", links)
             return links
@@ -306,19 +310,18 @@ class Anime(Entry):
         cache_res = await self._cache.get(f"anime_{self.id}_categories")
         if cache_res:
             return cache_res.value
-        variables = {"id" : self.id}
+        variables = {"id": self.id}
         data = await self._http.post_data(
-            url=BASE_URL,
-            data={"query" : ANIME_BY_ID_CATEGORIES, "variables" : variables}
+            url=BASE_URL, data={"query": ANIME_BY_ID_CATEGORIES, "variables": variables}
         )
-        categories =  [
+        categories = [
             Category(attributes)
             for attributes in data["data"]["findAnimeById"]["categories"]["nodes"]
         ]
         await self._cache.add(
             f"anime_{self.id}_categories",
             categories,
-            remove_after=self._cache.expiration       
+            remove_after=self._cache.expiration,
         )
         return categories
 
@@ -327,10 +330,9 @@ class Anime(Entry):
         cache_res = await self._cache.get(f"anime_{self.id}_characters")
         if cache_res:
             return cache_res.value
-        variables = {"id" : self.id, "limit" : 100}
+        variables = {"id": self.id, "limit": 100}
         data = await self._http.post_data(
-            url=BASE_URL,
-            data={"query" : ANIME_BY_ID_CHARACTERS, "variables" : variables}
+            url=BASE_URL, data={"query": ANIME_BY_ID_CHARACTERS, "variables": variables}
         )
         characters = [
             Character(attributes, entry_id=self.id)
@@ -339,16 +341,14 @@ class Anime(Entry):
         await self._cache.add(
             f"anime_{self.id}_characters",
             characters,
-            remove_after=self._cache.expiration
+            remove_after=self._cache.expiration,
         )
         return characters
 
-
     async def reviews(self, limit: int = 1) -> List[Review]:
-        variables = {"id" : self.id, "limit" : limit}
+        variables = {"id": self.id, "limit": limit}
         data = await self._http.post_data(
-            url=BASE_URL,
-            data={"query" : ANIME_BY_ID_REVIEWS, "variables" : variables}
+            url=BASE_URL, data={"query": ANIME_BY_ID_REVIEWS, "variables": variables}
         )
         return [
             Review(self.id, self.entry_type, attributes)
@@ -367,16 +367,17 @@ class Anime(Entry):
         cache_res = await self._cache.get(f"anime_{self.id}_episodes_{limit}")
         if cache_res:
             return cache_res.value
-        variables = {"id" : self.id, "limit" : limit}
+        variables = {"id": self.id, "limit": limit}
         data = await self._http.post_data(
-            url=BASE_URL,
-            data={"query" : ANIME_BY_ID_EPISODES, "variables" : variables}
+            url=BASE_URL, data={"query": ANIME_BY_ID_EPISODES, "variables": variables}
         )
-        episodes = [Episode(attributes) for attributes in data["data"]["findAnimeById"]["episodes"]["nodes"]]
+        episodes = [
+            Episode(attributes)
+            for attributes in data["data"]["findAnimeById"]["episodes"]["nodes"]
+        ]
         await self._cache.add(
             f"anime_{self.id}_episodes_{limit}",
             episodes,
-            remove_after=self._cache.expiration
+            remove_after=self._cache.expiration,
         )
         return episodes
-

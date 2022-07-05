@@ -1,4 +1,4 @@
-#QUERIES FOR KITSU GRAPHQL API
+# QUERIES FOR KITSU GRAPHQL API
 
 BASE_URL = "https://kitsu.io/api/graphql"
 
@@ -138,7 +138,7 @@ ANIME_BY_ID_CATEGORIES: str = """
             }
 """
 
-ANIME_BY_ID_STREAMLINKS: str =  """
+ANIME_BY_ID_STREAMLINKS: str = """
             query streamLinks ($id: ID!) {
                 findAnimeById(id: $id) {
                 streamingLinks (first: 10) {
@@ -613,25 +613,25 @@ QUERY_METHODS = {
     "manga_search": "searchMangaByTitle",
     "anime_id": "findAnimeById",
     "manga_id": "findMangaById",
-    #"character_search": "findCharacterBySlug"
+    # "character_search": "findCharacterBySlug"
 }
 
 ENTRY_TITLE = {
-    "searchAnimeByTitle" : ANIME_BY_TITLE,
-    "searchMangaByTitle" : MANGA_BY_TITLE,
+    "searchAnimeByTitle": ANIME_BY_TITLE,
+    "searchMangaByTitle": MANGA_BY_TITLE,
 }
 
 ENTRY_ID = {
-    "findAnimeById" : ANIME_BY_ID,
-    "findMangaById" : MANGA_BY_ID,
+    "findAnimeById": ANIME_BY_ID,
+    "findMangaById": MANGA_BY_ID,
 }
 
 ENTRY_ID_REVIEWS = {
-    "findAnimeById" : ANIME_BY_ID_REVIEWS,
-    "findMangaById" : MANGA_BY_ID_REVIEWS,   
+    "findAnimeById": ANIME_BY_ID_REVIEWS,
+    "findMangaById": MANGA_BY_ID_REVIEWS,
 }
 
 ENTRY_ID_CHARACTERS = {
-    "findAnimeById" : ANIME_BY_ID_CHARACTERS,
-    "findMangaById" : MANGA_BY_ID_CHARACTERS,
+    "findAnimeById": ANIME_BY_ID_CHARACTERS,
+    "findMangaById": MANGA_BY_ID_CHARACTERS,
 }

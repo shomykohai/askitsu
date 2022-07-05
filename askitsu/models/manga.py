@@ -34,7 +34,7 @@ from ..queries import (
     MANGA_BY_ID_CATEGORIES,
     MANGA_BY_ID_CHAPTERS,
     MANGA_BY_ID_CHARACTERS,
-    MANGA_BY_ID_REVIEWS
+    MANGA_BY_ID_REVIEWS,
 )
 
 __all__ = ("Manga", "Chapter")
@@ -57,8 +57,6 @@ class Chapter:
         Which volume the chapter belong to
     chapter: :class:`int`
         Chapter number
-    thumbnail: :class:`str`
-        Url of the thumbnail
     """
 
     __slots__ = (
@@ -69,32 +67,42 @@ class Chapter:
         "volume_number",
         "chapter",
         "length",
-        "thumbnail",
+        "_attributes",
     )
 
     def __init__(self, attributes: dict) -> None:
+        self._attributes = attributes
         self.id: int = int(attributes["id"])
         self.description: str = attributes["description"]["en"]
         self.title: str = attributes["titles"]["romanized"]
         self.volume_number: int = attributes["volume"]
         self.chapter: int = attributes["number"]
         # self.length: int = attributes["length"]
-        self.thumbnail: str = (
-            attributes["thumbnail"]["original"]["url"] if attributes["thumbnail"] else None
-        )
+
+    @property
+    def thumbnail(self) -> Optional[str]:
+        """Url of the thumbnail"""
+        try:
+            return self._attributes["thumbnail"]["original"]["url"]
+        except (KeyError, TypeError):
+            return None
 
     @property
     def created_at(self) -> Optional[datetime]:
         """Date when a chapter got added on Kitsu DB"""
         try:
-            return datetime.strptime(self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ")
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
         except ValueError:
             return None
 
     @property
     def updated_at(self) -> Optional[datetime]:
         try:
-            return datetime.strptime(self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ")
+            return datetime.strptime(
+                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
         except ValueError:
             return None
 
@@ -132,7 +140,7 @@ class Manga(Entry):
         Returns canonical title of the given manga
 
         .. versionadded:: 0.4.1
-        
+
     chapter_count: :class:`int`
         Number of chapters
     volume_count: :class:`int`
@@ -209,10 +217,10 @@ class Manga(Entry):
         "_http",
         "_titles",
         "_attributes",
-        "_cache"
+        "_cache",
     )
 
-    def __init__(self, attributes: dict, http: HTTPClient, cache: Cache, *args) -> None:
+    def __init__(self, attributes: dict, http: HTTPClient, cache: Cache) -> None:
         self._http = http
         self.entry_type: str = "manga"
         self.chapter_count: int = attributes["chapterCount"]
@@ -225,7 +233,6 @@ class Manga(Entry):
             attributes=attributes,
             http=http,
             cache=cache,
-            *args
         )
 
     def __repr__(self) -> str:
@@ -243,16 +250,18 @@ class Manga(Entry):
         cache_res = await self._cache.get(f"manga_{self.id}_chapters_{limit}")
         if cache_res:
             return cache_res.value
-        variables = {"id" : self.id}
+        variables = {"id": self.id}
         data = await self._http.post_data(
-            url=BASE_URL,
-            data={"query" : MANGA_BY_ID_CHAPTERS, "variables" : variables}
+            url=BASE_URL, data={"query": MANGA_BY_ID_CHAPTERS, "variables": variables}
         )
-        chapters = [Chapter(attributes) for attributes in data["data"]["findMangaById"]["chapters"]["nodes"]]
+        chapters = [
+            Chapter(attributes)
+            for attributes in data["data"]["findMangaById"]["chapters"]["nodes"]
+        ]
         await self._cache.add(
             f"manga_{self.id}_chapters_{limit}",
             chapters,
-            remove_after=self._cache.expiration
+            remove_after=self._cache.expiration,
         )
         return chapters
 
@@ -261,19 +270,18 @@ class Manga(Entry):
         cache_res = await self._cache.get(f"manga_{self.id}_categories")
         if cache_res:
             return cache_res.value
-        variables = {"id" : self.id}
+        variables = {"id": self.id}
         data = await self._http.post_data(
-            url=BASE_URL,
-            data={"query" : MANGA_BY_ID_CATEGORIES, "variables" : variables}
+            url=BASE_URL, data={"query": MANGA_BY_ID_CATEGORIES, "variables": variables}
         )
-        categories =  [
+        categories = [
             Category(attributes)
             for attributes in data["data"]["findMangaById"]["categories"]["nodes"]
         ]
         await self._cache.add(
             f"manga_{self.id}_categories",
             categories,
-            remove_after=self._cache.expiration       
+            remove_after=self._cache.expiration,
         )
         return categories
 
@@ -282,10 +290,9 @@ class Manga(Entry):
         cache_res = await self._cache.get(f"manga_{self.id}_characters")
         if cache_res:
             return cache_res.value
-        variables = {"id" : self.id, "limit" : 100}
+        variables = {"id": self.id, "limit": 100}
         data = await self._http.post_data(
-            url=BASE_URL,
-            data={"query" : MANGA_BY_ID_CHARACTERS, "variables" : variables}
+            url=BASE_URL, data={"query": MANGA_BY_ID_CHARACTERS, "variables": variables}
         )
         characters = [
             Character(attributes, entry_id=self.id)
@@ -294,15 +301,14 @@ class Manga(Entry):
         await self._cache.add(
             f"manga_{self.id}_characters",
             characters,
-            remove_after=self._cache.expiration
+            remove_after=self._cache.expiration,
         )
-        return characters 
+        return characters
 
     async def reviews(self, limit: int = 1) -> List[Review]:
-        variables = {"id" : self.id, "limit" : limit}
+        variables = {"id": self.id, "limit": limit}
         data = await self._http.post_data(
-            url=BASE_URL,
-            data={"query" : MANGA_BY_ID_REVIEWS, "variables" : variables}
+            url=BASE_URL, data={"query": MANGA_BY_ID_REVIEWS, "variables": variables}
         )
         return [
             Review(self.id, self.entry_type, attributes)

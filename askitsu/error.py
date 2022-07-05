@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from colorama import Fore, Style
+from colorama import Fore, Style  # type: ignore
 
 
 __all__ = (
@@ -30,7 +30,7 @@ __all__ = (
     "InvalidArgument",
     "NotAuthenticated",
     "BadApiRequest",
-    "NotFound"
+    "NotFound",
 )
 
 
@@ -71,7 +71,7 @@ class InvalidArgument(AttributeError):
         Error message to pass
     """
 
-    def __init__(self, msg) -> None:
+    def __init__(self, msg: str = None) -> None:
         super().__init__(msg)
 
 
@@ -88,7 +88,7 @@ class NotAuthenticated(HTTPError):
             f"{Fore.RED}You are not authenticated.\n"
             f"Check if the called API request need authentication "
             f"or if you passed valid credentials{Style.RESET_ALL}",
-            401
+            401,
         )
 
 
@@ -101,9 +101,10 @@ class BadApiRequest(HTTPError):
 
     def __init__(self, response: str) -> None:
         super().__init__(
-            f"{Fore.RED}An error occured.\n"
-            f"{response['detail']} - Response code: {400}{Style.RESET_ALL}",
-            400
+            f"{Fore.RED}An error occured.\n"  # type: ignore
+            f"{response['detail']} - Response code: {400}{Style.RESET_ALL}"
+            "",
+            400,
         )
 
 
@@ -115,7 +116,4 @@ class NotFound(HTTPError):
     """
 
     def __init__(self) -> None:
-        super().__init__(
-            f"{Fore.RED}Resource not found.\n{Style.RESET_ALL}",
-            404
-        )
+        super().__init__(f"{Fore.RED}Resource not found.\n{Style.RESET_ALL}", 404)
