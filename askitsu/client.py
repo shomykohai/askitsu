@@ -129,7 +129,7 @@ class Client:
         try:
             entry = self._entries[type_lower]
         except (KeyError, TypeError):
-            return None
+            raise InvalidArgument
         filter = "name" if type_lower == "characters" else "text"
         fetched_data = await self.http.get_data(
             f"{type_lower}?filter%5B{filter}%5D={query}&page%5Blimit%5D={limit}"
@@ -263,7 +263,7 @@ class Client:
         try:
             entry = self._entries[type_lower]
         except (KeyError, TypeError):
-            return None
+            raise InvalidArgument
         fetched_data = await self.http.get_data(f"{type_lower}/{id}")
         return (
             entry(attributes=fetched_data["data"], http=self.http)
@@ -390,7 +390,7 @@ class Client:
         try:
             entry = self._entries[type_lower]
         except (KeyError, TypeError):
-            return None
+            raise InvalidArgument
         fetched_data = await self.http.get_data(f"trending/{type_lower}")
         return [
             entry(attributes=attributes, http=self.http)

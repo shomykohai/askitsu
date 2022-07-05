@@ -61,7 +61,7 @@ class InvalidArgument(AttributeError):
         Error message to pass
     """
 
-    def __init__(self, msg) -> None:
+    def __init__(self, msg: str = None) -> None:
         super().__init__(msg)
 
 
