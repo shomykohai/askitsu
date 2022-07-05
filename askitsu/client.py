@@ -424,8 +424,8 @@ class Client:
                 for attributes in data_value
             ]
             if data_value
-            else None
-        )  # type: ignore
+            else None  # type: ignore
+        )
 
     async def __get_reviews_fetch(
         self, entry: Union[Manga, Anime], method: str, limit: int = 1
