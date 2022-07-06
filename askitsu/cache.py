@@ -26,7 +26,7 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Union, Optional
+from typing import Any, Dict, Union, Optional
 
 
 class CacheResult:
@@ -34,7 +34,7 @@ class CacheResult:
         self.name = name
         self.value = value
 
-    def as_dict(self) -> dict[str, Any]:
+    def as_dict(self) -> Dict[str, Any]:
         return {self.name: self.value}
 
     @property
@@ -46,7 +46,7 @@ class CacheResult:
 class Cache:
     def __init__(self, expiration: Optional[int] = None) -> None:
         self.expiration = expiration or 0
-        self.__cache: dict[str, Any] = {}
+        self.__cache: Dict[str, Any] = {}
 
     async def __remove_after(self, name: str, seconds: int) -> None:
         await asyncio.sleep(seconds)
@@ -57,7 +57,7 @@ class Cache:
         return self.__sizeof__()
 
     @property
-    def cache(self) -> dict[str, Any]:
+    def cache(self) -> Dict[str, Any]:
         return self.__cache
 
     async def get(self, name: str) -> Optional[CacheResult]:
