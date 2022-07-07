@@ -49,11 +49,16 @@ Chapter
 .. autoclass:: askitsu.Chapter
    :members:
 
-User
+Users
 ================
+
+User
+--------------------
 .. autoclass:: askitsu.User
    :members:
 
+UserProfile
+--------------------
 .. autoclass:: askitsu.UserProfile
    :members:
 

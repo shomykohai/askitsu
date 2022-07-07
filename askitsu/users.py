@@ -7,6 +7,7 @@ from .images import CoverImage, Image
 
 __all__ = ("User", "UserProfile")
 
+
 class User:
     """
     Represents a user of Kitsu
@@ -45,7 +46,7 @@ class User:
     posts_count: :class:`int`
         Number of posts
     rating_count: :class:`int`
-        ...
+        Number of ratings made by the user
     media_reaction: :class:`int`
         Number of interaction with medias
     pro: :class:`bool`
@@ -58,7 +59,7 @@ class User:
     profile_completed: :class:`bool`
         Return if the user has completed his profile
     feed_completed: :class:`bool`
-        ...
+        If the user completed their feed
     sfw_filter: :class:`str`
         Current SFW filter of the user
     """
@@ -183,6 +184,7 @@ class UserProfile:
     url: :class:`str`
         The url to the profile of the user
     """
+
     def __init__(self, id: int, attributes: dict, user: str, included: dict) -> None:
         self._attributes = attributes
         self.id: int = int(id)
