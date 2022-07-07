@@ -72,6 +72,7 @@ class Entry:
 
     @property
     def created_at(self) -> Optional[datetime]:
+        """When the media got added in Kitsu database"""
         try:
             return datetime.strptime(
                 self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -81,6 +82,7 @@ class Entry:
 
     @property
     def updated_at(self) -> Optional[datetime]:
+        """Last time the media got updated in Kitsu database"""
         try:
             return datetime.strptime(
                 self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -90,6 +92,7 @@ class Entry:
 
     @property
     def started_at(self) -> Optional[datetime]:
+        """Date when the Media started"""
         try:
             return datetime.strptime(self._attributes["startDate"], "%Y-%m-%d")
         except ValueError:
@@ -97,6 +100,7 @@ class Entry:
 
     @property
     def ended_at(self) -> Optional[datetime]:
+        """Date when Media ended"""
         try:
             return datetime.strptime(self._attributes["endDate"], "%Y-%m-%d")
         except ValueError:
@@ -104,27 +108,69 @@ class Entry:
 
     @property
     def url(self) -> str:
+        """
+        url: :class:`str`
+        Returns url to Kitsu.io website
+
+        .. versionadded:: 0.4.0
+        """
         return f"https://kitsu.io/{self.entry_type}/{self.slug}"
 
     @property
     def title(self) -> Title:
+        """
+        Return canon title of the given Media
+
+        .. versionchanged:: 0.4.1
+
+        Now it returns an instance of :class:`askitsu.Title`
+        """
         return Title(self._titles, self.id, self.entry_type)
 
     @property
     def poster_image(self) -> PosterImage:
+        """
+        Return poster image dict with all sizes
+
+        .. versionchanged:: 0.4.1
+
+        Now it returns a poster image object
+        """
         return PosterImage(self._attributes["posterImage"], self.id, self.entry_type)
 
     @property
     def cover_image(self) -> CoverImage:
+        """
+        Return cover image dict with all sizes
+
+        .. versionchanged:: 0.4.1
+
+        Now it returns a cover image object
+        """
         return CoverImage(self._attributes["coverImage"], self.id, self.entry_type)
 
     @property
     async def categories(self) -> List[Category]:
+        """
+        Categories of the Media
+
+        .. versionadded:: 0.4.0
+        """
         data = await self._http.get_data(url=f"{self.entry_type}/{self.id}/categories")
         return [Category(attributes) for attributes in data["data"]]
 
     @property
     async def characters(self) -> Union[Character, List[Character]]:
+        """
+        Get all characters (Max 20)
+
+        .. versionadded:: 0.4.1
+
+        Note
+        --------------
+        Use :meth:`askitsu.Client.get_characters` if you want to set a limit\n
+        The limit with this property is automatically set to 20 (The highest)
+        """
         data = await self._http.get_data(
             url=f"{self.entry_type}/{self.id}/characters?include=character&page%5Blimit%5D=20"
         )
@@ -136,6 +182,11 @@ class Entry:
         return characters if len(characters) > 1 else characters[0]
 
     async def reviews(self, limit: int = 1) -> Optional[Union[Review, List[Review]]]:
+        """
+        Get all the reviews of the Media
+
+        .. versionadded:: 0.3.0
+        """
         data = await self._http.get_data(
             url=f"{self.entry_type}/{self.id}/reviews?page%5Blimit%5D={limit}"
         )

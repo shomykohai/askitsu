@@ -34,6 +34,7 @@ from .http import HTTPClient
 class StreamLink:
     """
     Represent an :class:`Anime` stream link
+    (where you can watch the anime)
 
 
     Attributes
@@ -143,26 +144,15 @@ class Anime(Entry):
     id: :class:`int`
         ID of the anime
     status: :class:`str`
-        Actual status of the given anime (Ex. "finished"
-    started_at: Optional[:class:`datetime`]
-        Date when the anime started
-    ended_at: Optional[:class:`datetime`]
-        Date when the anime ended
+        Actual status of the given anime (E.g. "finished")
     slug: :class:`str`
         String identifier. Work as id to fetch data
     synopsis: :class:`str`
         Description of the given anime
-    title: :class:`str`
-        Return canon title of the given anime
-
-        .. versionchanged:: 0.4.1
-
-        Now it returns an instance of :class:`askitsu.Title`
     canonical_title: :class:`str`
         Returns canonical title of the given anime
 
         .. versionadded:: 0.4.1
-
     episode_count: :class:`int`
         Episode number
     episode_lenght: :class:`int`
@@ -174,36 +164,10 @@ class Anime(Entry):
         Return True | False
     yt_id: :class:`str`
         Return id of the YouTube trailer
-    cover_image: :class:`CoverImage`
-        Return cover image dict with all sizes
-
-        .. versionchanged:: 0.4.1
-
-        Now it returns a cover image object
-
-    poster_image: :class:`PosterImage`
-        Return poster image dict with all sizes
-
-        .. versionchanged:: 0.4.1
-
-        Now it returns a poster image object
-
     rating_rank: :class:`int`
         Return rating rank (Position on the leaderboard based on rating)
     popularity_rank: :class:`int`
         Return popularity rank (Position on the leaderboard based on user preferences)
-    youtube_url: Optional[:class:`str`]
-        Return full url of YouTube trailer
-    url: :class:`str`
-        Returns url to Kitsu.io website
-
-        .. versionadded:: 0.4.0
-
-    stream_links: List[:class:`StreamLink`]
-        Return a list of :class:StreamLink
-
-        .. versionadded:: 0.4.0
-
     rating: :class:`float`
         The rating received from the community in a scale from 1 to 100
 
@@ -214,25 +178,10 @@ class Anime(Entry):
 
         .. versionadded:: 0.4.0
 
-    categories: List[:class:`Category`]
-        Categories of the anime
-
-        .. versionadded:: 0.4.0
-
     subtype: Literal['ONA', 'OVA', 'TV', 'movie', 'music', 'special']
         The subtype of the show
 
         .. versionadded:: 0.4.1
-
-    characters: Union[:class:`Character`, List[:class:`Character`]
-        Get all characters (Max 20)
-
-        .. versionadded:: 0.4.1
-
-        Note
-        --------------
-        Use :meth:`askitsu.Client.get_characters` if you want to set a limit\n
-        The limit with this property is automatically set to 20 (The highest)
     """
 
     __slots__ = (
@@ -273,10 +222,16 @@ class Anime(Entry):
 
     @property
     def youtube_url(self) -> Optional[str]:
+        """Return full url of YouTube trailer"""
         return f"https://www.youtube.com/watch?v={self.yt_id}" if self.yt_id else None
 
     @property
     async def stream_links(self) -> Optional[List[StreamLink]]:
+        """
+        Return a list of :class:`StreamLink`
+
+        .. versionadded:: 0.4.0
+        """
         data = await self._http.get_data(
             url=f"anime/{self.id}/streaming-links?include=streamer"
         )
@@ -290,7 +245,7 @@ class Anime(Entry):
 
     async def episodes(self, limit: int = 12) -> Union[Episode, List[Episode]]:
         """
-        Returns a a episode or a list of episodes
+        Returns an episode or a list of episodes
 
         .. versionadded:: 0.4.0
 

@@ -118,11 +118,7 @@ class Manga(Entry):
     id: :class:`int`
         ID of the manga
     status: :class:`str`
-        Actual status of the given manga (Ex. "finished")
-    started_at: Optional[:class:`datetime`]
-        Date when the manga started
-    ended_at: Optional[:class:`datetime`]
-        Date when the manga ended
+        Actual status of the given manga (E.g. "finished")
     slug: :class:`str`
         String identifier. Work as id to fetch data
     synopsis: :class:`str`
@@ -144,29 +140,10 @@ class Manga(Entry):
         Number of volumes
     serialization: :class:`str`
         Return manga serialization
-    cover_image: :class:`CoverImage`
-        Return cover image dict with all sizes
-
-        .. versionchanged:: 0.4.1
-
-        Now it returns a cover image object
-
-    poster_image: :class:`PosterImage`
-        Return poster image dict with all sizes
-
-        .. versionchanged:: 0.4.1
-
-        Now it returns a poster image object
-
     rating_rank: :class:`int`
         Return rating rank
     popularity_rank: :class:`int`
         Return popularity rank position
-    url: :class:`str`
-        Returns url to Kitsu.io website
-
-        .. versionadded:: 0.4.0
-
     rating: :class:`float`
         The rating received from the community in a scale from 1 to 100
 
@@ -177,25 +154,10 @@ class Manga(Entry):
 
         .. versionadded:: 0.4.0
 
-    categories: List[:class:`Category`]
-        Categories of the manga
-
-        .. versionadded:: 0.4.0
-
     subtype: Literal['doujin', 'manga', 'manhua', 'manhwa', 'novel', 'oel', 'oneshot']
         The subtype of the manga
 
         .. versionadded:: 0.4.1
-
-    characters: Union[:class:`Character`, List[:class:`Character`]
-        Get all characters (Max 20)
-
-        .. versionadded:: 0.4.1
-
-        Note
-        --------------
-        Use :meth:`askitsu.Client.get_characters` if you want to set a limit\n
-        The limit with this property is automatically set to 20 (The highest)
     """
 
     __slots__ = (
