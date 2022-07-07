@@ -5,6 +5,7 @@ from typing import List, Optional
 from .http import HTTPClient
 from .images import CoverImage, Image
 
+__all__ = ("User", "UserProfile")
 
 class User:
     """
@@ -168,6 +169,20 @@ class User:
 
 
 class UserProfile:
+    """
+    A profile linked to a :class:`User`
+
+    Attributes
+    ---------------
+    id: :class:`int`
+        The id of the profile link
+    name: :class:`str`
+        Name of the linked profile
+    user: :class:`str`
+        Name of the user whom the profile belong to
+    url: :class:`str`
+        The url to the profile of the user
+    """
     def __init__(self, id: int, attributes: dict, user: str, included: dict) -> None:
         self._attributes = attributes
         self.id: int = int(id)
@@ -180,6 +195,7 @@ class UserProfile:
 
     @property
     def created_at(self) -> Optional[datetime]:
+        """When the user added the link to their profile"""
         try:
             return datetime.strptime(
                 self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -189,6 +205,7 @@ class UserProfile:
 
     @property
     def updated_at(self) -> Optional[datetime]:
+        """When the user last updated the link"""
         try:
             return datetime.strptime(
                 self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
