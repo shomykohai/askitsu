@@ -21,7 +21,7 @@ Anime
 --------------------
 
 .. autoclass:: askitsu.Anime
-   :members: episodes, categories
+   :members: episodes, categories, title, reviews, cover_image, poster_imags, started_at, ended_at, updated_at, created_at, url
    :show-inheritance:
 
 Episode
@@ -41,7 +41,7 @@ Manga
 --------------------
 
 .. autoclass:: askitsu.Manga
-   :members: chapters, categories
+   :members: chapters, categories, title, reviews, cover_image, poster_imags, started_at, ended_at, updated_at, created_at, url
    :show-inheritance:
 
 Chapter
