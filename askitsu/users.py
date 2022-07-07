@@ -144,7 +144,7 @@ class User:
             return None
 
     @property
-    def cover_image(self) -> Optional[CoverImage]:
+    def banner(self) -> Optional[CoverImage]:
         """Background of the user profile"""
         cover = self._data["coverImage"]
         if cover:
