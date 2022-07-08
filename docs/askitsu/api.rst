@@ -49,6 +49,18 @@ Chapter
 .. autoclass:: askitsu.Chapter
    :members:
 
+Users
+================
+
+User
+--------------------
+.. autoclass:: askitsu.User
+   :members:
+
+UserProfile
+--------------------
+.. autoclass:: askitsu.UserProfile
+   :members:
 
 Misc
 ================

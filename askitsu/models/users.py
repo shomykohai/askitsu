@@ -186,6 +186,20 @@ class User:
 
 @dataclass()
 class UserProfile:
+    """
+    A profile linked to a :class:`User`
+    Attributes
+    ---------------
+    id: :class:`int`
+        The id of the profile link
+    name: :class:`str`
+        Name of the linked profile
+    user: :class:`str`
+        Name of the user whom the profile belong to
+    url: :class:`str`
+        The url to the profile of the user
+    """
+
     def __init__(self, attributes: dict, user: str) -> None:
         self._attributes = attributes
         self.id: int = int(attributes["id"])
