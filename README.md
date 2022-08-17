@@ -15,9 +15,9 @@ askitsu
 
 # IMPORTANT
 
-⚠️ askitsu is migrating to the new Kitsu API (using GraphQL)<br>
+⚠️ askitsu is going trough a rewrite to support the new Kitsu GraphQL API<br>
 Therefore this branch is not currently ready to be used.<br>
-If you with to use the library, please install the `master` branch.
+If you wish to use the library, please install the `master` branch.
 
 # Key features
 
@@ -82,9 +82,11 @@ loop.run_until_complete(search())
 
 More examples can be found inside the example directory -> [Here](https://github.com/ShomyKohai/askitsu/tree/master/examples)
 
-# Links
+# Links & Credits
 
 - [Docs](https://askitsu.readthedocs.io/)
 - [PyPi](https://pypi.org/project/askitsu/)
-- [Kitsu.io Docs](https://kitsu.docs.apiary.io/)
+- [Kitsu.io Docs](https://kitsu.io/api/playground)
 - [discord.py](https://github.com/Rapptz/discord.py) (bot example)
+
+__"Kitsu" name and the "Kitsu logo" are property of [Kitsu](https://kitsu.io/)__
