@@ -39,6 +39,8 @@ ANIME_BY_ID: str = """
                         views {
                             name
                             url
+                          	width
+                          	height
                         }
                     }
                     bannerImage {
@@ -48,6 +50,8 @@ ANIME_BY_ID: str = """
                     views {
                         name
                         url
+                      	width
+                      	height
                     }      
                     }
                 }
@@ -191,6 +195,8 @@ ANIME_BY_TITLE: str = """
                     views {
                         name
                         url
+                        width
+                        height
                     }
                 }
                 bannerImage {
@@ -200,6 +206,8 @@ ANIME_BY_TITLE: str = """
                 views {
                     name
                     url
+                    width
+                    height
                 }      
                 }
             }
@@ -240,6 +248,8 @@ MANGA_BY_ID: str = """
             views {
                 name
                 url
+                width
+                height
             }
             }
             bannerImage {
@@ -249,6 +259,8 @@ MANGA_BY_ID: str = """
             views {
                 name
                 url
+                width
+                height
             }      
             }
         }
@@ -373,6 +385,8 @@ MANGA_BY_TITLE: str = """
                         views {
                             name
                             url
+                            width
+                            height
                         }
                         }
                         bannerImage {
@@ -382,6 +396,8 @@ MANGA_BY_TITLE: str = """
                         views {
                             name
                             url
+                            width
+                            height
                         }      
                         }
                 } 
@@ -437,6 +453,8 @@ USERS_BY_ID: str = """
                     views {
                         name
                         url
+                        width
+                        height
                     }
                 }
             }
@@ -504,6 +522,8 @@ USER_BY_USERNAME = """
                         views {
                             name
                             url
+                            width
+                            height
                         }
                     }
                     }
@@ -548,6 +568,8 @@ TRENDING_ENTRY = """
                             views {
                                 name
                                 url
+                                width
+                                height
                             }
                         }
                         bannerImage {
@@ -557,6 +579,8 @@ TRENDING_ENTRY = """
                         views {
                             name
                             url
+                            width
+                            height
                         }      
                         }
                 }
@@ -589,6 +613,8 @@ TRENDING_ENTRY = """
                         views {
                             name
                             url
+                            width
+                            height
                         }
                         }
                         bannerImage {
@@ -598,6 +624,8 @@ TRENDING_ENTRY = """
                         views {
                             name
                             url
+                            width
+                            height
                         }      
                         }
                 }

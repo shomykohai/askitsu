@@ -24,17 +24,17 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 
 __all__ = ("Image", "PosterImage", "CoverImage")
 
 
-def get_dimension(dim: str, values: dict) -> Optional[str]:
+def get_dimension(dim: str, values: dict, value: str = "url") -> Optional[Union[str, int]]:
     for dimensions in values:
         if dim in dimensions.values():
             try:
-                return dimensions.get("url", None)
+                return dimensions.get(value, None)
             except (KeyError, TypeError):
                 return None
     return None
@@ -97,7 +97,7 @@ class Image:
             return None
 
 
-class PosterImage:
+class PosterImage(Image):
     """
     Poster image of a media
 
@@ -126,51 +126,18 @@ class PosterImage:
         self.entry_id = entry_id
         self.entry_type = entry_type
 
-    @property
-    def tiny(self) -> Optional[str]:
-        try:
-            return get_dimension("tiny", self._data["views"])
-        except (KeyError, TypeError):
-            return None
-
-    @property
-    def small(self) -> Optional[str]:
-        try:
-            return get_dimension("small", self._data["views"])
-        except (KeyError, TypeError):
-            return None
-
-    @property
-    def medium(self) -> Optional[str]:
-        try:
-            return get_dimension("medium", self._data["views"])
-        except (KeyError, TypeError):
-            return None
-
-    @property
-    def large(self) -> Optional[str]:
-        try:
-            return get_dimension("large", self._data["views"])
-        except (KeyError, TypeError):
-            return None
-
-    @property
-    def original(self) -> Optional[str]:
-        try:
-            return self._data["original"].get("url", None)
-        except (KeyError, TypeError):
-            return None
-
     def dimension(
         self, size: Literal["tiny", "small", "medium", "large"]
     ) -> Optional[dict]:
         try:
-            return self._data["meta"]["dimensions"][size]
+            width = get_dimension(size, self._data["views"], value="width")
+            height = get_dimension(size, self._data["views"], value="height")
+            return {"width" : width, "height" : height}
         except (KeyError, TypeError):
             return None
 
 
-class CoverImage:
+class CoverImage(Image):
     """
     Cover image of a media
 
@@ -198,35 +165,15 @@ class CoverImage:
         self.entry_type = entry_type
 
     @property
-    def tiny(self) -> Optional[str]:
-        try:
-            return get_dimension("tiny", self._data["views"])
-        except (KeyError, TypeError):
-            return None
+    def medium(self) -> None: #placeholder
+        return None
 
-    @property
-    def small(self) -> Optional[str]:
+    def dimension(
+        self, size: Literal["tiny", "small", "medium", "large"]
+    ) -> Optional[dict]:
         try:
-            return get_dimension("small", self._data["views"])
-        except (KeyError, TypeError):
-            return None
-
-    @property
-    def large(self) -> Optional[str]:
-        try:
-            return get_dimension("large", self._data["views"])
-        except (KeyError, TypeError):
-            return None
-
-    @property
-    def original(self) -> Optional[str]:
-        try:
-            return self._data.get("original", None)
-        except (KeyError, TypeError):
-            return None
-
-    def dimension(self, size: Literal["tiny", "small", "large"]) -> Optional[dict]:
-        try:
-            return self._data["meta"]["dimensions"][size]
+            width = get_dimension(size, self._data["views"], value="width")
+            height = get_dimension(size, self._data["views"], value="height")
+            return {"width" : width, "height" : height}
         except (KeyError, TypeError):
             return None
