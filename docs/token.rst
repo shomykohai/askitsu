@@ -13,7 +13,7 @@ How to obtain a token?
 Kitsu API documentation already cover this topic `here <https://kitsu.docs.apiary.io/#introduction/authentication>`_
 
 | First you will need to make an account on `kitsu <https://kitsu.io>`_ website.
-| After making an acconut, you'll need to make a post request to `https://kitsu.io/api/oauth/token`
+| After making an account, you'll need to make a post request to `https://kitsu.io/api/oauth/token`
 | Kitsu supports 3 grant types, but for now only **Password** is implemented
 
 Making POST request
