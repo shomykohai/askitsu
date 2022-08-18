@@ -26,7 +26,7 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Dict, Union, Optional
+from typing import Any, Dict, Optional
 
 
 class CacheResult:

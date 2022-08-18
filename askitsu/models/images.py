@@ -24,13 +24,13 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Literal, Optional
 
 
 __all__ = ("Image", "PosterImage", "CoverImage")
 
 
-def get_dimension(dim: str, values: dict, value: str = "url") -> Optional[Union[str, int]]:
+def get_dimension(dim: str, values: dict, value: str = "url") -> Optional[str]:
     for dimensions in values:
         if dim in dimensions.values():
             try:
