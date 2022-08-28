@@ -188,7 +188,7 @@ class User:
         """When the user registered to Kitsu"""
         try:
             return datetime.strptime(
-                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
             )
         except ValueError:
             return None
