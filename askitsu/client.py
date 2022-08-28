@@ -31,7 +31,6 @@ from .cache import Cache
 from .queries import (
     BASE_URL,
     QUERY_METHODS,
-    ANIME_BY_ID_STREAMLINKS,
     ENTRY_ID,
     ENTRY_ID_CHARACTERS,
     ENTRY_ID_REVIEWS,
