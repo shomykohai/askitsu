@@ -434,12 +434,12 @@ class Client:
             )
 
     async def __get_characters_fetch(
-        self, entry: Union[Manga, Anime], method: str, limit: int = 1
+        self, entry: Union[Manga, Anime], method: str
     ) -> Optional[List[Character]]:
-        cache_res = await self._cache.get(f"{entry.entry_type}_characters_{limit}")
+        cache_res = await self._cache.get(f"{entry.entry_type}_characters")
         if cache_res:
             return cache_res.value
-        variables = {"id": entry.id, "limit": limit}
+        variables = {"id": entry.id, "limit": 100}
         query_fetch = ENTRY_ID_CHARACTERS.get(method)
         data = await self.http.post_data(
             url=BASE_URL, data={"query": query_fetch, "variables": variables}
@@ -450,11 +450,11 @@ class Client:
             Character(attributes, entry_id=entry.id)
             for attributes in data["data"][method]["characters"]["nodes"]
         ]
-        await self._cache.add(f"{entry.entry_type}_characters_{limit}", character)
+        await self._cache.add(f"{entry.entry_type}_characters", character)
         return character
 
     async def get_characters(
-        self, entry: Union[Anime, Manga], limit: int = 10
+        self, entry: Union[Anime, Manga]
     ) -> Optional[List[Character]]:
         """|coro|
 
@@ -474,7 +474,7 @@ class Client:
             raise InvalidArgument
         else:
             return await self.__get_characters_fetch(
-                entry=entry, method=method, limit=limit
+                entry=entry, method=method
             )
 
     async def get_user(self, id: int) -> Optional[User]:
