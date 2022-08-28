@@ -342,41 +342,6 @@ class Client:
         """
         return await self.get_entry("manga", id=id)
 
-    async def get_stream_links(self, anime: Anime) -> Optional[List[StreamLink]]:
-        """|coro|
-
-        Return all streaming link of an Anime object
-
-        Parameters
-        -----------
-        anime: :class:`Anime`
-            The anime to get stream links
-        """
-        if not isinstance(anime, Anime) and not isinstance(anime, Object):
-            raise InvalidArgument(
-                f"{Fore.RED}'{anime}' is not an istance of Anime\n"
-                f"Make sure you pass a valid argument to {Fore.LIGHTCYAN_EX}get_stream_links{Style.RESET_ALL}"
-            )
-        cache_res = await self._cache.get(f"anime_{anime.id}_streamlinks")
-        if cache_res:
-            return cache_res.value
-        variables = {"id": anime.id, "limit": 50}
-        data = await self.http.post_data(
-            url=BASE_URL,
-            data={"query": ANIME_BY_ID_STREAMLINKS, "variables": variables},
-        )
-        try:
-            links = [
-                StreamLink(attributes=attributes)
-                for attributes in data["data"]["findAnimeById"]["streamingLinks"][
-                    "nodes"
-                ]
-            ]
-            await self._cache.add(f"anime_{anime.id}_streamlinks", links)
-            return links
-        except KeyError:
-            return None
-
     @overload
     async def get_trending_entry(
         self, type: Literal["anime"], limit: int = ...
