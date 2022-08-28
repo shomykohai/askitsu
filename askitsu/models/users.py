@@ -188,6 +188,7 @@ class User:
 class UserProfile:
     """
     A profile linked to a :class:`User`
+
     Attributes
     ---------------
     id: :class:`int`
