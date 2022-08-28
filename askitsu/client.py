@@ -42,9 +42,9 @@ from .queries import (
 )
 from .error import InvalidArgument
 from .http import HTTPClient
-from .models.anime import Anime, StreamLink
+from .models.anime import Anime
 from .models.character import Character
-from .models.core import Object, Review
+from .models.core import Review
 from .models.manga import Manga
 from .models.users import User
 
