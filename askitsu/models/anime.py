@@ -118,26 +118,6 @@ class Episode:
         self.length: int = attributes["length"]
         self.thumbnail: str = attributes["thumbnail"]["original"]["url"]
 
-    @property
-    def created_at(self) -> Optional[datetime]:
-        """Date when this episode got added on Kitsu"""
-        try:
-            return datetime.strptime(
-                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
-            )
-        except ValueError:
-            return None
-
-    @property
-    def updated_at(self) -> Optional[datetime]:
-        """Last time when this episode got updated on Kitu"""
-        try:
-            return datetime.strptime(
-                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ"
-            )
-        except ValueError:
-            return None
-
 
 class Anime(Entry):
     """Represents an :class:`Anime` instance

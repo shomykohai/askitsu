@@ -183,6 +183,16 @@ class User:
         except KeyError:
             return None
 
+    @property
+    def created_at(self) -> Optional[datetime]:
+        """When the user registered to Kitsu"""
+        try:
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
+        except ValueError:
+            return None
+
 
 @dataclass()
 class UserProfile:
@@ -210,21 +220,3 @@ class UserProfile:
 
     def __repr__(self) -> str:
         return f"<UserProfile id={self.id} slug={self.user}>"
-
-    @property
-    def created_at(self) -> Optional[datetime]:
-        try:
-            return datetime.strptime(
-                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
-            )
-        except ValueError:
-            return None
-
-    @property
-    def updated_at(self) -> Optional[datetime]:
-        try:
-            return datetime.strptime(
-                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
-            )
-        except ValueError:
-            return None

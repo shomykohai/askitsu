@@ -86,23 +86,3 @@ class Character:
     @property
     def image(self) -> Image:
         return Image(self._attributes["character"]["image"])
-
-    @property
-    def created_at(self) -> Optional[datetime]:
-        """When a character got added in Kitu DB"""
-        try:
-            return datetime.strptime(
-                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
-            )
-        except ValueError:
-            return None
-
-    @property
-    def updated_at(self) -> Optional[datetime]:
-        """Last time a character got updated"""
-        try:
-            return datetime.strptime(
-                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ"
-            )
-        except ValueError:
-            return None

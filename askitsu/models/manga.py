@@ -75,7 +75,6 @@ class Chapter:
         self.id: int = int(attributes["id"])
         self.description: str = attributes["description"]["en"]
         self.title: str = attributes["titles"]["romanized"]
-        self.volume_number: int = attributes["volume"]
         self.chapter: int = attributes["number"]
         # self.length: int = attributes["length"]
 
@@ -85,25 +84,6 @@ class Chapter:
         try:
             return self._attributes["thumbnail"]["original"]["url"]
         except (KeyError, TypeError):
-            return None
-
-    @property
-    def created_at(self) -> Optional[datetime]:
-        """Date when a chapter got added on Kitsu DB"""
-        try:
-            return datetime.strptime(
-                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
-            )
-        except ValueError:
-            return None
-
-    @property
-    def updated_at(self) -> Optional[datetime]:
-        try:
-            return datetime.strptime(
-                self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ"
-            )
-        except ValueError:
             return None
 
     # @property
@@ -245,12 +225,12 @@ class Manga(Entry):
         .. versionadded:: 0.4.0
 
         limit: :class:`int`
-            Limit of chapters to fetch. Defaults to 12 (Max 20).
+            Limit of chapters to fetch. Defaults to 12.
         """
         cache_res = await self._cache.get(f"manga_{self.id}_chapters_{limit}")
         if cache_res:
             return cache_res.value
-        variables = {"id": self.id}
+        variables = {"id": self.id, "limit": limit}
         data = await self._http.post_data(
             url=BASE_URL, data={"query": MANGA_BY_ID_CHAPTERS, "variables": variables}
         )
