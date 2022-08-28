@@ -103,8 +103,6 @@ ANIME_BY_ID_CHARACTERS: str = """
                 nodes {
                     role
                     character {
-                    createdAt
-                    updatedAt
                     id
                     slug
                     description
@@ -274,12 +272,9 @@ MANGA_BY_ID_CHAPTERS = """
             chapters (first: $limit) {
             nodes {
                 id
-                createdAt
-                updatedAt
                 titles {
                 romanized
                 }
-
                 description
                 number
                 thumbnail {
@@ -300,8 +295,6 @@ MANGA_BY_ID_CHARACTERS: str = """
                 nodes {
                     role
                     character {
-                    createdAt
-                    updatedAt
                     id
                     slug
                     description
@@ -410,6 +403,7 @@ USERS_BY_ID: str = """
             query userByID ($id: ID!) {
             findProfileById (id: $id) {
                 id
+                createdAt
                 name
                 slug
                 birthday 
@@ -479,6 +473,7 @@ USER_BY_USERNAME = """
                 searchProfileByUsername (first: 1, username: $name) {
                 nodes {
                     id
+                    createdAt
                     name
                     slug
                     birthday 
