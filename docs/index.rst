@@ -13,11 +13,25 @@ askitsu
    * Written with ``async``/``await`` syntax
    * Compatible with discord bots (See examples)
 
+`Supported endpoints`
+* 🎞️ Anime (Anime, Episodes and Streaming Links)
+* 📖 Manga (Manga and Chapters)
+* 👥 Characters
+* 📰 Reviews
+* 👤 User (Profile and Profile Links)
+
+Coming soon:
+
+* 🗞️ Posts
+* 🗨️ Comments
+* 📚 User Libraries
+
 Introduction
 ==================
 To begin with askitsu you can read the guides below
    * **First steps** to work with the library: :doc:`Introduction <../introduction>` | :doc:`Token <../token>`
    * **Simple examples** to get started with the library: :doc:`Examples <../examples>`
+   * **API Reference** :doc:`API <../askitsu/api>`
 
 
 Tree
