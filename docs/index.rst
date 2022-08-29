@@ -9,9 +9,9 @@ askitsu
 
 # IMPORTANT
 
-⚠️ askitsu is going trough a rewrite to support the new Kitsu GraphQL API<br>
-Therefore this branch is not currently ready to be used.<br>
-If you wish to use the library, please install the `master` branch.<br><br><br>
+| ⚠️ askitsu is going trough a rewrite to support the new Kitsu GraphQL API
+| Therefore this branch is not currently ready to be used.
+| If you wish to use the library, please install the `master` branch.
 
 `Features`
    * askitsu is an async API wrapper written in python for `Kitsu.io <https://kitsu.io/>`_.
@@ -19,7 +19,8 @@ If you wish to use the library, please install the `master` branch.<br><br><br>
    * Written with ``async``/``await`` syntax
    * Compatible with discord bots (See examples)
 
-Overview of the features
+`Overview of the features``
+
 .. tab-set::
 
       .. tab-item:: Supported endpoints
