@@ -26,6 +26,20 @@ If you wish to use the library, please install the `master` branch.
 - Support most of primary Kitsu entries -- Anime, Manga, Characters and much more
 - Can be used with discord bots
 
+# Currently avaiable endpoints
+
+- 🎞️ Anime (Anime, Episodes and Streaming Links)
+- 📖 Manga (Manga and Chapters)
+- 👥 Characters
+- 📰 Reviews
+- 👤 User (Profile and Profile Links)
+
+Coming soon:
+
+- 🗞️ Posts
+- 🗨️ Comments
+- 📚 User Libraries
+
 # Installing
 
 Requires python 3.8+
