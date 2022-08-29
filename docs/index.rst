@@ -12,7 +12,7 @@ IMPORTANT
 
 | ⚠️ askitsu is going trough a rewrite to support the new Kitsu GraphQL API
 | Therefore this branch is not currently ready to be used.
-| If you wish to use the library, please install the `master` branch.
+| If you wish to use the library, please install the ``master`` branch.
 
 `Features`
    * askitsu is an async API wrapper written in python for `Kitsu.io <https://kitsu.io/>`_.
@@ -25,6 +25,7 @@ IMPORTANT
 .. tab-set::
 
       .. tab-item:: Supported endpoints
+
          * 🎞️ Anime (Anime, Episodes and Streaming Links)
          * 📖 Manga (Manga and Chapters)
          * 👥 Characters
@@ -32,6 +33,7 @@ IMPORTANT
          * 👤 User (Profile and Profile Links)
 
       .. tab-item:: Coming Soon
+         
          * 🗞️ Posts
          * 🗨️ Comments
          * 📚 User Libraries
