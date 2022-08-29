@@ -14,17 +14,16 @@ askitsu
    * Compatible with discord bots (See examples)
 
 `Supported endpoints`
-* 🎞️ Anime (Anime, Episodes and Streaming Links)
-* 📖 Manga (Manga and Chapters)
-* 👥 Characters
-* 📰 Reviews
-* 👤 User (Profile and Profile Links)
+   * 🎞️ Anime (Anime, Episodes and Streaming Links)
+   * 📖 Manga (Manga and Chapters)
+   * 👥 Characters
+   * 📰 Reviews
+   * 👤 User (Profile and Profile Links)
 
 Coming soon:
-
-* 🗞️ Posts
-* 🗨️ Comments
-* 📚 User Libraries
+   * 🗞️ Posts
+   * 🗨️ Comments
+   * 📚 User Libraries
 
 Introduction
 ==================
