@@ -7,7 +7,8 @@ askitsu
 .. image:: images/light.png
    :class: only-light
 
-# IMPORTANT
+IMPORTANT
+==========
 
 | ⚠️ askitsu is going trough a rewrite to support the new Kitsu GraphQL API
 | Therefore this branch is not currently ready to be used.
@@ -19,7 +20,7 @@ askitsu
    * Written with ``async``/``await`` syntax
    * Compatible with discord bots (See examples)
 
-`Overview of the features``
+`Overview of the features`
 
 .. tab-set::
 
