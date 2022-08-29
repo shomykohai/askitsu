@@ -8,12 +8,14 @@ askitsu
    :class: only-light
 
 `Features`
+===========
    * askitsu is an async API wrapper written in python for `Kitsu.io <https://kitsu.io/>`_.
    * It offers access to various endpoints such :class:`Anime`.
    * Written with ``async``/``await`` syntax
    * Compatible with discord bots (See examples)
 
 `Supported endpoints`
+---------------------
    * 🎞️ Anime (Anime, Episodes and Streaming Links)
    * 📖 Manga (Manga and Chapters)
    * 👥 Characters
