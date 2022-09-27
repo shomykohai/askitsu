@@ -17,7 +17,7 @@ askitsu
 
 ⚠️ askitsu is going trough a rewrite to support the new Kitsu GraphQL API<br>
 Therefore this branch is not currently ready to be used.<br>
-If you wish to use the library, please install the `master` branch.
+If you wish to use the library, please install the `json-api` branch.
 
 # Key features
 

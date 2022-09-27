@@ -12,7 +12,7 @@ askitsu
 
    | ⚠️ askitsu is going trough a rewrite to support the new Kitsu GraphQL API
    | Therefore this branch is not currently ready to be used.
-   | If you wish to use the library, please install the ``master`` branch.
+   | If you wish to use the library, please install the ``json-api`` branch.
 
 `Features`
    * askitsu is an async API wrapper written in python for `Kitsu.io <https://kitsu.io/>`_.

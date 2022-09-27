@@ -32,10 +32,10 @@ To install the library you simply run this command
     :class: seealso
 
     You can get the latest version of the library on GitHub, by installing 
-    The `Graphql` branch with the following command
+    The `master` branch with the following command
 
     .. code:: 
 
-        python3 -m pip install git+https://github.com/ShomyKohai/askitsu.git@Graphql
+        python3 -m pip install git+https://github.com/ShomyKohai/askitsu.git
 
 Next: :doc:`Token <../token>`
