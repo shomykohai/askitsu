@@ -24,14 +24,16 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
+from colorama import Fore, Style # type: ignore
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
 
 from .images import CoverImage, Image
 from ..cache import Cache
+from ..error import InvalidArgument
 from ..http import HTTPClient
-from ..queries import BASE_URL, USERS_BY_ID_SOCIAL
+from ..queries import BASE_URL, USERS_BY_ID_SOCIAL, POSTS_FROM_USER
 
 
 __all__ = ("User", "UserProfile")
@@ -193,6 +195,31 @@ class User:
         except ValueError:
             return None
 
+    async def posts(self, limit: int = 10) -> Optional[List[Post]]:
+        if limit > 2000:
+            raise InvalidArgument(
+                f"{Fore.RED}The argument {Fore.YELLOW}`limit` {Fore.RED}can't exceed {Fore.LIGHTCYAN_EX}2000{Style.RESET_ALL}"
+            )
+        cache_res = await self._cache.get(f"user_{self.slug}_posts")
+        if cache_res:
+            return cache_res.value
+        variables = {"id": self.id, "limit": limit}
+        data = await self._http.post_data(
+            url=BASE_URL, data={"query": POSTS_FROM_USER, "variables": variables}
+        )
+        try:
+            links = [
+                Post(attributes, self)
+                for attributes in data["data"]["findProfileById"]["posts"]["nodes"]
+            ]
+            await self._cache.add(
+                f"user_{self.slug}_posts",
+                links,
+                remove_after=self._cache.expiration,
+            )
+            return links
+        except KeyError:
+            return None
 
 @dataclass()
 class UserProfile:
@@ -220,3 +247,26 @@ class UserProfile:
 
     def __repr__(self) -> str:
         return f"<UserProfile id={self.id} slug={self.user}>"
+
+class Post:
+    """
+    A post made by a :class:`User`
+    """
+    def __init__(self, attributes: dict, author: User) -> None:
+        self._attributes = attributes
+        self.id: int = int(attributes["id"])
+        self.content: str = attributes["content"]
+        self.nsfw: bool = attributes["isNsfw"]
+        self.spoiler: bool = attributes["isSpoiler"]
+        self.likes_count: int = int(attributes["likes"]["totalCount"])
+        self.author = author
+
+    @property
+    def created_at(self) -> Optional[datetime]:
+        """When the user registered to Kitsu"""
+        try:
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
+        except ValueError:
+            return None

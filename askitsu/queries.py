@@ -525,6 +525,7 @@ USER_BY_USERNAME = """
                     }
             }
 """
+
 # ================ MISC ================
 
 TRENDING_ENTRY = """
@@ -629,6 +630,22 @@ TRENDING_ENTRY = """
             }
 """
 
+POSTS_FROM_USER = """
+            query posts($id: ID!, $limit: Int) {
+            findProfileById (id: $id) {
+              posts (first: $limit) {
+                nodes{
+                  id
+                  createdAt
+                  content
+                  isNsfw
+                  isSpoiler
+                  likes(first: 1){
+                    totalCount
+                  }
+                }
+              }
+            }}"""
 # ================ METHODS ================
 
 QUERY_METHODS = {
