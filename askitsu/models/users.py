@@ -33,7 +33,7 @@ from .images import CoverImage, Image
 from ..cache import Cache
 from ..error import InvalidArgument
 from ..http import HTTPClient
-from ..queries import BASE_URL, USERS_BY_ID_SOCIAL, POSTS_FROM_USER
+from ..queries import USERS_BY_ID_SOCIAL, POSTS_FROM_USER
 
 
 __all__ = ("User", "UserProfile")
@@ -169,7 +169,7 @@ class User:
             return cache_res.value
         variables = {"id": self.id}
         data = await self._http.post_data(
-            url=BASE_URL, data={"query": USERS_BY_ID_SOCIAL, "variables": variables}
+            data={"query": USERS_BY_ID_SOCIAL, "variables": variables}
         )
         try:
             links = [
@@ -205,7 +205,7 @@ class User:
             return cache_res.value
         variables = {"id": self.id, "limit": limit}
         data = await self._http.post_data(
-            url=BASE_URL, data={"query": POSTS_FROM_USER, "variables": variables}
+            data={"query": POSTS_FROM_USER, "variables": variables}
         )
         try:
             links = [

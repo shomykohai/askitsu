@@ -36,7 +36,6 @@ from ..queries import (
     ANIME_BY_ID_EPISODES,
     ANIME_BY_ID_REVIEWS,
     ANIME_BY_ID_STREAMLINKS,
-    BASE_URL,
 )
 
 
@@ -270,7 +269,6 @@ class Anime(Entry):
             return cache_res.value
         variables = {"id": self.id}
         data = await self._http.post_data(
-            url=BASE_URL,
             data={"query": ANIME_BY_ID_STREAMLINKS, "variables": variables},
         )
         try:
@@ -292,7 +290,7 @@ class Anime(Entry):
             return cache_res.value
         variables = {"id": self.id}
         data = await self._http.post_data(
-            url=BASE_URL, data={"query": ANIME_BY_ID_CATEGORIES, "variables": variables}
+            data={"query": ANIME_BY_ID_CATEGORIES, "variables": variables}
         )
         categories = [
             Category(attributes)
@@ -312,7 +310,7 @@ class Anime(Entry):
             return cache_res.value
         variables = {"id": self.id, "limit": 100}
         data = await self._http.post_data(
-            url=BASE_URL, data={"query": ANIME_BY_ID_CHARACTERS, "variables": variables}
+            data={"query": ANIME_BY_ID_CHARACTERS, "variables": variables}
         )
         characters = [
             Character(attributes, entry_id=self.id)
@@ -328,7 +326,7 @@ class Anime(Entry):
     async def reviews(self, limit: int = 1) -> List[Review]:
         variables = {"id": self.id, "limit": limit}
         data = await self._http.post_data(
-            url=BASE_URL, data={"query": ANIME_BY_ID_REVIEWS, "variables": variables}
+            data={"query": ANIME_BY_ID_REVIEWS, "variables": variables}
         )
         return [
             Review(self.id, self.entry_type, attributes)
@@ -349,7 +347,7 @@ class Anime(Entry):
             return cache_res.value
         variables = {"id": self.id, "limit": limit}
         data = await self._http.post_data(
-            url=BASE_URL, data={"query": ANIME_BY_ID_EPISODES, "variables": variables}
+            data={"query": ANIME_BY_ID_EPISODES, "variables": variables}
         )
         episodes = [
             Episode(attributes)

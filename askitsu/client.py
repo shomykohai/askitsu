@@ -29,7 +29,6 @@ from typing import Dict, List, Literal, Optional, overload, Type, Union
 from .cache import Cache
 
 from .queries import (
-    BASE_URL,
     QUERY_METHODS,
     ENTRY_ID,
     ENTRY_ID_CHARACTERS,
@@ -108,7 +107,7 @@ class Client:
         variables = {"title": query, "limit": limit}
         query_fetch = ENTRY_TITLE.get(method)
         data = await self.http.post_data(
-            url=BASE_URL, data={"query": query_fetch, "variables": variables}
+            data={"query": query_fetch, "variables": variables}
         )
         if not data["data"][method]:
             return None
@@ -248,7 +247,7 @@ class Client:
             return cache_res.value
         variables = {"name": name}
         data = await self.http.post_data(
-            url=BASE_URL, data={"query": USER_BY_USERNAME, "variables": variables}
+            data={"query": USER_BY_USERNAME, "variables": variables}
         )
         user = User(
             data["data"]["searchProfileByUsername"]["nodes"][0],
@@ -271,7 +270,7 @@ class Client:
         variables = {"id": id}
         query_fetch = ENTRY_ID.get(method)
         data = await self.http.post_data(
-            url=BASE_URL, data={"query": query_fetch, "variables": variables}
+            data={"query": query_fetch, "variables": variables}
         )
         if not data["data"][method]:
             return None
@@ -379,7 +378,7 @@ class Client:
             raise InvalidArgument
         variables = {"media": type_upper, "limit": limit}
         data = await self.http.post_data(
-            url=BASE_URL, data={"query": TRENDING_ENTRY, "variables": variables}
+            data={"query": TRENDING_ENTRY, "variables": variables}
         )
         data_value = data["data"]["globalTrending"]["nodes"]
         return (
@@ -397,7 +396,7 @@ class Client:
         variables = {"id": entry.id, "limit": limit}
         query_fetch = ENTRY_ID_REVIEWS.get(method)
         data = await self.http.post_data(
-            url=BASE_URL, data={"query": query_fetch, "variables": variables}
+            data={"query": query_fetch, "variables": variables}
         )
         if not data["data"][method]:
             return None
@@ -441,7 +440,7 @@ class Client:
         variables = {"id": entry.id, "limit": 100}
         query_fetch = ENTRY_ID_CHARACTERS.get(method)
         data = await self.http.post_data(
-            url=BASE_URL, data={"query": query_fetch, "variables": variables}
+            data={"query": query_fetch, "variables": variables}
         )
         if not data["data"][method]:
             return None
@@ -495,7 +494,7 @@ class Client:
             await self._cache.remove(f"user_{id}")
         variables = {"id": id}
         data = await self.http.post_data(
-            url=BASE_URL, data={"query": USERS_BY_ID, "variables": variables}
+            data={"query": USERS_BY_ID, "variables": variables}
         )
         user = (
             User(data["data"]["findProfileById"], http=self.http, cache=self._cache)
@@ -529,7 +528,7 @@ class Client:
             return True
         variables = {"slug": slug}
         data = await self.http.post_data(
-            url=BASE_URL, data={"query": query, "variables": variables}
+            data={"query": query, "variables": variables}
         )
         if data["data"]["findProfileBySlug"] is not None:
             await self._cache.add(f"user_{slug}", None)

@@ -30,7 +30,6 @@ from .core import Category, Entry, Review
 from ..cache import Cache
 from ..http import HTTPClient
 from ..queries import (
-    BASE_URL,
     MANGA_BY_ID_CATEGORIES,
     MANGA_BY_ID_CHAPTERS,
     MANGA_BY_ID_CHARACTERS,
@@ -232,7 +231,7 @@ class Manga(Entry):
             return cache_res.value
         variables = {"id": self.id, "limit": limit}
         data = await self._http.post_data(
-            url=BASE_URL, data={"query": MANGA_BY_ID_CHAPTERS, "variables": variables}
+            data={"query": MANGA_BY_ID_CHAPTERS, "variables": variables}
         )
         chapters = [
             Chapter(attributes)
@@ -252,7 +251,7 @@ class Manga(Entry):
             return cache_res.value
         variables = {"id": self.id}
         data = await self._http.post_data(
-            url=BASE_URL, data={"query": MANGA_BY_ID_CATEGORIES, "variables": variables}
+            data={"query": MANGA_BY_ID_CATEGORIES, "variables": variables}
         )
         categories = [
             Category(attributes)
@@ -272,7 +271,7 @@ class Manga(Entry):
             return cache_res.value
         variables = {"id": self.id, "limit": 100}
         data = await self._http.post_data(
-            url=BASE_URL, data={"query": MANGA_BY_ID_CHARACTERS, "variables": variables}
+            data={"query": MANGA_BY_ID_CHARACTERS, "variables": variables}
         )
         characters = [
             Character(attributes, entry_id=self.id)
@@ -288,7 +287,7 @@ class Manga(Entry):
     async def reviews(self, limit: int = 1) -> List[Review]:
         variables = {"id": self.id, "limit": limit}
         data = await self._http.post_data(
-            url=BASE_URL, data={"query": MANGA_BY_ID_REVIEWS, "variables": variables}
+            data={"query": MANGA_BY_ID_REVIEWS, "variables": variables}
         )
         return [
             Review(self.id, self.entry_type, attributes)

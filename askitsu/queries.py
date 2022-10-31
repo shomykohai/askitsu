@@ -1,7 +1,5 @@
 # QUERIES FOR KITSU GRAPHQL API
 
-BASE_URL = "https://kitsu.io/api/graphql"
-
 
 # ================ ANIME ================
 
