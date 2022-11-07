@@ -97,7 +97,6 @@ class User:
         "media_reaction",
         "pro",
         "pro_tier",
-        # "url",
         "_attributes",
         "_http",
         "_cache",
@@ -123,7 +122,6 @@ class User:
         self.media_reaction: int = attributes["mediaReactions"]["totalCount"]
         self.pro: bool = True if attributes["proTier"] else False
         self.pro_tier: Optional[str] = attributes["proTier"]
-        # self.url: str = attributes["url"]
 
     def __repr__(self) -> str:
         return f"<User slug='{self.slug}' id={self.id}>"
