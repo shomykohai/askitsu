@@ -132,7 +132,7 @@ class PosterImage(Image):
         try:
             width = get_dimension(size, self._data["views"], value="width")
             height = get_dimension(size, self._data["views"], value="height")
-            return {"width" : width, "height" : height}
+            return {"width": width, "height": height}
         except (KeyError, TypeError):
             return None
 
@@ -165,7 +165,7 @@ class CoverImage(Image):
         self.entry_type = entry_type
 
     @property
-    def medium(self) -> None: #placeholder
+    def medium(self) -> None:  # placeholder
         return None
 
     def dimension(
@@ -174,6 +174,6 @@ class CoverImage(Image):
         try:
             width = get_dimension(size, self._data["views"], value="width")
             height = get_dimension(size, self._data["views"], value="height")
-            return {"width" : width, "height" : height}
+            return {"width": width, "height": height}
         except (KeyError, TypeError):
             return None

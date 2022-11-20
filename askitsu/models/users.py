@@ -24,7 +24,7 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
-from colorama import Fore, Style # type: ignore
+from colorama import Fore, Style  # type: ignore
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
@@ -219,6 +219,7 @@ class User:
         except KeyError:
             return None
 
+
 @dataclass()
 class UserProfile:
     """
@@ -246,10 +247,12 @@ class UserProfile:
     def __repr__(self) -> str:
         return f"<UserProfile id={self.id} slug={self.user}>"
 
+
 class Post:
     """
     A post made by a :class:`User`
     """
+
     def __init__(self, attributes: dict, author: User) -> None:
         self._attributes = attributes
         self.id: int = int(attributes["id"])
