@@ -6,12 +6,12 @@ from . import __version__
 from .cache import Cache
 from .error import HTTPError, InvalidArgument
 from .queries import ENTRY_ID, ENTRY_ID_CHARACTERS, ENTRY_ID_REVIEWS, ENTRY_TITLE
+from .models.character import Character
 
 if TYPE_CHECKING:
     from .models.anime import Anime
-    from .models.character import Character
-    from .models.manga import Manga
     from .models.core import Review
+    from .models.manga import Manga
 
 __all__ = ("HTTPClient",)
 
