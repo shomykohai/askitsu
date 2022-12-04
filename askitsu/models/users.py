@@ -240,7 +240,7 @@ class UserProfile:
     def __init__(self, attributes: dict, user: str) -> None:
         self._attributes = attributes
         self.id: int = int(attributes["id"])
-        # self.name: str = _["attributes"]["name"] #Needs to be re-added (wait for kitsu fix)
+        self.name: str = attributes["site"]["name"]
         self.user: str = user
         self.url: str = attributes["url"]
 

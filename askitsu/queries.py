@@ -460,6 +460,9 @@ USERS_BY_ID_SOCIAL = """
                 nodes {
                     id
                     url
+                    site{
+                        name
+                    }
                 }
                 }
             }
