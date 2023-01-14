@@ -57,7 +57,7 @@ class Cache:
         return self.__sizeof__()
 
     @property
-    def cache(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return self.__cache
 
     async def get(self, name: str) -> Optional[CacheResult]:

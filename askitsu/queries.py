@@ -527,7 +527,7 @@ USER_BY_USERNAME = """
             }
 """
 
-USER_LIBRARY =  """
+USER_LIBRARY = """
             query Library ($media: MediaTypeEnum!, $id: ID!, $limit: Int){
                 findProfileById(id: $id){
                 library{

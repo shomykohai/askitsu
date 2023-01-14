@@ -7,6 +7,7 @@ from .cache import Cache
 from .error import HTTPError, InvalidArgument
 from .queries import ENTRY_ID, ENTRY_ID_CHARACTERS, ENTRY_ID_REVIEWS, ENTRY_TITLE
 from .models.character import Character
+from .models.enums import Fetchable
 
 if TYPE_CHECKING:
     from .models.anime import Anime
@@ -50,12 +51,16 @@ class HTTPClient:
             else:
                 raise HTTPError("Something went wrong.", response.status)
 
-    async def _search_entry(self, type: str, query: str, limit: int, method: str):
-        cache_res = await self._cache.get(f"{type}_{query.replace(' ', '_')}_{limit}")
+    async def _search_entry(
+        self, entry_type: Fetchable, query: str, limit: int, method: str
+    ):
+        cache_res = await self._cache.get(
+            f"{entry_type.value}_{query.replace(' ', '_')}_{limit}"
+        )
         if cache_res:
             return cache_res.value if len(cache_res.value) > 1 else cache_res.value[0]
         try:
-            entry = self._entries[type]
+            entry = self._entries[entry_type.value]
         except (KeyError, TypeError):
             raise InvalidArgument
         variables = {"title": query, "limit": limit}
@@ -68,21 +73,18 @@ class HTTPClient:
             for attributes in data["data"][method]["nodes"]
         ]
         await self._cache.add(
-            f"{type}_{query.replace(' ', '_')}_{limit}",
+            f"{entry_type.value}_{query.replace(' ', '_')}_{limit}",
             fetched,
             remove_after=self._cache_expiration,
         )
         return fetched if len(fetched) > 1 else fetched[0]
 
-   
-    async def _get_entry_fetch(
-        self, type: str, id: int, method: str
-    ):
-        cache_res = await self._cache.get(f"{type}_{id}")
+    async def _get_entry_fetch(self, entry_type: Fetchable, id: int, method: str):
+        cache_res = await self._cache.get(f"{entry_type.value}_{id}")
         if cache_res:
             return cache_res.value
         try:
-            entry = self._entries[type]
+            entry = self._entries[entry_type.value]
         except (KeyError, TypeError):
             raise InvalidArgument
         variables = {"id": id}
@@ -93,7 +95,7 @@ class HTTPClient:
         fetched_entry = entry(
             attributes=data["data"][method], http=self, cache=self._cache
         )
-        await self._cache.add(f"{type}_{id}", fetched_entry)
+        await self._cache.add(f"{entry_type.value}_{id}", fetched_entry)
         return fetched_entry
 
     async def _get_reviews_fetch(

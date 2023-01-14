@@ -26,14 +26,9 @@ import aiohttp
 from colorama import Fore, Style  # type: ignore
 from typing import Dict, List, Literal, Optional, overload, Type, Union
 
-from .cache import Cache
 
 from .queries import (
     QUERY_METHODS,
-    ENTRY_ID,
-    ENTRY_ID_CHARACTERS,
-    ENTRY_ID_REVIEWS,
-    ENTRY_TITLE,
     TRENDING_ENTRY,
     USERS_BY_ID,
     USER_BY_USERNAME,
@@ -43,6 +38,7 @@ from .http import HTTPClient
 from .models.anime import Anime
 from .models.character import Character
 from .models.core import Review
+from .models.enums import Entries, Media, Fetchable
 from .models.manga import Manga
 from .models.users import User
 
@@ -98,39 +94,39 @@ class Client:
         return self.http.token
 
     @overload
-    async def search(self, type: Literal["anime"], query: str) -> Optional[Anime]:
+    async def search(self, type: Literal[Entries.ANIME], query: str) -> Optional[Anime]:
         ...
 
     @overload
     async def search(
-        self, type: Literal["anime"], query: str, limit: int
+        self, type: Literal[Entries.ANIME], query: str, limit: int
     ) -> Optional[List[Anime]]:
         ...
 
     @overload
-    async def search(self, type: Literal["manga"], query: str) -> Optional[Manga]:
+    async def search(self, type: Literal[Entries.MANGA], query: str) -> Optional[Manga]:
         ...
 
     @overload
     async def search(
-        self, type: Literal["manga"], query: str, limit: int
+        self, type: Literal[Entries.MANGA], query: str, limit: int
     ) -> Optional[List[Manga]]:
         ...
 
     @overload
     async def search(
-        self, type: Literal["characters"], query: str
+        self, type: Literal[Entries.CHARACTER], query: str
     ) -> Optional[Character]:
         ...
 
     @overload
     async def search(
-        self, type: Literal["characters"], query: str, limit: int
+        self, type: Literal[Entries.CHARACTER], query: str, limit: int
     ) -> Optional[List[Character]]:
         ...
 
     async def search(
-        self, type: Literal["anime", "manga", "characters"], query: str, limit: int = 1
+        self, type: Fetchable, query: str, limit: int = 1
     ) -> Optional[
         Union[Anime, List[Anime], Manga, List[Manga], Character, List[Character]]
     ]:
@@ -148,14 +144,13 @@ class Client:
             Limit the search to a specific number of results
 
         """
-        type_lower = type.lower()
         try:
-            method = QUERY_METHODS[f"{type_lower}_search"]
+            method = QUERY_METHODS[f"{type.value}_search"]
         except (KeyError, TypeError):
             raise InvalidArgument
         else:
             return await self.http._search_entry(
-                type=type_lower, query=query, limit=limit, method=method
+                entry_type=type, query=query, limit=limit, method=method
             )
 
     @overload
@@ -180,7 +175,7 @@ class Client:
         limit: :class:`int`
             Limit the search to a specific number of results
         """
-        return await self.search("anime", query=query, limit=limit)
+        return await self.search(Entries.ANIME, query=query, limit=limit)
 
     @overload
     async def search_manga(self, query: str) -> Optional[Manga]:
@@ -204,7 +199,7 @@ class Client:
         limit: :class:`int`
             Limit the search to a specific number of results
         """
-        return await self.search("manga", query=query, limit=limit)
+        return await self.search(Entries.MANGA, query=query, limit=limit)
 
     #############################
     #    SEARCH CHARACTERS ?    #
@@ -235,19 +230,19 @@ class Client:
         return user
 
     @overload
-    async def get_entry(self, type: Literal["anime"], id: int) -> Anime:
+    async def get_entry(self, type: Literal[Entries.ANIME], id: int) -> Anime:
         ...
 
     @overload
-    async def get_entry(self, type: Literal["manga"], id: int) -> Manga:
+    async def get_entry(self, type: Literal[Entries.MANGA], id: int) -> Manga:
         ...
 
     @overload
-    async def get_entry(self, type: Literal["characters"], id: int) -> Character:
+    async def get_entry(self, type: Literal[Entries.CHARACTER], id: int) -> Character:
         ...
 
     async def get_entry(
-        self, type: Literal["anime", "manga", "characters"], id: int
+        self, type: Fetchable, id: int
     ) -> Optional[Union[Anime, Manga, Character]]:
         """|coro|
 
@@ -260,14 +255,13 @@ class Client:
         id: :class:`int`
             ID of the media
         """
-        type_lower = type.lower()
         try:
-            method = QUERY_METHODS[f"{type_lower}_id"]
+            method = QUERY_METHODS[f"{type.value}_id"]
         except (KeyError, TypeError):
             raise InvalidArgument
         else:
             return await self.http._get_entry_fetch(
-                type=type_lower, id=id, method=method
+                entry_type=type, id=id, method=method
             )
 
     async def get_anime_entry(self, id: int) -> Anime:
@@ -280,7 +274,7 @@ class Client:
         id: :class:`int`
             ID of the anime
         """
-        return await self.get_entry("anime", id=id)
+        return await self.get_entry(Entries.ANIME, id=id)
 
     async def get_manga_entry(self, id: int) -> Manga:
         """|coro|
@@ -294,22 +288,22 @@ class Client:
         id: :class:`int`
             ID of the manga
         """
-        return await self.get_entry("manga", id=id)
+        return await self.get_entry(Entries.MANGA, id=id)
 
     @overload
     async def get_trending_entry(
-        self, type: Literal["anime"], limit: int = ...
+        self, type: Literal[Entries.ANIME], limit: int = ...
     ) -> List[Anime]:
         ...
 
     @overload
     async def get_trending_entry(
-        self, type: Literal["manga"], limit: int = ...
+        self, type: Literal[Entries.MANGA], limit: int = ...
     ) -> List[Manga]:
         ...
 
     async def get_trending_entry(
-        self, type: Literal["anime", "manga"], limit: int = 10
+        self, type: Media, limit: int = 10
     ) -> Optional[Union[List[Anime], List[Manga]]]:
         """|coro|
 
@@ -322,7 +316,7 @@ class Client:
         entry: Union[:class:`Anime`, :class:`Manga`]
             Entry to fetch its trending
         """
-        type_upper = type.upper()
+        type_upper = type.value.upper()
         if type_upper not in ("ANIME", "MANGA"):
             raise InvalidArgument(
                 f"{Fore.RED}{type_upper.capitalize} cannot be fetched in trending list\n"

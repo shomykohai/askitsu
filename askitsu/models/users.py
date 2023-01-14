@@ -30,7 +30,7 @@ from datetime import datetime
 from typing import List, Optional, Union
 
 from .anime import Anime
-from .enums import MediaType, LibraryEntryStatus
+from .enums import Entries, MediaType, LibraryEntryStatus
 from .images import CoverImage, Image
 from .manga import Manga
 from ..cache import Cache
@@ -238,28 +238,30 @@ class User:
         except KeyError:
             return None
 
-    async def library(self, media: MediaType, filter: LibraryEntryStatus = None, limit: int = 10) -> Optional[List[LibraryEntry]]:
+    async def library(
+        self, media: MediaType, filter: LibraryEntryStatus = None, limit: int = 10
+    ) -> Optional[List[LibraryEntry]]:
         if limit > 2000:
             raise InvalidArgument(
                 f"{Fore.RED}The argument {Fore.YELLOW}`limit` {Fore.RED}can't exceed {Fore.LIGHTCYAN_EX}2000{Style.RESET_ALL}"
             )
-        cache_res = await self._cache.get(f"user_{self.slug}_library_{media.value}")
+        cache_res = await self._cache.get(
+            f"user_{self.slug}_library_{media.value}_{limit}_{filter.value if filter else 'ALL'}"
+        )
         if cache_res:
             return cache_res.value
-        variables = {"media" : str(media.value).upper(), "id": self.id, "limit": limit}
+        variables = {"media": str(media.value).upper(), "id": self.id, "limit": limit}
         query = USER_LIBRARY % f'{f", status: {filter.value}" if filter else ""}'
-        print(USER_LIBRARY)
-        data = await self._http.post_data(
-            data={"query": query, "variables": variables}
-        )
-        print(data)
+        data = await self._http.post_data(data={"query": query, "variables": variables})
         try:
             entries = [
                 LibraryEntry(attributes, self, self._http)
-                for attributes in data["data"]["findProfileById"]["library"]["all"]["nodes"]
+                for attributes in data["data"]["findProfileById"]["library"]["all"][
+                    "nodes"
+                ]
             ]
             await self._cache.add(
-                f"user_{self.slug}_library_{media.value}",
+                f"user_{self.slug}_library_{media.value}_{limit}_{filter.value if filter else 'ALL'}",
                 entries,
                 remove_after=self._cache.expiration,
             )
@@ -329,7 +331,7 @@ class LibraryEntry:
     def __init__(self, attributes: dict, user: User, http: HTTPClient) -> None:
         self.__http = http
         self._attributes = attributes
-        self.media_type: str= attributes["media"]["type"]
+        self.media_type: str = attributes["media"]["type"]
         self.media_id: int = attributes["media"]["id"]
         self.id = int(attributes["id"])
         self.user: User = user
@@ -347,7 +349,6 @@ class LibraryEntry:
 
     @property
     async def media(self) -> Union[Anime, Manga]:
-        print(self.media_type)
         if self.media_type == MediaType.ANIME.value.capitalize():
             query = "findAnimeById"
         elif self.media_type == MediaType.MANGA.value.capitalize():
@@ -355,9 +356,10 @@ class LibraryEntry:
         else:
             raise NotFound
         return await self.__http._get_entry_fetch(
-            self.media_type.lower(),
+            # Return media type as value of enum
+            Entries(self.media_type.lower()),
             self.media_id,
-            query
+            query,
         )
 
     @property
@@ -369,7 +371,7 @@ class LibraryEntry:
             )
         except ValueError:
             return None
-    
+
     @property
     def progressed_at(self) -> Optional[datetime]:
         """When the library entry got a progress update"""
@@ -379,7 +381,7 @@ class LibraryEntry:
             )
         except ValueError:
             return None
-    
+
     @property
     def finished_at(self) -> Optional[datetime]:
         """When the library entry got finished"""
