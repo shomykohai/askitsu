@@ -31,12 +31,12 @@ askitsu
          * 👥 Characters
          * 📰 Reviews
          * 👤 User (Profile and Profile Links)
+         * 🗞️ Posts
+         * 📚 User Libraries
 
       .. tab-item:: Coming Soon
 
-         * 🗞️ Posts
          * 🗨️ Comments
-         * 📚 User Libraries
 
 Introduction
 ==================

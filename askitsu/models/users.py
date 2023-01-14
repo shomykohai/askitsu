@@ -39,7 +39,7 @@ from ..http import HTTPClient
 from ..queries import USERS_BY_ID_SOCIAL, USER_LIBRARY, POSTS_FROM_USER
 
 
-__all__ = ("User", "UserProfile")
+__all__ = ("User", "UserProfile", "Post", "LibraryEntry")
 
 
 class User:
