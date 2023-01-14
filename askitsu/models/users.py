@@ -367,7 +367,7 @@ class LibraryEntry:
         The ID of the linked media
     nsfw: :class:`bool`
         If the library entry is NSFW or not
-    notes: Optional[class:`str`]
+    notes: Optional[:class:`str`]
         Additional notes made by the user
     """
 

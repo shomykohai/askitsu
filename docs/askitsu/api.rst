@@ -123,16 +123,19 @@ Entries
 --------
 .. autoclass:: askitsu.Entries
    :members:
+   :undoc-members:
 
 MediaType
 ----------
 .. autoclass:: askitsu.MediaType
    :members:
+   :undoc-members:
 
 LibraryEntryStatus
 -------------------
 .. autoclass:: askitsu.LibraryEntryStatus
    :members:
+   :undoc-members:
 
 Errors
 ==============
