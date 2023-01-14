@@ -360,7 +360,7 @@ class LibraryEntry:
     private: :class:`bool`
         If the library entry is private
     progress: :class:`int`
-        Progress of the user in the linked media 
+        Progress of the user in the linked media
     media_type: :class:`str`
         The type of the linked media: `Anime` or `Manga`
     media_id: :class:`int`

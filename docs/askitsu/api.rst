@@ -62,6 +62,16 @@ UserProfile
 .. autoclass:: askitsu.UserProfile
    :members:
 
+Post
+--------------------
+.. autoclass:: askitsu.Post
+   :members:
+
+LibraryEntry
+--------------------
+.. autoclass:: askitsu.LibraryEntry
+   :members:
+
 Misc
 ================
 
@@ -104,6 +114,24 @@ CoverImage
 PosterImage
 ---------------------
 .. autoclass:: askitsu.PosterImage
+   :members:
+
+Enums
+==============
+
+Entries
+--------
+.. autoclass:: askitsu.Entries
+   :members:
+
+MediaType
+----------
+.. autoclass:: askitsu.MediaType
+   :members:
+
+LibraryEntryStatus
+-------------------
+.. autoclass:: askitsu.LibraryEntryStatus
    :members:
 
 Errors
