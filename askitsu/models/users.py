@@ -27,13 +27,16 @@ from __future__ import annotations
 from colorama import Fore, Style  # type: ignore
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 
+from .anime import Anime
+from .enums import MediaType, LibraryEntryStatus
 from .images import CoverImage, Image
+from .manga import Manga
 from ..cache import Cache
-from ..error import InvalidArgument
+from ..error import InvalidArgument, NotFound
 from ..http import HTTPClient
-from ..queries import USERS_BY_ID_SOCIAL, POSTS_FROM_USER
+from ..queries import USERS_BY_ID_SOCIAL, USER_LIBRARY, POSTS_FROM_USER
 
 
 __all__ = ("User", "UserProfile")
@@ -183,6 +186,22 @@ class User:
         except KeyError:
             return None
 
+    async def library_entries_count(self, media: MediaType) -> int:
+        query = """
+            query library_entries_count ($id: ID!, $media: MediaTypeEnum!) {
+                findProfileById(id: $id) {
+                    library{
+                        all(mediaType: $media, first: 2000){
+                            totalCount
+                        }
+                    }
+                }
+            }
+        """
+        variables = {"id": self.id, "media": str(media.value).upper()}
+        data = await self._http.post_data(data={"query": query, "variables": variables})
+        return data["data"]["findProfileById"]["library"]["all"].get("totalCount", 0)
+
     @property
     def created_at(self) -> Optional[datetime]:
         """When the user registered to Kitsu"""
@@ -206,16 +225,45 @@ class User:
             data={"query": POSTS_FROM_USER, "variables": variables}
         )
         try:
-            links = [
+            posts = [
                 Post(attributes, self)
                 for attributes in data["data"]["findProfileById"]["posts"]["nodes"]
             ]
             await self._cache.add(
                 f"user_{self.slug}_posts",
-                links,
+                posts,
                 remove_after=self._cache.expiration,
             )
-            return links
+            return posts
+        except KeyError:
+            return None
+
+    async def library(self, media: MediaType, filter: LibraryEntryStatus = None, limit: int = 10) -> Optional[List[LibraryEntry]]:
+        if limit > 2000:
+            raise InvalidArgument(
+                f"{Fore.RED}The argument {Fore.YELLOW}`limit` {Fore.RED}can't exceed {Fore.LIGHTCYAN_EX}2000{Style.RESET_ALL}"
+            )
+        cache_res = await self._cache.get(f"user_{self.slug}_library_{media.value}")
+        if cache_res:
+            return cache_res.value
+        variables = {"media" : str(media.value).upper(), "id": self.id, "limit": limit}
+        query = USER_LIBRARY % f'{f", status: {filter.value}" if filter else ""}'
+        print(USER_LIBRARY)
+        data = await self._http.post_data(
+            data={"query": query, "variables": variables}
+        )
+        print(data)
+        try:
+            entries = [
+                LibraryEntry(attributes, self, self._http)
+                for attributes in data["data"]["findProfileById"]["library"]["all"]["nodes"]
+            ]
+            await self._cache.add(
+                f"user_{self.slug}_library_{media.value}",
+                entries,
+                remove_after=self._cache.expiration,
+            )
+            return entries
         except KeyError:
             return None
 
@@ -268,6 +316,76 @@ class Post:
         try:
             return datetime.strptime(
                 self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
+        except ValueError:
+            return None
+
+
+class LibraryEntry:
+    """
+    A library entry that belongs to a :class:`User`
+    """
+
+    def __init__(self, attributes: dict, user: User, http: HTTPClient) -> None:
+        self.__http = http
+        self._attributes = attributes
+        self.media_type: str= attributes["media"]["type"]
+        self.media_id: int = attributes["media"]["id"]
+        self.id = int(attributes["id"])
+        self.user: User = user
+        self.progress: int = int(attributes["progress"])
+        self.nsfw: bool = attributes["nsfw"]
+        self.status: LibraryEntryStatus = attributes["status"]
+        self.reconsume_count: int = attributes["reconsumeCount"]
+        self.reconsuming: bool = attributes["reconsuming"]
+        self.rating: Optional[int] = attributes["rating"]
+        self.notes: Optional[str] = attributes["notes"]
+        self.private: bool = attributes["private"]
+
+    def __repr__(self) -> str:
+        return f"<LibraryEntry id={self.id} type={self.media_type} media_id={self.media_id} user={self.user}>"
+
+    @property
+    async def media(self) -> Union[Anime, Manga]:
+        print(self.media_type)
+        if self.media_type == MediaType.ANIME.value.capitalize():
+            query = "findAnimeById"
+        elif self.media_type == MediaType.MANGA.value.capitalize():
+            query = "findMangaById"
+        else:
+            raise NotFound
+        return await self.__http._get_entry_fetch(
+            self.media_type.lower(),
+            self.media_id,
+            query
+        )
+
+    @property
+    def created_at(self) -> Optional[datetime]:
+        """When the library entry got created"""
+        try:
+            return datetime.strptime(
+                self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
+        except ValueError:
+            return None
+    
+    @property
+    def progressed_at(self) -> Optional[datetime]:
+        """When the library entry got a progress update"""
+        try:
+            return datetime.strptime(
+                self._attributes["progressedAt"], "%Y-%m-%dT%H:%M:%SZ"
+            )
+        except ValueError:
+            return None
+    
+    @property
+    def finished_at(self) -> Optional[datetime]:
+        """When the library entry got finished"""
+        try:
+            return datetime.strptime(
+                self._attributes["finishedAt"], "%Y-%m-%dT%H:%M:%SZ"
             )
         except ValueError:
             return None

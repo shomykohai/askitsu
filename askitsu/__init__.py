@@ -23,6 +23,7 @@ from .error import *
 from .models.anime import *
 from .models.character import *
 from .models.core import *
+from .models.enums import *
 from .models.images import *
 from .models.manga import *
 from .models.users import *

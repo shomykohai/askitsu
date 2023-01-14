@@ -527,6 +527,35 @@ USER_BY_USERNAME = """
             }
 """
 
+USER_LIBRARY =  """
+            query Library ($media: MediaTypeEnum!, $id: ID!, $limit: Int){
+                findProfileById(id: $id){
+                library{
+                    all(mediaType:$media, first: $limit%s){
+                    nodes{
+                        createdAt
+                        progressedAt
+                        finishedAt
+                        media {
+                        id
+                        type
+                        }
+                        id
+                        nsfw
+                        status
+                        reconsuming
+                        reconsumeCount
+                        rating
+                        notes
+                        private
+                        progress
+                    }
+                }
+                }
+            }
+            }
+"""
+
 # ================ MISC ================
 
 TRENDING_ENTRY = """

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import aiohttp
-from typing import Any, Dict, List, Optional, Type, TYPE_CHECKING, Union
+from typing import Any, List, Optional, overload, TYPE_CHECKING, Union
 from . import __version__
 from .cache import Cache
 from .error import HTTPError, InvalidArgument
@@ -74,9 +74,10 @@ class HTTPClient:
         )
         return fetched if len(fetched) > 1 else fetched[0]
 
+   
     async def _get_entry_fetch(
         self, type: str, id: int, method: str
-    ) -> Optional[Union[Anime, Manga, Character]]:
+    ):
         cache_res = await self._cache.get(f"{type}_{id}")
         if cache_res:
             return cache_res.value
