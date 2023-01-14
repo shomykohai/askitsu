@@ -136,7 +136,7 @@ class Client:
 
         Parameters
         -----------
-        type: Literal["anime", "manga", "characters"]
+        type: :class:`Entries`
             The type of entry to search
         query: :class:`str`
             Represents the search query
@@ -250,7 +250,7 @@ class Client:
 
         Parameters
         -----------
-        type: :class:`str`
+        type: :class:`Entries`
             The type of media to fetch
         id: :class:`int`
             ID of the media
@@ -341,7 +341,7 @@ class Client:
         )
 
     async def get_reviews(
-        self, entry: Union[Manga, Anime], limit: int = 1
+        self, entry: Union[Anime, Manga], limit: int = 1
     ) -> Optional[List[Review]]:
         """|coro|
 
@@ -351,7 +351,7 @@ class Client:
 
         Parameters
         -----------
-        entry: Union[Manga, Anime]
+        entry: Union[:class:`Anime`, :class:`Manga`]
             A valid entry to get reviews (Can also be :class:`Object`)
         limit: :class:`int`
             Limit to reviews to fetch

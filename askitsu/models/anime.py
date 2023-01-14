@@ -126,7 +126,7 @@ class Anime(Entry):
     id: :class:`int`
         ID of the anime
     status: :class:`str`
-        Actual status of the given anime (Ex. "finished"
+        Actual status of the given anime (E.g. "finished"
     started_at: Optional[:class:`datetime`]
         Date when the anime started
     ended_at: Optional[:class:`datetime`]

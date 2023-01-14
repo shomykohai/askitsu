@@ -301,6 +301,21 @@ class UserProfile:
 class Post:
     """
     A post made by a :class:`User`
+
+    Attributes
+    -----------
+    id: :class:`int`
+        ID of the post
+    content: :class:`str`
+        Formatted content of the post
+    nsfw: :class:`bool`
+        If the post is marked as NSFW by the author
+    likes_count: :class:`int`
+        Number of likes in the post
+    spoiler: :class:`bool`
+        If the post is marked as spoiler by the author
+    author: :class:`User`
+        The author of the Post
     """
 
     def __init__(self, attributes: dict, author: User) -> None:
@@ -326,6 +341,34 @@ class Post:
 class LibraryEntry:
     """
     A library entry that belongs to a :class:`User`
+
+    Attributes
+    -----------
+    id: :class:`int`
+        ID of the LibraryEntry
+    status: :class:`LibraryEntryStatus`
+        Status of the Media in the library entry
+    user: :class:`User`
+        User which the library entry belongs to
+    reconsume_count: :class:`int`
+        Number of reconsume of a media
+        (E.g. Rewatch in `Anime`)
+    reconsuming: :class:`bool`
+        If the user is currently reconsuming the Media
+    rating: Optional[:class:`int`]
+        Rating of the Media given by the user
+    private: :class:`bool`
+        If the library entry is private
+    progress: :class:`int`
+        Progress of the user in the linked media 
+    media_type: :class:`str`
+        The type of the linked media: `Anime` or `Manga`
+    media_id: :class:`int`
+        The ID of the linked media
+    nsfw: :class:`bool`
+        If the library entry is NSFW or not
+    notes: Optional[class:`str`]
+        Additional notes made by the user
     """
 
     def __init__(self, attributes: dict, user: User, http: HTTPClient) -> None:
@@ -349,6 +392,7 @@ class LibraryEntry:
 
     @property
     async def media(self) -> Union[Anime, Manga]:
+        """The linked media"""
         if self.media_type == MediaType.ANIME.value.capitalize():
             query = "findAnimeById"
         elif self.media_type == MediaType.MANGA.value.capitalize():
