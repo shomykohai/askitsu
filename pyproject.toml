@@ -32,6 +32,7 @@ include = [
 "Bug Tracker" = "https://github.com/ShomyKohai/askitsu/issues"
 
 [tool.poetry.dependencies]
+python = "^3.8"
 aiohttp = "^3.6.0"
 colorama = "^0.4.6"
 
