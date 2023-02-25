@@ -35,7 +35,7 @@ setup(
     author="ShomyKohai",
     version=version,
     license="MIT",
-    description="An async python wrapper Kitsu.io API",
+    description="An async API wrapper for Kitsu.io",
     long_description=readme,
     long_description_content_type="text/markdown",
     packages=packages,

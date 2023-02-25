@@ -18,11 +18,7 @@ askitsu
 💡 UPDATE:<br>
 The master branch is now in a status where it can be used.<br>
 For any issue you may encounter, please make a new [issue](https://github.com/ShomyKohai/askitsu/issues).<br>
-You can check the [projects](https://github.com/ShomyKohai/askitsu/projects?type=classic) tab to see current proggress.
-
-⚠️ askitsu is going trough a rewrite to support the new Kitsu GraphQL API<br>
-Therefore this branch is not currently ready to be used.<br>
-If you wish to use the library, please install the `json-api` branch.
+You can check the [projects](https://github.com/ShomyKohai/askitsu/projects?type=classic) tab to see current progress.
 
 # Key features
 

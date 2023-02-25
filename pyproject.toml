@@ -1,3 +1,38 @@
+[tool.poetry]
+name = "askitsu"
+version = "1.0.0"
+description = "An async API wrapper for Kitsu.io"
+authors = ["ShomyKohai"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/ShomyKohai/askitsu"
+keywords = ["kitsu", "kitsu api", "kitsu.io", "async"]
+classifiers = [
+	"Development Status :: 3 - Alpha",
+	"License :: OSI Approved :: MIT License",
+	"Intended Audience :: Developers",
+	"Natural Language :: English",
+	"Operating System :: OS Independent",
+	"Programming Language :: Python :: 3.8",
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+	"Topic :: Internet",
+	"Topic :: Software Development :: Libraries",
+	"Topic :: Software Development :: Libraries :: Python Modules",
+	"Topic :: Utilities",
+	"Typing :: Typed",
+]
+
 include = [
 	"LICENSE",
 ]
+
+[tool.poetry.urls]
+"Documentation" = "https://askitsu.rtfd.org/"
+"Bug Tracker" = "https://github.com/ShomyKohai/askitsu/issues"
+
+[tool.poetry.dependencies]
+aiohttp = "^3.6.0"
+colorama = "^0.4.6"
+
+
