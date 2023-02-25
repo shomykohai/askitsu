@@ -201,10 +201,6 @@ class Client:
         """
         return await self.search(Entries.MANGA, query=query, limit=limit)
 
-    #############################
-    #    SEARCH CHARACTERS ?    #
-    #############################
-
     async def search_user(self, name: str) -> Optional[User]:
         """
         Fetch a user by their username
