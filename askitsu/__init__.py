@@ -14,7 +14,7 @@ __title__ = "askitsu"
 __author__ = "ShomyKohai"
 __license__ = "MIT"
 __copyright__ = "Copyright 2022-present ShomyKohai"
-__version__ = "0.4.1"
+__version__ = "1.0.0"
 
 # __all__
 
