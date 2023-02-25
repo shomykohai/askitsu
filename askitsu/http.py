@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import aiohttp
+import logging
 from typing import Any, List, Optional, overload, TYPE_CHECKING, Union
 from . import __version__
 from .cache import Cache
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
     from .models.manga import Manga
 
 __all__ = ("HTTPClient",)
-
+__log__ = logging.getLogger(__name__)
 
 class HTTPClient:
     def __init__(
@@ -47,6 +48,9 @@ class HTTPClient:
             url="https://kitsu.io/api/graphql", json=data, headers=self.__headers
         ) as response:
             if response.status == 200:
+                __log__.info(
+                    "Sent a request to Kitsu API"
+                )
                 return await response.json()
             else:
                 raise HTTPError("Something went wrong.", response.status)
@@ -66,6 +70,7 @@ class HTTPClient:
         variables = {"title": query, "limit": limit}
         query_fetch = ENTRY_TITLE.get(method)
         data = await self.post_data(data={"query": query_fetch, "variables": variables})
+        __log__.info(f"Sent request to Kitsu API: {method}")
         if not data["data"][method]:
             return None
         fetched = [
@@ -77,6 +82,7 @@ class HTTPClient:
             fetched,
             remove_after=self._cache_expiration,
         )
+        __log__.debug(f"Added {entry_type.value}_{query.replace(' ', '_')}_{limit} to cache")
         return fetched if len(fetched) > 1 else fetched[0]
 
     async def _get_entry_fetch(self, entry_type: Fetchable, id: int, method: str):
@@ -96,6 +102,7 @@ class HTTPClient:
             attributes=data["data"][method], http=self, cache=self._cache
         )
         await self._cache.add(f"{entry_type.value}_{id}", fetched_entry)
+        __log__.debug(f"Added {entry_type.value}_{id} to cache")
         return fetched_entry
 
     async def _get_reviews_fetch(
