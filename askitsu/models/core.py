@@ -193,7 +193,7 @@ class Entry(ABC):
         self.status: str = attributes["status"]
         self.slug: str = attributes["slug"]
         self.canonical_title: str = attributes["titles"]["canonical"]
-        self.description: str = attributes["description"]["en"]
+        self.description: Optional[str] = attributes["description"].get("en", None)
         self.rating_rank = attributes["averageRatingRank"]
         self.popularity_rank = attributes["userCountRank"]
         self.rating: float = attributes["averageRating"]
