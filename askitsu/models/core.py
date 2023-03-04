@@ -205,7 +205,7 @@ class Entry(ABC):
             return datetime.strptime(
                 self._attributes["createdAt"], "%Y-%m-%dT%H:%M:%SZ"
             )
-        except ValueError:
+        except (ValueError, TypeError):
             return None
 
     @property
@@ -214,21 +214,21 @@ class Entry(ABC):
             return datetime.strptime(
                 self._attributes["updatedAt"], "%Y-%m-%dT%H:%M:%SZ"
             )
-        except ValueError:
+        except (ValueError, TypeError):
             return None
 
     @property
     def started_at(self) -> Optional[datetime]:
         try:
             return datetime.strptime(self._attributes["startDate"], "%Y-%m-%d")
-        except ValueError:
+        except (ValueError, TypeError):
             return None
 
     @property
     def ended_at(self) -> Optional[datetime]:
         try:
             return datetime.strptime(self._attributes["endDate"], "%Y-%m-%d")
-        except ValueError:
+        except (ValueError, TypeError):
             return None
 
     @property
