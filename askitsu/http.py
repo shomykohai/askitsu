@@ -31,7 +31,7 @@ class HTTPClient:
         self.__headers = {
             "Accept": "application/vnd.api+json",
             "Content-Type": "application/vnd.api+json",
-            "User-Agent": f"askitsu (https://github.com/ShomyKohai/askitsu {__version__})",
+            "User-Agent": f"askitsu (https://github.com/shomykohai/askitsu {__version__})",
             "Authorization": self.__authorization,
         }
         self._entries = entries
@@ -45,7 +45,7 @@ class HTTPClient:
 
     async def post_data(self, data: dict) -> Any:
         async with self.__session.post(
-            url="https://kitsu.io/api/graphql", json=data, headers=self.__headers
+            url="https://kitsu.app/api/graphql", json=data, headers=self.__headers
         ) as response:
             if response.status == 200:
                 __log__.info(
